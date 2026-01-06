@@ -1,0 +1,326 @@
+---
+alwaysApply: true
+---
+
+# Lead Management CRM - Cursor AI Rules
+
+## SQL Server Connection string
+
+- Server name : LAPTOP-IVUUMPKG\SQLEXPRESS
+
+## Core Execution Rules
+
+### Rule 1: Theme Enforcement
+
+- MANDATORY: All frontend UI elements, components, and pages MUST strictly adhere to the styles defined in the 'docs\modern_soft_theme_implementation.md' and the custom CSS/SCSS files created in Phase 1.4 in TODO.md.
+- Use the specified color palette, typography, spacing, and component specifications (Sidebar, Data Tables, Buttons, Forms) defined in theme.css, bootstrap-override.scss, and components.css.
+- Ensure all React-Bootstrap components are styled using the overridden variables and custom classes.
+- Prioritize the theme's design principles, such as Generous Padding, Rounded Corners Everywhere, and Subtle Shadows with Teal Tint.
+
+### Rule 2: Sequential Execution
+
+- Complete tasks in the EXACT order listed in the TODO document
+- Do NOT skip ahead to later tasks
+- Do NOT work on multiple phases simultaneously
+- Always follow the task order strictly
+
+### Rule 3: User Confirmation
+
+- Before starting ANY task or subtask, ask the user for confirmation
+- Use this format: "Ready to start [Phase X.Y - Task Name]? (yes/no)"
+- Wait for user response before proceeding
+- Do not assume permission to start a task
+
+### Rule 4: Completion Notification
+
+- After completing each task, mark it with ✅ in the TODO document
+- Notify the user with this format: "✅ Completed: [Phase X.Y - Task Name]. Ready for next task?"
+- Provide a brief summary of what was accomplished
+- Ask if the user wants to proceed to the next task
+
+### Rule 5: Error Handling
+
+- If a task fails, STOP all execution immediately
+- Do NOT attempt to continue to the next task
+- Notify the user with detailed error information including:
+  - Which task failed (Phase X.Y - Task Name)
+  - The exact error message
+  - The file(s) involved
+  - Suggested fix or troubleshooting steps
+
+### Rule 6: No Git Initialization
+
+- Do NOT initialize Git repository (no `git init`)
+- Do NOT create `.gitignore` files
+- Do NOT perform any Git-related operations (commit, push, pull, etc.)
+- The user will handle all Git operations manually
+
+### Rule 7: Windows PowerShell Syntax
+
+- **MANDATORY: Use proper PowerShell syntax for all terminal commands** - Since the development environment is Windows, use PowerShell cmdlets and syntax instead of POSIX/Linux commands
+- Use PowerShell cmdlets like `Get-ChildItem` instead of `ls`, `Set-Location` instead of `cd`, `New-Item` instead of `touch`
+- Use backslashes (`\`) for Windows file paths instead of forward slashes (`/`)
+- Use PowerShell parameter syntax with hyphens (e.g., `-Path`, `-Name`, `-Value`) instead of POSIX flags
+- Use PowerShell pipeline operator (`|`) and object-oriented approach instead of traditional shell piping
+- Avoid bash/zsh specific syntax like `&&`, `||`, `;` for command chaining - use PowerShell equivalents
+- Use `Join-Path` cmdlet for path construction instead of string concatenation
+- Use proper PowerShell escaping with backticks (``) for special characters
+- Test all commands in PowerShell environment before using them
+
+## Technology Stack Enforcement
+
+### Frontend Requirements
+
+- Framework: React 18+ with Vite
+- Language: TypeScript (strict mode enabled)
+- Styling: Bootstrap 5 (use react-bootstrap components)
+- State Management: React Context API or Redux Toolkit
+- HTTP Client: Axios with interceptors
+- Routing: React Router DOM v6+
+- Charts: Recharts library
+- OAuth: @react-oauth/google for Google OAuth 2.0 integration
+
+### Backend Requirements
+
+- Framework: ASP.NET Core 10 Web API
+- ORM: Entity Framework Core
+- Database: MS SQL Server 2022+
+- Authentication: JWT tokens with role-based access control (RBAC) + Google OAuth 2.0
+- Password Hashing: BCrypt
+- Email: SMTP-based email service
+- OAuth Package: Microsoft.AspNetCore.Authentication.Google
+
+### Code Quality Standards
+
+- Follow React/Vite best practices
+- Use TypeScript for all frontend code (no `any` types unless absolutely necessary)
+- Implement proper error handling with try-catch blocks
+- Add meaningful comments for complex logic
+- Use async/await for asynchronous operations
+- Follow RESTful API conventions
+- Implement input validation on both frontend and backend
+- Use descriptive variable and function names
+
+## Folder Structure Enforcement
+
+### Maintain Exact Structure
+
+```
+Lead-management-crm/
+├── frontend/          (React + Vite + TypeScript + Bootstrap)
+│   ├── src/
+│   │   ├── components/
+│   │   ├── pages/
+│   │   ├── services/
+│   │   ├── contexts/
+│   │   ├── utils/
+│   │   └── types/
+│   ├── package.json
+│   └── vite.config.ts
+│
+└── backend/           (ASP.NET Core Web API)
+    ├── Controllers/
+    ├── Models/
+    ├── Services/
+    ├── Data/
+    ├── DTOs/
+    ├── Utils/
+    ├── Middleware/
+    └── Program.cs
+```
+
+### File Naming Conventions
+
+- Frontend Components: PascalCase (e.g., `AddLeadModal.tsx`)
+- Frontend Services: camelCase (e.g., `authService.ts`)
+- Backend Controllers: PascalCase ending with `Controller` (e.g., `AuthController.cs`)
+- Backend Models: PascalCase (e.g., `Lead.cs`)
+- Backend Services: PascalCase ending with `Service` (e.g., `EmailService.cs`)
+
+## Database Specifications
+
+### Critical Model Requirements
+
+#### User Model Must Include:
+
+- `UserId` (Primary Key)
+- `CompanyId` (Foreign Key to Company)
+- `ManagerId` (Foreign Key to User, nullable) - **REQUIRED for hierarchy**
+- `UserRoleId` (Foreign Key to UserRole)
+- `PasswordHash` (nullable) - **NULL for SSO users**
+- `IsSSOUser` (boolean) - **REQUIRED to identify SSO vs traditional users**
+- `SSOProvider` (string, nullable) - **e.g., "Google", "Microsoft"**
+- `SSOProviderId` (string, nullable) - **Unique identifier from SSO provider**
+- All standard audit fields (CreatedDate, UpdatedDate, IsActive)
+
+#### Lead Model Must Include:
+
+- `ReferredBy` (string, nullable) - **REQUIRED field**
+- Conditional display: Show only when LeadSource = "Referral"
+- All fields as specified in PRD
+
+### Relationship Rules
+
+- User.ManagerId creates self-referencing relationship in User table
+- Configure cascade delete rules appropriately
+- Use nullable foreign keys where specified
+
+## Authentication & Authorization
+
+### JWT Implementation
+
+- Include claims: userId, companyId, roleId, roleName
+- Set appropriate token expiry (default: 60 minutes, RememberMe: 7 days)
+- Implement token refresh mechanism (optional for Phase 1)
+- Store token in localStorage on frontend
+- Attach token to all API requests via Axios interceptor
+
+### SSO Implementation (Google OAuth 2.0)
+
+- Use `@react-oauth/google` package on frontend
+- Use `Microsoft.AspNetCore.Authentication.Google` package on backend
+- Configure Google OAuth credentials in appsettings.json (ClientId, ClientSecret)
+- Implement `/api/auth/google-login` endpoint to handle OAuth callback
+- Validate Google token on backend using Google's token validation API
+- Create or update user with SSO details (IsSSOUser=true, SSOProvider="Google", SSOProviderId=googleUserId)
+- Set PasswordHash to NULL for SSO users
+- Return JWT token after successful SSO authentication
+- Handle both new user registration and existing user login via SSO
+
+### SSO User Flow
+
+1. User clicks "Sign in with Google" button
+2. Frontend initiates Google OAuth flow using @react-oauth/google
+3. Google returns authorization token to frontend
+4. Frontend sends token to backend `/api/auth/google-login` endpoint
+5. Backend validates token with Google's API
+6. Backend checks if user exists by email and SSOProviderId
+7. If new user: Create user record with IsSSOUser=true, PasswordHash=null
+8. If existing user: Verify SSOProvider matches and user is active
+9. Backend generates JWT token with standard claims
+10. Frontend stores JWT token and redirects to Dashboard
+
+### Password-Based vs SSO Authentication
+
+- Traditional users: Have PasswordHash, IsSSOUser=false, can login with email/password
+- SSO users: Have PasswordHash=NULL, IsSSOUser=true, can only login via SSO provider
+- Users cannot mix authentication methods (no password login for SSO users)
+- Email must be verified for traditional users (OTP flow)
+- Email is pre-verified for SSO users (trusted by OAuth provider)
+
+### Role-Based Access Control
+
+- System Admin: Full system access, can switch between companies
+- Company Admin: Full access within their company
+- Company Manager: Access to team members' data and own data
+- Team Member: Access to own assigned leads only
+
+### Authorization Checks
+
+- Validate user role on every protected API endpoint
+- Filter data by companyId for all user queries
+- Implement authorization attributes on controllers
+
+## Out of Scope for Phase 1
+
+### Do NOT Implement:
+
+- Multiple SSO providers beyond Google (Microsoft, Facebook, GitHub, etc. are future enhancements)
+- SSO for invitation-based user registration (invited users use traditional email/password)
+- Advanced lead scoring or AI features
+- Automated lead distribution with complex routing
+- Email campaign integration
+- SMS/WhatsApp native integration
+- Third-party CRM integrations
+- Duplicate lead detection
+- Custom fields functionality
+- Account linking (merging SSO and traditional accounts)
+
+## Special Instructions
+
+### When Creating Forms:
+
+- Always implement client-side validation
+- Show inline error messages
+- Disable submit button during API calls
+- Show loading spinner on submit button
+- Display success toast notifications
+- Clear form or close modal on success
+- For SSO login: Display "Sign in with Google" button using GoogleLogin component
+- Handle OAuth errors gracefully with user-friendly messages
+
+### When Creating Data Grids:
+
+- Implement pagination (10, 25, 50 rows per page)
+- Add sorting capability (ascending/descending)
+- Include filter panel with relevant filters
+- Show total record count
+- Implement column show/hide toggle
+- Add checkbox selection for bulk operations
+- Show "No data" message when grid is empty
+
+### When Creating API Endpoints:
+
+- **MANDATORY: Authenticate and authorize ALL API endpoints** - Every API endpoint must validate JWT tokens and enforce role-based access control (RBAC)
+- Return standardized ApiResponse object
+- Include proper HTTP status codes
+- Validate all input parameters
+- Filter by companyId automatically
+- Check user permissions
+- Log errors appropriately
+- Handle null/empty cases gracefully
+- **MANDATORY: Implement debug logging for all API endpoints** - Log request details (method, endpoint, userId, companyId), input parameters, response status, and execution time for debugging and monitoring
+
+### When Implementing Charts:
+
+- Use Recharts library for all visualizations
+- Make charts responsive
+- Include proper labels and legends
+- Use consistent color scheme
+- Show "No data" message when applicable
+
+## Communication Standards
+
+### When Reporting Progress:
+
+- State which phase and task you're working on
+- Mention files created or modified
+- Highlight any important decisions made
+- Note any deviations from the plan (with justification)
+
+### When Asking Questions:
+
+- Be specific about what you need clarification on
+- Provide context (which phase/task)
+- Suggest possible solutions if applicable
+
+### When Encountering Issues:
+
+- State the problem clearly
+- Provide error messages in full
+- Indicate which files are affected
+- Suggest troubleshooting steps
+
+## Checkpoint Reminders
+
+- Review TODO document before starting each phase
+- Verify all dependencies are installed
+- Ensure database connection string is configured
+- Test each feature manually after implementation
+- Keep code organized and maintainable
+- Update TODO checklist after each task completion
+
+## Always remove temporary test scripts created
+
+## Final Notes
+
+- Prioritize functionality over aesthetics in Phase 1
+- Focus on core features as specified in PRD
+- Maintain clean, readable, and well-documented code
+- Ask for clarification when requirements are ambiguous
+- Always consider security implications
+- Think about scalability and maintainability
+
+---
+
+**These rules are mandatory and must be followed for every task in the Lead Management CRM project.**
