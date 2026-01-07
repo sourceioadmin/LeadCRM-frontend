@@ -307,7 +307,7 @@ const Login: React.FC = () => {
                 ) : (
                   <>
                     <img
-                      src="https://developers.google.com/identity/images/g-logo.png"
+                      src="/google-icon.svg"
                       alt="Google"
                       style={{ width: '18px', height: '18px', marginRight: '12px' }}
                     />
