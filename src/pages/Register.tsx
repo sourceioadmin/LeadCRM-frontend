@@ -183,18 +183,26 @@ const Register: React.FC = () => {
     setError('');
 
     try {
-      const response = await registerUser({
+      const payload: any = {
         companyName: formData.companyName,
         industry: formData.industry,
         size: formData.size,
-        website: formData.website,
-        phone: formData.phone,
         fullName: formData.fullName,
         email: formData.email,
         username: formData.username,
         password: formData.password,
         confirmPassword: formData.confirmPassword
-      });
+      };
+
+      // Only include optional fields if they have values
+      if (formData.website.trim()) {
+        payload.website = formData.website;
+      }
+      if (formData.phone.trim()) {
+        payload.phone = formData.phone;
+      }
+
+      const response = await registerUser(payload);
 
       if (response.data.success) {
         // Store email for OTP verification page
