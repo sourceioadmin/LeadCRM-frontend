@@ -11,14 +11,12 @@ import {
 } from "react-bootstrap";
 import { Mail, ArrowLeft } from "lucide-react";
 import { useToast } from "../components/Toast";
-import { useAuth } from "../contexts/AuthContext";
 import { verifyOtp, resendOtp } from "../services/authService";
 
 const VerifyOtp: React.FC = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { showSuccess, showError } = useToast();
-  const { login } = useAuth();
 
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [email, setEmail] = useState('');
@@ -92,24 +90,14 @@ const VerifyOtp: React.FC = () => {
       });
 
       if (response.data.success) {
-        const token = response.data.data?.token;
-        const user = response.data.data?.user;
+        // Email verified successfully - no auto-login
+        localStorage.removeItem('verificationEmail'); // Clean up
 
-        if (token && user) {
-          // Store token and update auth context
-          localStorage.setItem('authToken', token);
-          localStorage.setItem('userData', JSON.stringify(user));
-          localStorage.removeItem('verificationEmail'); // Clean up
-          login(token, user);
-
-          showSuccess('Email Verified!', 'Welcome to Lead Management CRM!');
-          // Navigate after a longer delay to ensure success message is visible and prevent any error toasts from interrupting
-          setTimeout(() => {
-            navigate('/', { replace: true });
-          }, 2500);
-        } else {
-          throw new Error('Invalid response from server');
-        }
+        showSuccess('Email Verified!', 'Email verified successfully. Please login with your credentials.');
+        // Navigate to login page after showing success message
+        setTimeout(() => {
+          navigate('/login', { replace: true });
+        }, 2000);
       }
     } catch (err: any) {
       const errorMessage = err.response?.data?.message || 'OTP verification failed.';
