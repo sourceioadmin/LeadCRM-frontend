@@ -58,6 +58,8 @@ const Settings: React.FC = () => {
   const [companySettings, setCompanySettings] = useState<CompanySettings | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [showCompanyConfirmModal, setShowCompanyConfirmModal] = useState(false);
+  const [showLogoRemoveConfirmModal, setShowLogoRemoveConfirmModal] = useState(false);
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -80,6 +82,7 @@ const Settings: React.FC = () => {
   const [newSourceName, setNewSourceName] = useState('');
   const [editSourceName, setEditSourceName] = useState('');
   const [seeding, setSeeding] = useState(false);
+  const [showSeedConfirmModal, setShowSeedConfirmModal] = useState(false);
 
   // Lead Statuses state
   const [leadStatuses, setLeadStatuses] = useState<LeadStatus[]>([]);
@@ -87,6 +90,8 @@ const Settings: React.FC = () => {
   const [showAddStatusModal, setShowAddStatusModal] = useState(false);
   const [editingStatus, setEditingStatus] = useState<LeadStatus | null>(null);
   const [deletingStatus, setDeletingStatus] = useState<LeadStatus | null>(null);
+  const [showReorderConfirmModal, setShowReorderConfirmModal] = useState(false);
+  const [pendingReorderData, setPendingReorderData] = useState<LeadStatusReorderData | null>(null);
   const [newStatusName, setNewStatusName] = useState('');
   const [newStatusOrder, setNewStatusOrder] = useState(0);
   const [editStatusName, setEditStatusName] = useState('');
@@ -97,6 +102,7 @@ const Settings: React.FC = () => {
   const [emailSettingsLoading, setEmailSettingsLoading] = useState(false);
   const [emailSettingsSaving, setEmailSettingsSaving] = useState(false);
   const [emailSettingsTesting, setEmailSettingsTesting] = useState(false);
+  const [showEmailConfirmModal, setShowEmailConfirmModal] = useState(false);
 
   // Email form state
   const [emailFormData, setEmailFormData] = useState({
@@ -203,7 +209,7 @@ const Settings: React.FC = () => {
     }
   };
 
-  const handleRemoveLogo = () => {
+  const handleRemoveSelectedLogo = () => {
     setLogoFile(null);
     // Restore original logo with full URL if it exists
     const originalLogoUrl = companySettings?.logo ? `${BACKEND_BASE_URL}${companySettings.logo}` : null;
@@ -212,6 +218,47 @@ const Settings: React.FC = () => {
       fileInputRef.current.value = '';
     }
     showInfo('Logo Cleared', 'New logo selection removed');
+  };
+
+  const handleRemoveExistingLogo = () => {
+    setShowLogoRemoveConfirmModal(true);
+  };
+
+  const handleConfirmRemoveLogo = async () => {
+    try {
+      setShowLogoRemoveConfirmModal(false);
+      console.log('🗑️ Starting immediate logo removal...');
+
+      // Immediately remove the logo using the settings update API
+      const updateData = {
+        companyName: companySettings?.companyName || '',
+        industry: companySettings?.industry,
+        size: companySettings?.size,
+        website: companySettings?.website,
+        phone: companySettings?.phone,
+        removeLogo: true
+      };
+
+      const response = await updateCompanySettings(updateData);
+      console.log('🗑️ Logo removal response:', response);
+
+      if (response.success) {
+        console.log('✅ Logo removal successful, updating UI...');
+        // Update company settings with the response data
+        setCompanySettings(response.data);
+        // Clear the logo preview immediately
+        setLogoPreview(null);
+        showSuccess('Logo Removed', 'Company logo has been successfully removed');
+        console.log('✅ UI updated successfully - logo removed immediately');
+      } else {
+        console.log('❌ Logo removal failed:', response.message);
+        showError('Removal Failed', response.message || 'Failed to remove company logo');
+      }
+    } catch (error: any) {
+      console.log('💥 Error during logo removal:', error);
+      showError('Error', 'Failed to remove company logo');
+      console.error('Error removing logo:', error);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -541,8 +588,13 @@ const Settings: React.FC = () => {
 
     const sourceIndex = result.source.index;
     const destinationIndex = result.destination.index;
-    const draggableId = result.draggableId;
 
+    if (sourceIndex === destinationIndex) {
+      console.log('❌ Same position, returning');
+      return;
+    }
+
+    const draggableId = result.draggableId;
     console.log(`📍 Moving item ${draggableId} from ${sourceIndex} to ${destinationIndex}`);
 
     const items = Array.from(leadStatuses);
@@ -556,27 +608,39 @@ const Settings: React.FC = () => {
     }));
 
     console.log('Updated statuses:', updatedStatuses);
-    setLeadStatuses(updatedStatuses);
+
+    // Prepare reorder data for confirmation
+    const reorderData: LeadStatusReorderData = {
+      statuses: updatedStatuses.map(status => ({
+        leadStatusId: status.leadStatusId,
+        displayOrder: status.displayOrder
+      }))
+    };
+
+    // Store the reorder data and show confirmation modal
+    setPendingReorderData(reorderData);
+    setShowReorderConfirmModal(true);
+  };
+
+  const handleConfirmReorder = async () => {
+    if (!pendingReorderData) return;
+
+    setShowReorderConfirmModal(false);
 
     try {
-      const reorderData: LeadStatusReorderData = {
-        statuses: updatedStatuses.map(status => ({
-          leadStatusId: status.leadStatusId,
-          displayOrder: status.displayOrder
-        }))
-      };
-
-      console.log('Sending reorder data:', reorderData);
-      const response = await reorderLeadStatuses(reorderData);
+      console.log('Sending reorder data:', pendingReorderData);
+      const response = await reorderLeadStatuses(pendingReorderData);
 
       if (response.success) {
         console.log('Reorder successful');
         showSuccess('Success', 'Lead statuses reordered successfully');
+        setPendingReorderData(null);
         await loadLeadStatuses();
       } else {
         console.log('Reorder failed:', response.message);
         showError('Error', response.message || 'Failed to reorder lead statuses');
         // Revert the local state on error
+        setPendingReorderData(null);
         await loadLeadStatuses();
       }
     } catch (error: any) {
@@ -585,8 +649,16 @@ const Settings: React.FC = () => {
       showError('Error', errorMessage);
       console.error('Error reordering lead statuses:', error);
       // Revert the local state on error
+      setPendingReorderData(null);
       await loadLeadStatuses();
     }
+  };
+
+  const handleCancelReorder = () => {
+    setShowReorderConfirmModal(false);
+    setPendingReorderData(null);
+    // Revert to original order
+    loadLeadStatuses();
   };
 
   const startEditingStatus = (status: LeadStatus) => {
@@ -795,7 +867,7 @@ const Settings: React.FC = () => {
                         <p className="mt-2">Loading company settings...</p>
                       </div>
                     ) : (
-                      <Form onSubmit={handleSubmit}>
+                      <Form onSubmit={(e) => { e.preventDefault(); setShowCompanyConfirmModal(true); }}>
                         <Row>
                           <Col md={8}>
                             <Row>
@@ -879,14 +951,25 @@ const Settings: React.FC = () => {
                                       className="border"
                                     />
                                     <div className="mt-2">
-                                      <Button
-                                        variant="outline-danger"
-                                        size="sm"
-                                        onClick={handleRemoveLogo}
-                                      >
-                                        <X size={14} className="me-1" />
-                                        Remove
-                                      </Button>
+                                      {logoFile ? (
+                                        <Button
+                                          variant="outline-danger"
+                                          size="sm"
+                                          onClick={handleRemoveSelectedLogo}
+                                        >
+                                          <X size={14} className="me-1" />
+                                          Remove Selection
+                                        </Button>
+                                      ) : companySettings?.logo ? (
+                                        <Button
+                                          variant="outline-danger"
+                                          size="sm"
+                                          onClick={handleRemoveExistingLogo}
+                                        >
+                                          <X size={14} className="me-1" />
+                                          Remove Logo
+                                        </Button>
+                                      ) : null}
                                     </div>
                                   </div>
                                 ) : (
@@ -951,6 +1034,90 @@ const Settings: React.FC = () => {
                         </div>
                       </Form>
                     )}
+
+                    {/* Company Settings Confirmation Modal */}
+                    <Modal show={showCompanyConfirmModal} onHide={() => setShowCompanyConfirmModal(false)}>
+                      <Modal.Header closeButton>
+                        <Modal.Title>Save Company Settings</Modal.Title>
+                      </Modal.Header>
+                      <Modal.Body>
+                        <p>Are you sure you want to save these company settings?</p>
+                        <div className="mt-3">
+                          <strong>Changes to be saved:</strong>
+                          <ul className="mb-0 mt-2">
+                            {formData.companyName !== companySettings?.companyName && (
+                              <li>Company Name: "{formData.companyName}"</li>
+                            )}
+                            {formData.industry !== companySettings?.industry && (
+                              <li>Industry: "{formData.industry}"</li>
+                            )}
+                            {formData.size !== companySettings?.size && (
+                              <li>Company Size: "{formData.size}"</li>
+                            )}
+                            {formData.website !== companySettings?.website && (
+                              <li>Website: "{formData.website}"</li>
+                            )}
+                            {formData.phone !== companySettings?.phone && (
+                              <li>Phone: "{formData.phone}"</li>
+                            )}
+                            {logoFile && (
+                              <li>Logo: New file selected ({logoFile.name})</li>
+                            )}
+                          </ul>
+                          {Object.values(formData).every(value =>
+                            !value || (typeof value === 'string' && value.trim() === '')
+                          ) && !logoFile && (
+                            <p className="text-muted mt-2">No changes detected.</p>
+                          )}
+                        </div>
+                      </Modal.Body>
+                      <Modal.Footer>
+                        <Button variant="secondary" onClick={() => setShowCompanyConfirmModal(false)}>
+                          Cancel
+                        </Button>
+                        <Button
+                          variant="primary"
+                          onClick={() => {
+                            setShowCompanyConfirmModal(false);
+                            handleSubmit({ preventDefault: () => {} } as React.FormEvent);
+                          }}
+                          disabled={saving}
+                        >
+                          {saving ? (
+                            <>
+                              <Spinner animation="border" size="sm" className="me-2" />
+                              Saving...
+                            </>
+                          ) : (
+                            'Confirm Save'
+                          )}
+                        </Button>
+                      </Modal.Footer>
+                    </Modal>
+
+                    {/* Logo Removal Confirmation Modal */}
+                    <Modal show={showLogoRemoveConfirmModal} onHide={() => setShowLogoRemoveConfirmModal(false)}>
+                      <Modal.Header closeButton>
+                        <Modal.Title>Remove Company Logo</Modal.Title>
+                      </Modal.Header>
+                      <Modal.Body>
+                        <p>Are you sure you want to remove the company logo?</p>
+                        <Alert variant="warning">
+                          <strong>Warning:</strong> This action cannot be undone. The logo will be permanently removed from your company settings.
+                        </Alert>
+                      </Modal.Body>
+                      <Modal.Footer>
+                        <Button variant="secondary" onClick={() => setShowLogoRemoveConfirmModal(false)}>
+                          Cancel
+                        </Button>
+                        <Button
+                          variant="danger"
+                          onClick={handleConfirmRemoveLogo}
+                        >
+                          Remove Logo
+                        </Button>
+                      </Modal.Footer>
+                    </Modal>
                   </div>
                 </Tab.Pane>
 
@@ -990,7 +1157,7 @@ const Settings: React.FC = () => {
                               <div className="d-flex flex-column gap-2">
                                 <Button
                                   variant="primary"
-                                  onClick={handleSeedDefaultData}
+                                  onClick={() => setShowSeedConfirmModal(true)}
                                   disabled={seeding}
                                   className="w-100"
                                 >
@@ -1148,7 +1315,7 @@ const Settings: React.FC = () => {
                                   <div className="d-flex justify-content-center gap-2">
                                     <Button
                                       variant="primary"
-                                      onClick={handleSeedDefaultData}
+                                      onClick={() => setShowSeedConfirmModal(true)}
                                       disabled={seeding}
                                     >
                                       {seeding ? (
@@ -1324,6 +1491,41 @@ const Settings: React.FC = () => {
                         </Button>
                       </Modal.Footer>
                     </Modal>
+
+                    {/* Seed Default Data Confirmation Modal */}
+                    <Modal show={showSeedConfirmModal} onHide={() => setShowSeedConfirmModal(false)}>
+                      <Modal.Header closeButton>
+                        <Modal.Title>Seed Default Data</Modal.Title>
+                      </Modal.Header>
+                      <Modal.Body>
+                        <p>Are you sure you want to seed default data for your company?</p>
+                        <Alert variant="warning">
+                          <strong>Warning:</strong> This action will create default lead sources, lead statuses, and urgency levels. If you already have custom data, this may overwrite or duplicate existing entries.
+                        </Alert>
+                      </Modal.Body>
+                      <Modal.Footer>
+                        <Button variant="secondary" onClick={() => setShowSeedConfirmModal(false)}>
+                          Cancel
+                        </Button>
+                        <Button
+                          variant="primary"
+                          onClick={() => {
+                            setShowSeedConfirmModal(false);
+                            handleSeedDefaultData();
+                          }}
+                          disabled={seeding}
+                        >
+                          {seeding ? (
+                            <>
+                              <Spinner animation="border" size="sm" className="me-2" />
+                              Seeding...
+                            </>
+                          ) : (
+                            'Confirm Seed Data'
+                          )}
+                        </Button>
+                      </Modal.Footer>
+                    </Modal>
                   </div>
                 </Tab.Pane>
 
@@ -1363,7 +1565,7 @@ const Settings: React.FC = () => {
                               <div className="d-flex flex-column gap-2">
                                 <Button
                                   variant="primary"
-                                  onClick={handleSeedDefaultData}
+                                  onClick={() => setShowSeedConfirmModal(true)}
                                   disabled={seeding}
                                   className="w-100"
                                 >
@@ -1592,7 +1794,7 @@ const Settings: React.FC = () => {
                                           <div className="d-flex justify-content-center gap-2">
                                             <Button
                                               variant="primary"
-                                              onClick={handleSeedDefaultData}
+                                              onClick={() => setShowSeedConfirmModal(true)}
                                               disabled={seeding}
                                             >
                                               {seeding ? (
@@ -1820,6 +2022,46 @@ const Settings: React.FC = () => {
                         </Button>
                       </Modal.Footer>
                     </Modal>
+
+                    {/* Reorder Confirmation Modal */}
+                    <Modal show={showReorderConfirmModal} onHide={handleCancelReorder}>
+                      <Modal.Header closeButton>
+                        <Modal.Title>Reorder Lead Statuses</Modal.Title>
+                      </Modal.Header>
+                      <Modal.Body>
+                        <p>Are you sure you want to reorder the lead statuses?</p>
+                        <Alert variant="info">
+                          <strong>Note:</strong> This will change the display order of lead statuses throughout your application. Make sure this is the order you want.
+                        </Alert>
+                        {pendingReorderData && (
+                          <div className="mt-3">
+                            <strong>New Order:</strong>
+                            <ol className="mb-0 mt-2">
+                              {leadStatuses
+                                .sort((a, b) => {
+                                  const aData = pendingReorderData.statuses.find(s => s.leadStatusId === a.leadStatusId);
+                                  const bData = pendingReorderData.statuses.find(s => s.leadStatusId === b.leadStatusId);
+                                  return (aData?.displayOrder || 0) - (bData?.displayOrder || 0);
+                                })
+                                .map((status, index) => (
+                                  <li key={status.leadStatusId}>{status.name}</li>
+                                ))}
+                            </ol>
+                          </div>
+                        )}
+                      </Modal.Body>
+                      <Modal.Footer>
+                        <Button variant="secondary" onClick={handleCancelReorder}>
+                          Cancel
+                        </Button>
+                        <Button
+                          variant="primary"
+                          onClick={handleConfirmReorder}
+                        >
+                          Confirm Reorder
+                        </Button>
+                      </Modal.Footer>
+                    </Modal>
                   </div>
                 </Tab.Pane>
 
@@ -1856,7 +2098,7 @@ const Settings: React.FC = () => {
                         <p className="mt-2">Loading email settings...</p>
                       </div>
                     ) : (
-                      <Form onSubmit={handleSaveEmailSettings}>
+                      <Form onSubmit={(e) => { e.preventDefault(); setShowEmailConfirmModal(true); }}>
                         <Row>
                           <Col lg={8}>
                             <Card className="mb-4">
@@ -2116,6 +2358,51 @@ const Settings: React.FC = () => {
                         </div>
                       </Form>
                     )}
+
+                    {/* Email Settings Confirmation Modal */}
+                    <Modal show={showEmailConfirmModal} onHide={() => setShowEmailConfirmModal(false)}>
+                      <Modal.Header closeButton>
+                        <Modal.Title>Save Email Settings</Modal.Title>
+                      </Modal.Header>
+                      <Modal.Body>
+                        <p>Are you sure you want to save these email settings?</p>
+                        <Alert variant="warning">
+                          <strong>Warning:</strong> Incorrect email settings may prevent your application from sending emails. Please verify your SMTP configuration before saving.
+                        </Alert>
+                        <div className="mt-3">
+                          <strong>Current Settings:</strong>
+                          <ul className="mb-0 mt-2">
+                            <li>SMTP Host: {emailFormData.smtpHost || 'Not set'}</li>
+                            <li>SMTP Port: {emailFormData.smtpPort || 'Not set'}</li>
+                            <li>Username: {emailFormData.smtpUsername || 'Not set'}</li>
+                            <li>From Email: {emailFormData.fromEmail || 'Not set'}</li>
+                            <li>From Name: {emailFormData.fromName || 'Not set'}</li>
+                          </ul>
+                        </div>
+                      </Modal.Body>
+                      <Modal.Footer>
+                        <Button variant="secondary" onClick={() => setShowEmailConfirmModal(false)}>
+                          Cancel
+                        </Button>
+                        <Button
+                          variant="primary"
+                          onClick={() => {
+                            setShowEmailConfirmModal(false);
+                            handleSaveEmailSettings({ preventDefault: () => {} } as React.FormEvent);
+                          }}
+                          disabled={emailSettingsSaving}
+                        >
+                          {emailSettingsSaving ? (
+                            <>
+                              <Spinner animation="border" size="sm" className="me-2" />
+                              Saving...
+                            </>
+                          ) : (
+                            'Confirm Save'
+                          )}
+                        </Button>
+                      </Modal.Footer>
+                    </Modal>
                   </div>
                 </Tab.Pane>
               </Tab.Content>

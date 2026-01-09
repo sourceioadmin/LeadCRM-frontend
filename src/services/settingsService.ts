@@ -23,6 +23,7 @@ export interface UpdateCompanySettingsData {
   website?: string;
   phone?: string;
   logoFile?: File;
+  removeLogo?: boolean; // Flag to indicate logo should be removed
 }
 
 export interface LeadSource {
@@ -104,9 +105,11 @@ export const updateCompanySettings = async (data: UpdateCompanySettingsData): Pr
   if (data.website) formData.append('website', data.website);
   if (data.phone) formData.append('phone', data.phone);
 
-  // Add file if provided
+  // Add file if provided, or handle logo removal
   if (data.logoFile) {
     formData.append('logoFile', data.logoFile);
+  } else if (data.removeLogo) {
+    formData.append('removeLogo', 'true');
   }
 
   const response = await api.put<CompanySettingsResponse>('/settings/company', formData, {
