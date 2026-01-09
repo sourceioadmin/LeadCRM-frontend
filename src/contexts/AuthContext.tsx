@@ -55,10 +55,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
                   localStorage.setItem('userData', JSON.stringify(updatedUser));
                   setUser(updatedUser);
                 } else {
+                  // Silently use cached data if profile fetch fails
                   setUser(parsedUser);
                 }
               } catch (profileError) {
-                // If profile fetch fails, use cached data
+                // Silently use cached data if profile fetch fails - don't show error toasts during auth initialization
+                console.log('Profile fetch failed during auth init, using cached data:', profileError);
                 setUser(parsedUser);
               }
             } else {

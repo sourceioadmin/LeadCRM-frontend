@@ -429,8 +429,8 @@ const Register: React.FC = () => {
 
   const getProgressValue = () => {
     switch (currentStep) {
-      case 1: return 50;
-      case 2: return 100;
+      case 1: return 0;
+      case 2: return 50;
       default: return 0;
     }
   };

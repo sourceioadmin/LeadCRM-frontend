@@ -71,7 +71,7 @@ const VerifyOtp: React.FC = () => {
     }
   };
 
-  const handleKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyDown = (index: number, e: React.KeyboardEvent<HTMLElement>) => {
     if (e.key === 'Backspace' && !otp[index] && index > 0) {
       const prevInput = document.getElementById(`otp-${index - 1}`);
       prevInput?.focus();
@@ -103,9 +103,10 @@ const VerifyOtp: React.FC = () => {
           login(token, user);
 
           showSuccess('Email Verified!', 'Welcome to Lead Management CRM!');
+          // Navigate after a longer delay to ensure success message is visible and prevent any error toasts from interrupting
           setTimeout(() => {
-            navigate('/');
-          }, 1500);
+            navigate('/', { replace: true });
+          }, 2500);
         } else {
           throw new Error('Invalid response from server');
         }
