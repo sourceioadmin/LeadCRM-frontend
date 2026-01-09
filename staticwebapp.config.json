@@ -1,0 +1,35 @@
+{
+  "navigationFallback": {
+    "rewrite": "/index.html",
+    "exclude": [
+      "/assets/*.{png,jpg,jpeg,gif,svg,ico,webp}",
+      "/assets/*.{css,js,json}",
+      "/robots.txt",
+      "/favicon.ico",
+      "/manifest.json"
+    ]
+  },
+  "routes": [
+    {
+      "route": "/accept-invite",
+      "allowedRoles": ["anonymous"]
+    },
+    {
+      "route": "/verify-otp",
+      "allowedRoles": ["anonymous"]
+    },
+    {
+      "route": "/register",
+      "allowedRoles": ["anonymous"]
+    },
+    {
+      "route": "/login",
+      "allowedRoles": ["anonymous"]
+    }
+  ],
+  "responseOverrides": {
+    "404": {
+      "rewrite": "/index.html"
+    }
+  }
+}
