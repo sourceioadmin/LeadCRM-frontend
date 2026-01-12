@@ -387,6 +387,8 @@ const Dashboard: React.FC = () => {
         return 'info';
       case 'Team Member':
         return 'secondary';
+      case 'Referral Partner':
+        return 'info';
       default:
         return 'secondary';
     }
@@ -424,6 +426,11 @@ const Dashboard: React.FC = () => {
   const isAdminOrManager = user?.roleName === 'System Admin' || 
                            user?.roleName === 'Company Admin' || 
                            user?.roleName === 'Company Manager';
+  
+  /**
+   * Check if user is a Referral Partner
+   */
+  const isReferralPartner = user?.roleName === 'Referral Partner' || user?.userRoleId === 5;
 
   return (
     <div className="dashboard-container">
@@ -442,18 +449,23 @@ const Dashboard: React.FC = () => {
             )}
           </h2>
           <p className="text-muted mb-0 d-none d-sm-block">
-            Here's your lead management overview for today.
+            {isReferralPartner
+              ? "Manage and track your referred leads."
+              : "Here's your lead management overview for today."
+            }
           </p>
         </div>
         <div className="d-flex gap-2">
-          <Button
-            variant="outline-secondary"
-            size="sm"
-            onClick={loadDashboardData}
-            title="Refresh Dashboard"
-          >
-            <RefreshCw size={16} />
-          </Button>
+          {!isReferralPartner && (
+            <Button
+              variant="outline-secondary"
+              size="sm"
+              onClick={loadDashboardData}
+              title="Refresh Dashboard"
+            >
+              <RefreshCw size={16} />
+            </Button>
+          )}
           <Button
             variant="primary"
             onClick={() => setShowAddLeadModal(true)}
@@ -471,8 +483,9 @@ const Dashboard: React.FC = () => {
         </Alert>
       )}
 
-      {/* Statistics Cards */}
-      <Row className="g-3 mb-4">
+      {/* Statistics Cards - Hide for Referral Partners */}
+      {!isReferralPartner && (
+        <Row className="g-3 mb-4">
         <Col xs={12} sm={6} lg={3}>
           <Link to={isAdminOrManager ? "/all-leads" : "/my-leads"} className="text-decoration-none">
             <Card className="h-100 shadow-sm border-0 stat-card" style={{ cursor: 'pointer' }}>
@@ -494,10 +507,31 @@ const Dashboard: React.FC = () => {
             </Card>
           </Link>
         </Col>
-        <Col xs={12} sm={6} lg={3}>
-          {isAdminOrManager ? (
-            <Link to="/assign-leads" className="text-decoration-none">
-              <Card className="h-100 shadow-sm border-0 stat-card" style={{ cursor: 'pointer' }}>
+        {/* Unassigned Leads card - Only show for Admins and Managers, hide for Referral Partners */}
+        {!isReferralPartner && (
+          <Col xs={12} sm={6} lg={3}>
+            {isAdminOrManager ? (
+              <Link to="/assign-leads" className="text-decoration-none">
+                <Card className="h-100 shadow-sm border-0 stat-card" style={{ cursor: 'pointer' }}>
+                  <Card.Body className="py-4">
+                    <div className="d-flex align-items-center justify-content-between">
+                      <div>
+                        {statsLoading ? (
+                          <Spinner animation="border" size="sm" className="text-warning" />
+                        ) : (
+                          <h3 className="text-warning mb-0 fw-bold">{stats?.unassignedLeads ?? 0}</h3>
+                        )}
+                        <p className="text-muted mb-0 small mt-1">Unassigned</p>
+                      </div>
+                      <div className="stat-icon bg-warning bg-opacity-10 rounded-circle p-3">
+                        <Users size={24} className="text-warning" />
+                      </div>
+                    </div>
+                  </Card.Body>
+                </Card>
+              </Link>
+            ) : (
+              <Card className="h-100 shadow-sm border-0 stat-card">
                 <Card.Body className="py-4">
                   <div className="d-flex align-items-center justify-content-between">
                     <div>
@@ -514,48 +548,33 @@ const Dashboard: React.FC = () => {
                   </div>
                 </Card.Body>
               </Card>
+            )}
+          </Col>
+        )}
+        {/* Today's Follow-ups card - Only show for Admins and Managers, hide for Referral Partners */}
+        {!isReferralPartner && (
+          <Col xs={12} sm={6} lg={3}>
+            <Link to="/followups" state={{ from: 'dashboard' }} className="text-decoration-none">
+              <Card className="h-100 shadow-sm border-0 stat-card" style={{ cursor: 'pointer' }}>
+                <Card.Body className="py-4">
+                  <div className="d-flex align-items-center justify-content-between">
+                    <div>
+                      {statsLoading ? (
+                        <Spinner animation="border" size="sm" className="text-info" />
+                      ) : (
+                        <h3 className="text-info mb-0 fw-bold">{stats?.todaysFollowups ?? 0}</h3>
+                      )}
+                      <p className="text-muted mb-0 small mt-1">Today's Follow-ups</p>
+                    </div>
+                    <div className="stat-icon bg-info bg-opacity-10 rounded-circle p-3">
+                      <Calendar size={24} className="text-info" />
+                    </div>
+                  </div>
+                </Card.Body>
+              </Card>
             </Link>
-          ) : (
-            <Card className="h-100 shadow-sm border-0 stat-card">
-              <Card.Body className="py-4">
-                <div className="d-flex align-items-center justify-content-between">
-                  <div>
-                    {statsLoading ? (
-                      <Spinner animation="border" size="sm" className="text-warning" />
-                    ) : (
-                      <h3 className="text-warning mb-0 fw-bold">{stats?.unassignedLeads ?? 0}</h3>
-                    )}
-                    <p className="text-muted mb-0 small mt-1">Unassigned</p>
-                  </div>
-                  <div className="stat-icon bg-warning bg-opacity-10 rounded-circle p-3">
-                    <Users size={24} className="text-warning" />
-                  </div>
-                </div>
-              </Card.Body>
-            </Card>
-          )}
-        </Col>
-        <Col xs={12} sm={6} lg={3}>
-          <Link to="/followups" state={{ from: 'dashboard' }} className="text-decoration-none">
-            <Card className="h-100 shadow-sm border-0 stat-card" style={{ cursor: 'pointer' }}>
-              <Card.Body className="py-4">
-                <div className="d-flex align-items-center justify-content-between">
-                  <div>
-                    {statsLoading ? (
-                      <Spinner animation="border" size="sm" className="text-info" />
-                    ) : (
-                      <h3 className="text-info mb-0 fw-bold">{stats?.todaysFollowups ?? 0}</h3>
-                    )}
-                    <p className="text-muted mb-0 small mt-1">Today's Follow-ups</p>
-                  </div>
-                  <div className="stat-icon bg-info bg-opacity-10 rounded-circle p-3">
-                    <Calendar size={24} className="text-info" />
-                  </div>
-                </div>
-              </Card.Body>
-            </Card>
-          </Link>
-        </Col>
+          </Col>
+        )}
         <Col xs={12} sm={6} lg={3}>
           <Card className="h-100 shadow-sm border-0 stat-card">
             <Card.Body className="py-4">
@@ -576,9 +595,11 @@ const Dashboard: React.FC = () => {
           </Card>
         </Col>
       </Row>
+      )}
 
-      {/* Analytics Charts Row */}
-      <Row className="g-3 mb-4">
+      {/* Analytics Charts Row - Hide for Referral Partners */}
+      {!isReferralPartner && (
+        <Row className="g-3 mb-4">
         {/* Sales Conversion Funnel */}
         <Col xs={12} lg={4}>
           <Card className="h-100 shadow-sm border-0">
@@ -702,9 +723,11 @@ const Dashboard: React.FC = () => {
           </Card>
         </Col>
       </Row>
+      )}
 
-      {/* Recent Leads Table */}
-      <Row className="g-3 mb-4">
+      {/* Recent Leads Table - Hide for Referral Partners */}
+      {!isReferralPartner && (
+        <Row className="g-3 mb-4">
         <Col xs={12}>
           <Card className="shadow-sm border-0">
             <Card.Header className="bg-white border-bottom d-flex justify-content-between align-items-center py-3">
@@ -800,7 +823,7 @@ const Dashboard: React.FC = () => {
           </Card>
         </Col>
       </Row>
-
+      )}
 
       {/* Floating Action Button */}
       <Button
