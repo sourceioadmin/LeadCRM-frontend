@@ -6,6 +6,7 @@ import { getMyLeads, getLeadSources, getLeadStatuses, getUrgencyLevels } from '.
 import { Lead, LeadSource, LeadStatus, Urgency } from '../types/Lead';
 import { MyLeadsResponse, PaginatedLeadResponse, LeadStatusDistribution } from '../services/leadService';
 import { formatDate } from '../utils/dateUtils';
+import { useAuth } from '../contexts/AuthContext';
 
 interface FilterState {
   dateFrom: string;
@@ -42,6 +43,11 @@ interface ColumnVisibility {
 }
 
 const MyLeads: React.FC = () => {
+  const { user } = useAuth();
+
+  // Determine user's role
+  const isReferralPartner = user?.roleName === 'Referral Partner';
+
   // State management
   const [leadsData, setLeadsData] = useState<MyLeadsResponse | null>(null);
   const [loading, setLoading] = useState(true);
@@ -158,6 +164,11 @@ const MyLeads: React.FC = () => {
 
       if (response.success && response.data) {
         setLeadsData(response.data);
+        // For Referral Partners, leads are readonly
+        if (isReferralPartner) {
+          // All leads for Referral Partners should have isReadonly = true
+          // This is already handled by the backend, but we can verify here if needed
+        }
       } else {
         setError(response.message || 'Failed to load leads');
       }
@@ -271,8 +282,10 @@ const MyLeads: React.FC = () => {
       {/* Mobile-first header: stack vertically on mobile, side-by-side on larger */}
       <div className="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 gap-3">
         <div className="flex-grow-1">
-          <h2 className="mb-1">My Leads</h2>
-          <p className="text-muted mb-0">Manage leads assigned to you</p>
+          <h2 className="mb-1">{isReferralPartner ? 'My Referred Leads' : 'My Leads'}</h2>
+          <p className="text-muted mb-0">
+            {isReferralPartner ? 'View leads you have referred' : 'Manage leads assigned to you'}
+          </p>
         </div>
         <div className="d-flex gap-2 flex-wrap align-items-center">
           <div style={{ width: '300px' }}>
@@ -313,14 +326,16 @@ const MyLeads: React.FC = () => {
               ))}
             </Dropdown.Menu>
           </Dropdown>
-          <Button
-            variant="primary"
-            onClick={handleAddLead}
-            className="w-100 w-md-auto mt-2 mt-md-0"
-          >
-            <Plus size={18} className="me-2" />
-            <span className="d-none d-sm-inline">Add Lead</span>
-          </Button>
+          {!isReferralPartner && (
+            <Button
+              variant="primary"
+              onClick={handleAddLead}
+              className="w-100 w-md-auto mt-2 mt-md-0"
+            >
+              <Plus size={18} className="me-2" />
+              <span className="d-none d-sm-inline">Add Lead</span>
+            </Button>
+          )}
         </div>
       </div>
 
@@ -502,11 +517,18 @@ const MyLeads: React.FC = () => {
             </div>
           ) : leadsData?.leads.leads.length === 0 ? (
             <div className="text-center py-5">
-              <p className="text-muted">No leads found matching your criteria.</p>
-              <Button variant="primary" onClick={handleAddLead}>
-                <Plus size={16} className="me-2" />
-                Add Your First Lead
-              </Button>
+              <p className="text-muted">
+                {isReferralPartner
+                  ? "No referred leads found."
+                  : "No leads found matching your criteria."
+                }
+              </p>
+              {!isReferralPartner && (
+                <Button variant="primary" onClick={handleAddLead}>
+                  <Plus size={16} className="me-2" />
+                  Add Your First Lead
+                </Button>
+              )}
             </div>
           ) : (
             <div className="table-responsive">
@@ -600,18 +622,27 @@ const MyLeads: React.FC = () => {
                             )}
                           </div>
 
-                          {/* Action buttons for mobile */}
-                          <div className="d-flex gap-2 mt-3 pt-2 border-top">
-                            <Button
-                              variant="outline-primary"
-                              size="sm"
-                              onClick={() => handleEditLead(lead)}
-                              className="w-100"
-                            >
-                              <Edit size={14} className="me-1" />
-                              Edit Lead
-                            </Button>
-                          </div>
+                          {/* Action buttons for mobile - Hide for readonly leads */}
+                          {!lead.isReadonly && (
+                            <div className="d-flex gap-2 mt-3 pt-2 border-top">
+                              <Button
+                                variant="outline-primary"
+                                size="sm"
+                                onClick={() => handleEditLead(lead)}
+                                className="w-100"
+                              >
+                                <Edit size={14} className="me-1" />
+                                Edit Lead
+                              </Button>
+                            </div>
+                          )}
+                          {lead.isReadonly && (
+                            <div className="d-flex gap-2 mt-3 pt-2 border-top">
+                              <Badge bg="secondary" className="w-100 text-center py-2">
+                                Read Only
+                              </Badge>
+                            </div>
+                          )}
                         </Card.Body>
                       </Card>
                     </div>
@@ -659,7 +690,7 @@ const MyLeads: React.FC = () => {
                           Created {sort.sortBy === 'CreatedDate' && (sort.sortDirection === 'asc' ? '↑' : '↓')}
                         </th>
                       )}
-                      <th>Actions</th>
+                      {!isReferralPartner && <th>Actions</th>}
                     </tr>
                   </thead>
                   <tbody>
@@ -753,16 +784,24 @@ const MyLeads: React.FC = () => {
                         )}
                         {columnVisibility.followupDate && <td className="d-none d-lg-table-cell">{formatDate(lead.followupDate)}</td>}
                         {columnVisibility.createdDate && <td className="d-none d-xl-table-cell">{formatDate(lead.createdDate)}</td>}
-                        <td>
-                          <Button
-                            variant="outline-primary"
-                            size="sm"
-                            onClick={() => handleEditLead(lead)}
-                            title="Edit Lead"
-                          >
-                            <Edit size={14} />
-                          </Button>
-                        </td>
+                        {!isReferralPartner && (
+                          <td>
+                            {!lead.isReadonly ? (
+                              <Button
+                                variant="outline-primary"
+                                size="sm"
+                                onClick={() => handleEditLead(lead)}
+                                title="Edit Lead"
+                              >
+                                <Edit size={14} />
+                              </Button>
+                            ) : (
+                              <Badge bg="secondary" className="d-flex align-items-center justify-content-center" style={{ minWidth: '60px', minHeight: '31px' }}>
+                                Read Only
+                              </Badge>
+                            )}
+                          </td>
+                        )}
                       </tr>
                     ))}
                   </tbody>

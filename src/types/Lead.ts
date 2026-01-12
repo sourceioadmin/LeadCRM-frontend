@@ -30,6 +30,7 @@ export interface Lead {
   updatedByUserId?: number;
   updatedByUserName?: string; // Added for display
   statusUpdateDate?: string;
+  isReadonly: boolean; // Indicates if lead is readonly (for Referral Partners)
 }
 
 export interface LeadSource {

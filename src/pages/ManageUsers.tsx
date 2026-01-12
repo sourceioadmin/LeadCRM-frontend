@@ -193,7 +193,8 @@ const ManageUsers: React.FC = () => {
   const getAvailableRoles = () => [
     { id: 2, name: 'Company Admin' },
     { id: 3, name: 'Company Manager' },
-    { id: 4, name: 'Team Member' }
+    { id: 4, name: 'Team Member' },
+    { id: 5, name: 'Referral Partner' }
   ];
 
   const getAvailableManagers = () => {

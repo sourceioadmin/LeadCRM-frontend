@@ -11,7 +11,7 @@ interface InviteUserModalProps {
 const InviteUserModal: React.FC<InviteUserModalProps> = ({ show, onHide, onSuccess }) => {
   const [formData, setFormData] = useState({
     email: '',
-    userRoleId: 4 // Always Team Member
+    userRoleId: 4 // Default to Team Member
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -75,7 +75,7 @@ const InviteUserModal: React.FC<InviteUserModalProps> = ({ show, onHide, onSucce
 
   const handleClose = () => {
     if (!loading) {
-      setFormData({ email: '', userRoleId: 4 }); // Always reset to Team Member
+      setFormData({ email: '', userRoleId: 4 }); // Reset to Team Member default
       setError(null);
       setSuccess(null);
       onHide();
@@ -129,12 +129,13 @@ const InviteUserModal: React.FC<InviteUserModalProps> = ({ show, onHide, onSucce
               value={formData.userRoleId}
               onChange={handleChange}
               required
-              disabled={loading || true} // Always disabled since only Team Member is allowed
+              disabled={loading}
             >
               <option value={4}>Team Member</option>
+              <option value={5}>Referral Partner</option>
             </Form.Select>
             <Form.Text className="text-muted">
-              All invited users start as Team Members. Administrators can change roles later in the manage users section.
+              Choose the role for this user. You can select Team Member or Referral Partner. Roles can be changed later in the manage users section.
             </Form.Text>
           </Form.Group>
         </Modal.Body>

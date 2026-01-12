@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Modal, Button, Form, Alert, Spinner, Row, Col, Card } from 'react-bootstrap';
+import { Modal, Button, Form, Alert, Spinner, Row, Col, Card, Badge } from 'react-bootstrap';
 import { createLead, getLead, updateLead, getLeadSources, getLeadStatuses, getUrgencyLevels, getAssignableUsers } from '../services/leadService';
 import { LeadSource, LeadStatus, Urgency, Lead } from '../types/Lead';
 import { useAuth } from '../contexts/AuthContext';
@@ -40,13 +40,25 @@ const AddLeadModal: React.FC<AddLeadModalProps> = ({ show, onHide, onSuccess, le
 
   // Determine if we're in edit mode
   const isEditMode = !!lead;
-  
+
   // Determine user's role
   const userRole = user?.roleName || '';
   const isAdmin = userRole === 'Company Admin' || userRole === 'System Admin';
   const isManager = userRole === 'Company Manager';
   const isTeamMember = userRole === 'Team Member';
+  const isReferralPartner = userRole === 'Referral Partner' || user?.userRoleId === 5;
   const canAssignLeads = isAdmin || isManager;
+
+  // Check if lead is readonly (for Referral Partners or other readonly scenarios)
+  const isLeadReadonly = lead?.isReadonly === true;
+
+  // If editing a readonly lead, show message and prevent editing
+  useEffect(() => {
+    if (isEditMode && isLeadReadonly) {
+      console.warn('Attempting to edit a readonly lead');
+      // The modal will show the lead as readonly below
+    }
+  }, [isEditMode, isLeadReadonly]);
 
   // Form state
   const [formData, setFormData] = useState<FormData>({
@@ -216,6 +228,32 @@ const AddLeadModal: React.FC<AddLeadModalProps> = ({ show, onHide, onSuccess, le
     }
   }, [show, lead, isEditMode]);
 
+  // Auto-populate lead source and referred by for Referral Partners
+  useEffect(() => {
+    if (show && !isEditMode && isReferralPartner) {
+      // Auto-populate Referred By field with RP's name
+      if (user?.fullName) {
+        setFormData((prev) => ({
+          ...prev,
+          referredBy: user.fullName,
+        }));
+      }
+
+      // Auto-populate lead source when sources are loaded
+      if (leadSources.length > 0) {
+        const referralSource = leadSources.find(
+          (source) => source.name.toLowerCase() === 'referral'
+        );
+        if (referralSource) {
+          setFormData((prev) => ({
+            ...prev,
+            leadSourceId: referralSource.leadSourceId.toString(),
+          }));
+        }
+      }
+    }
+  }, [show, lead, isEditMode, isReferralPartner, user?.fullName, leadSources]);
+
   const loadDropdownOptions = async () => {
     setLoadingOptions(true);
     try {
@@ -227,7 +265,20 @@ const AddLeadModal: React.FC<AddLeadModalProps> = ({ show, onHide, onSuccess, le
       ]);
 
       if (sourcesRes.success && sourcesRes.data) {
-        setLeadSources(sourcesRes.data.filter(s => s.isActive));
+        const activeSources = sourcesRes.data.filter(s => s.isActive);
+        setLeadSources(activeSources);
+        
+        // Auto-select "Referral" source for Referral Partners
+        if (!isEditMode && isReferralPartner) {
+          const referralSource = activeSources.find(s => s.name.toLowerCase() === 'referral');
+          if (referralSource) {
+            setFormData(prev => ({ 
+              ...prev, 
+              leadSourceId: referralSource.leadSourceId.toString(),
+              referredBy: user?.fullName || '' // Auto-set referredBy to user's name
+            }));
+          }
+        }
       }
 
       if (statusesRes.success && statusesRes.data) {
@@ -357,6 +408,13 @@ const AddLeadModal: React.FC<AddLeadModalProps> = ({ show, onHide, onSuccess, le
     setLoading(true);
 
     try {
+      // Validate leadSourceId before parsing
+      if (!formData.leadSourceId || isNaN(parseInt(formData.leadSourceId))) {
+        setError('Please select a lead source');
+        setLoading(false);
+        return;
+      }
+
       const baseRequestData = {
         leadDate: formData.leadDate,
         clientName: formData.clientName.trim(),
@@ -366,14 +424,20 @@ const AddLeadModal: React.FC<AddLeadModalProps> = ({ show, onHide, onSuccess, le
         address: formData.address.trim() || undefined,
         city: formData.city.trim() || undefined,
         leadSourceId: parseInt(formData.leadSourceId),
-        referredBy: isReferralSource() ? formData.referredBy.trim() : undefined,
+        referredBy: isReferralPartner && user?.fullName 
+          ? user.fullName 
+          : (isReferralSource() && formData.referredBy.trim() ? formData.referredBy.trim() : undefined),
         interestedIn: formData.interestedIn.trim() || undefined,
         expectedBudget: formData.expectedBudget ? parseFloat(formData.expectedBudget) : undefined,
-        urgencyLevelId: formData.urgencyLevelId ? parseInt(formData.urgencyLevelId) : undefined,
+        urgencyLevelId: formData.urgencyLevelId && formData.urgencyLevelId !== '' 
+          ? parseInt(formData.urgencyLevelId) 
+          : undefined,
         // For Team Members, always assign to themselves
         assignedToUserId: isTeamMember && user
           ? user.userId
-          : (formData.assignedToUserId ? parseInt(formData.assignedToUserId) : undefined),
+          : (formData.assignedToUserId && formData.assignedToUserId !== '' 
+              ? parseInt(formData.assignedToUserId) 
+              : undefined),
         followupDate: formData.followupDate || undefined,
         notes: formData.notes.trim() || undefined
       };
@@ -385,6 +449,7 @@ const AddLeadModal: React.FC<AddLeadModalProps> = ({ show, onHide, onSuccess, le
           ...baseRequestData,
           leadStatusId: formData.leadStatusId ? parseInt(formData.leadStatusId) : lead.leadStatusId
         };
+        console.log('📤 [AddLeadModal] Update lead request:', updateData);
         response = await updateLead(lead.leadId, updateData);
       } else {
         // For create, leadStatusId is optional
@@ -392,6 +457,8 @@ const AddLeadModal: React.FC<AddLeadModalProps> = ({ show, onHide, onSuccess, le
           ...baseRequestData,
           leadStatusId: formData.leadStatusId ? parseInt(formData.leadStatusId) : undefined
         };
+        console.log('📤 [AddLeadModal] Create lead request:', createData);
+        console.log('📤 [AddLeadModal] User role:', userRole, 'isReferralPartner:', isReferralPartner);
         response = await createLead(createData);
       }
 
@@ -430,11 +497,18 @@ const AddLeadModal: React.FC<AddLeadModalProps> = ({ show, onHide, onSuccess, le
         setError(response.message || (isEditMode ? 'Failed to update lead' : 'Failed to create lead'));
       }
     } catch (err: any) {
-      console.error('Create lead error:', err);
-      setError(
-        err.response?.data?.message || 
-        'An error occurred while creating the lead. Please try again.'
-      );
+      console.error('❌ [AddLeadModal] Create lead error:', err);
+      console.error('❌ [AddLeadModal] Error response:', err.response?.data);
+      console.error('❌ [AddLeadModal] Error status:', err.response?.status);
+      console.error('❌ [AddLeadModal] Form data:', formData);
+      console.error('❌ [AddLeadModal] User:', user);
+      
+      const errorMessage = err.response?.data?.message || 
+        err.response?.data?.error ||
+        err.message ||
+        'An error occurred while creating the lead. Please try again.';
+      
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -487,11 +561,21 @@ const AddLeadModal: React.FC<AddLeadModalProps> = ({ show, onHide, onSuccess, le
       className="add-lead-modal"
     >
       <Modal.Header closeButton={!loading} className="border-0 pb-0">
-        <Modal.Title className="fw-semibold">{isEditMode ? 'Edit Lead' : 'Add New Lead'}</Modal.Title>
+        <Modal.Title className="fw-semibold">
+          {isEditMode ? (isLeadReadonly ? 'View Lead (Read Only)' : 'Edit Lead') : 'Add New Lead'}
+        </Modal.Title>
+        {isLeadReadonly && (
+          <Badge bg="secondary" className="ms-2">Read Only</Badge>
+        )}
       </Modal.Header>
 
-      <Form onSubmit={handleSubmit} key={isEditMode ? `edit-${lead?.leadId}` : 'add'}>
+      <Form onSubmit={isLeadReadonly ? (e) => e.preventDefault() : handleSubmit} key={isEditMode ? `edit-${lead?.leadId}` : 'add'}>
         <Modal.Body className="px-4" ref={modalBodyRef} onScroll={closeDatePickers}>
+          {isLeadReadonly && (
+            <Alert variant="info" className="mb-3">
+              <strong>Read Only:</strong> This lead cannot be edited. It is displayed for reference only.
+            </Alert>
+          )}
           {error && (
             <Alert variant="danger" dismissible onClose={() => setError(null)} className="mb-3">
               {error}
@@ -654,7 +738,7 @@ const AddLeadModal: React.FC<AddLeadModalProps> = ({ show, onHide, onSuccess, le
                           value={formData.leadSourceId}
                           onChange={handleChange}
                           isInvalid={!!errors.leadSourceId}
-                          disabled={loading}
+                          disabled={loading || isReferralPartner}
                         >
                           <option value="">Select lead source</option>
                           {leadSources.map((source) => (
@@ -666,6 +750,11 @@ const AddLeadModal: React.FC<AddLeadModalProps> = ({ show, onHide, onSuccess, le
                         <Form.Control.Feedback type="invalid">
                           {errors.leadSourceId}
                         </Form.Control.Feedback>
+                        {isReferralPartner && (
+                          <Form.Text className="text-muted small">
+                            Automatically set to "Referral" for Referral Partners.
+                          </Form.Text>
+                        )}
                       </Form.Group>
                     </Col>
 
@@ -694,8 +783,8 @@ const AddLeadModal: React.FC<AddLeadModalProps> = ({ show, onHide, onSuccess, le
                   </Row>
 
 
-                  {/* Conditional ReferredBy field */}
-                  {isReferralSource() && (
+                  {/* ReferredBy field - Show for Referral source or when user is RP */}
+                  {(isReferralSource() || isReferralPartner) && (
                     <Row className="g-3">
                       <Col xs={12}>
                         <Form.Group className="mb-3">
@@ -708,14 +797,20 @@ const AddLeadModal: React.FC<AddLeadModalProps> = ({ show, onHide, onSuccess, le
                             name="referredBy"
                             value={formData.referredBy}
                             onChange={handleChange}
-                            placeholder="Enter referrer name"
+                            placeholder={isReferralPartner ? "" : "Enter referrer name"}
                             isInvalid={!!errors.referredBy}
-                            disabled={loading}
+                            disabled={loading || isReferralPartner}
+                            readOnly={isReferralPartner}
                             maxLength={100}
                           />
                           <Form.Control.Feedback type="invalid">
                             {errors.referredBy}
                           </Form.Control.Feedback>
+                          {isReferralPartner && (
+                            <Form.Text className="text-muted small">
+                              Auto-populated with your name as the referrer.
+                            </Form.Text>
+                          )}
                         </Form.Group>
                       </Col>
                     </Row>
@@ -842,49 +937,52 @@ const AddLeadModal: React.FC<AddLeadModalProps> = ({ show, onHide, onSuccess, le
                     </Row>
 
                     <Row className="g-3">
-                      <Col xs={12} md={6}>
-                        <Form.Group className="mb-3">
-                          <Form.Label className="fw-medium">Assign To</Form.Label>
-                          {canAssignLeads ? (
-                            // Admin and Manager can select from dropdown
-                            <Form.Select
-                              size="sm"
-                              name="assignedToUserId"
-                              value={formData.assignedToUserId}
-                              onChange={handleChange}
-                              disabled={loading}
-                            >
-                              <option value="">Unassigned</option>
-                              {users.map((assignableUser: any) => (
-                                <option key={assignableUser.userId} value={assignableUser.userId}>
-                                  {assignableUser.fullName} ({assignableUser.email})
-                                </option>
-                              ))}
-                            </Form.Select>
-                          ) : (
-                            // Team Member - disabled field with their name
-                            <Form.Control
-                              type="text"
-                              size="sm"
-                              value={user?.fullName || 'Auto-assigned to you'}
-                              disabled
-                              className="bg-light"
-                            />
-                          )}
-                          {isTeamMember && (
-                            <Form.Text className="text-muted small">
-                              Leads are automatically assigned to you
-                            </Form.Text>
-                          )}
-                          {isManager && users.length === 0 && (
-                            <Form.Text className="text-warning small">
-                              No team members found. Add team members to assign leads.
-                            </Form.Text>
-                          )}
-                        </Form.Group>
-                      </Col>
+                      {/* Hide Assign To field completely for Referral Partners */}
+                      {!isReferralPartner && (
+                        <Col xs={12} md={6}>
+                          <Form.Group className="mb-3">
+                            <Form.Label className="fw-medium">Assign To</Form.Label>
+                            {canAssignLeads ? (
+                              // Admin and Manager can select from dropdown
+                              <Form.Select
+                                size="sm"
+                                name="assignedToUserId"
+                                value={formData.assignedToUserId}
+                                onChange={handleChange}
+                                disabled={loading}
+                              >
+                                <option value="">Unassigned</option>
+                                {users.map((assignableUser: any) => (
+                                  <option key={assignableUser.userId} value={assignableUser.userId}>
+                                    {assignableUser.fullName} ({assignableUser.email})
+                                  </option>
+                                ))}
+                              </Form.Select>
+                            ) : (
+                              // Team Member - disabled field with their name
+                              <Form.Control
+                                type="text"
+                                size="sm"
+                                value={user?.fullName || 'Auto-assigned to you'}
+                                disabled
+                                className="bg-light"
+                              />
+                            )}
+                            {isTeamMember && (
+                              <Form.Text className="text-muted small">
+                                Leads are automatically assigned to you
+                              </Form.Text>
+                            )}
+                            {isManager && users.length === 0 && (
+                              <Form.Text className="text-warning small">
+                                No team members found. Add team members to assign leads.
+                              </Form.Text>
+                            )}
+                          </Form.Group>
+                        </Col>
+                      )}
 
-                      <Col xs={12} md={6}>
+                      <Col xs={12} md={isReferralPartner ? 12 : 6}>
                         <Form.Group className="mb-3">
                           <Form.Label className="fw-medium">Follow-up Date</Form.Label>
                           <Form.Control
@@ -944,7 +1042,7 @@ const AddLeadModal: React.FC<AddLeadModalProps> = ({ show, onHide, onSuccess, le
             <Button
               variant="primary"
               type="submit"
-              disabled={loading || loadingOptions}
+              disabled={loading || loadingOptions || isLeadReadonly}
               className="flex-grow-1 flex-sm-grow-0 px-4"
             >
             {loading ? (
@@ -961,8 +1059,8 @@ const AddLeadModal: React.FC<AddLeadModalProps> = ({ show, onHide, onSuccess, le
               </>
             ) : (
               <>
-                <i className={`bi bi-${isEditMode ? 'pencil' : 'plus-circle'} me-2`}></i>
-                {isEditMode ? 'Update Lead' : 'Create Lead'}
+                <i className={`bi bi-${isLeadReadonly ? 'eye' : (isEditMode ? 'pencil' : 'plus-circle')} me-2`}></i>
+                {isLeadReadonly ? 'View Only' : (isEditMode ? 'Update Lead' : 'Create Lead')}
               </>
             )}
             </Button>
