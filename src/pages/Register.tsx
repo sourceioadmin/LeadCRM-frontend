@@ -42,7 +42,6 @@ interface RegisterFormData {
 const disposableDomains = [
   "example.com",
   "test.com",
-  "mailinator.com",
   "tempmail.com",
   "fake.com",
   "invalid.com",
