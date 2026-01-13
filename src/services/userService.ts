@@ -145,6 +145,24 @@ export const getCurrentUserProfile = async (): Promise<UserResponse> => {
   return response.data;
 };
 
+/**
+ * Get all Referral Partners in the company
+ */
+export const getReferralPartners = async (): Promise<UsersResponse> => {
+  const response = await api.get<UsersResponse>('/user');
+  if (response.data.success && response.data.data) {
+    // Filter to only return active Referral Partners
+    const referralPartners = response.data.data.filter(
+      (user) => (user.roleName === 'Referral Partner' || user.roleId === 5) && user.isActive
+    );
+    return {
+      ...response.data,
+      data: referralPartners
+    };
+  }
+  return response.data;
+};
+
 export default {
   inviteUser,
   getUsers,
@@ -152,6 +170,7 @@ export default {
   updateUser,
   toggleUserStatus,
   resetUserPassword,
-  getCurrentUserProfile
+  getCurrentUserProfile,
+  getReferralPartners
 };
 

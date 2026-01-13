@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Modal, Button, Form, Alert, Spinner, Row, Col, Card, Badge } from 'react-bootstrap';
+import { Modal, Button, Form, Alert, Spinner, Row, Col, Card, Badge, InputGroup, Dropdown } from 'react-bootstrap';
 import { createLead, getLead, updateLead, getLeadSources, getLeadStatuses, getUrgencyLevels, getAssignableUsers } from '../services/leadService';
 import { LeadSource, LeadStatus, Urgency, Lead } from '../types/Lead';
 import { useAuth } from '../contexts/AuthContext';
 import { formatDate, formatDateForInput, getTodayForInput } from '../utils/dateUtils';
+import { getReferralPartners, User } from '../services/userService';
 
 interface AddLeadModalProps {
   show: boolean;
@@ -94,6 +95,14 @@ const AddLeadModal: React.FC<AddLeadModalProps> = ({ show, onHide, onSuccess, le
   const [urgencyLevels, setUrgencyLevels] = useState<Urgency[]>([]);
   const [users, setUsers] = useState<any[]>([]);
   const [loadingOptions, setLoadingOptions] = useState(false);
+
+  // Referral Partner combobox state
+  const [referralPartners, setReferralPartners] = useState<User[]>([]);
+  const [referredByUserId, setReferredByUserId] = useState<number | null>(null);
+  const [showReferralPartnerDropdown, setShowReferralPartnerDropdown] = useState(false);
+  const [filteredReferralPartners, setFilteredReferralPartners] = useState<User[]>([]);
+  const referredByInputRef = useRef<HTMLInputElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Prevent modal from closing immediately after opening (fixes mobile touch issues)
   const [modalOpenedAt, setModalOpenedAt] = useState<number | null>(null);
@@ -217,6 +226,10 @@ const AddLeadModal: React.FC<AddLeadModalProps> = ({ show, onHide, onSuccess, le
           followupDate: '',
           notes: ''
         });
+        // Reset combobox state
+        setReferredByUserId(null);
+        setShowReferralPartnerDropdown(false);
+        setFilteredReferralPartners(referralPartners);
       }
 
       loadDropdownOptions();
@@ -254,14 +267,29 @@ const AddLeadModal: React.FC<AddLeadModalProps> = ({ show, onHide, onSuccess, le
     }
   }, [show, lead, isEditMode, isReferralPartner, user?.fullName, leadSources]);
 
+  // Match referredBy with Referral Partner when editing (after both lead data and RPs are loaded)
+  useEffect(() => {
+    if (isEditMode && lead && formData.referredBy && referralPartners.length > 0) {
+      const matchingRP = referralPartners.find(
+        rp => rp.fullName.toLowerCase() === formData.referredBy.toLowerCase()
+      );
+      if (matchingRP) {
+        setReferredByUserId(matchingRP.userId);
+      } else {
+        setReferredByUserId(null);
+      }
+    }
+  }, [isEditMode, lead, formData.referredBy, referralPartners]);
+
   const loadDropdownOptions = async () => {
     setLoadingOptions(true);
     try {
-      const [sourcesRes, statusesRes, urgencyRes, usersRes] = await Promise.all([
+      const [sourcesRes, statusesRes, urgencyRes, usersRes, referralPartnersRes] = await Promise.all([
         getLeadSources(),
         getLeadStatuses(),
         getUrgencyLevels(),
-        getAssignableUsers()
+        getAssignableUsers(),
+        !isReferralPartner ? getReferralPartners() : Promise.resolve({ success: true, data: [], message: '' })
       ]);
 
       if (sourcesRes.success && sourcesRes.data) {
@@ -306,6 +334,12 @@ const AddLeadModal: React.FC<AddLeadModalProps> = ({ show, onHide, onSuccess, le
           setFormData(prev => ({ ...prev, assignedToUserId: user.userId.toString() }));
         }
       }
+
+      // Load Referral Partners for combobox (only for non-RP users)
+      if (!isReferralPartner && referralPartnersRes.success && referralPartnersRes.data) {
+        setReferralPartners(referralPartnersRes.data);
+        setFilteredReferralPartners(referralPartnersRes.data);
+      }
     } catch (err) {
       console.error('Failed to load dropdown options:', err);
       setError('Failed to load form options. Please try again.');
@@ -336,6 +370,10 @@ const AddLeadModal: React.FC<AddLeadModalProps> = ({ show, onHide, onSuccess, le
         followupDate: formatDateForInput(leadData.followupDate),
         notes: leadData.notes || ''
       });
+
+      // Try to match referredBy with a Referral Partner
+      // This will be handled after referral partners are loaded
+      setReferredByUserId(null);
     } catch (err) {
       console.error('Failed to load lead data:', err);
       setError('Failed to load lead data. Please try again.');
@@ -351,11 +389,89 @@ const AddLeadModal: React.FC<AddLeadModalProps> = ({ show, onHide, onSuccess, le
       [name]: value
     }));
     
+    // If lead source changes and it's not "Referral", clear referredBy fields
+    if (name === 'leadSourceId') {
+      const selectedSource = leadSources.find(s => s.leadSourceId.toString() === value);
+      if (selectedSource && selectedSource.name.toLowerCase() !== 'referral') {
+        setFormData(prev => ({ ...prev, referredBy: '' }));
+        setReferredByUserId(null);
+        setShowReferralPartnerDropdown(false);
+      }
+    }
+    
     // Clear error for this field
     if (errors[name]) {
       setErrors(prev => {
         const newErrors = { ...prev };
         delete newErrors[name];
+        return newErrors;
+      });
+    }
+  };
+
+  // Combobox handlers for Referred By field
+  const handleReferredByChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setFormData(prev => ({ ...prev, referredBy: value }));
+    
+    // Filter Referral Partners based on typed text
+    if (value.trim()) {
+      const filtered = referralPartners.filter(rp =>
+        rp.fullName.toLowerCase().includes(value.toLowerCase())
+      );
+      setFilteredReferralPartners(filtered);
+      setShowReferralPartnerDropdown(filtered.length > 0);
+    } else {
+      setFilteredReferralPartners(referralPartners);
+      setShowReferralPartnerDropdown(false);
+    }
+    
+    // Clear referredByUserId when user types (free text mode)
+    setReferredByUserId(null);
+    
+    // Clear error for this field
+    if (errors.referredBy) {
+      setErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors.referredBy;
+        return newErrors;
+      });
+    }
+  };
+
+  const handleReferredByFocus = () => {
+    if (isReferralSource() && !isReferralPartner && referralPartners.length > 0) {
+      const searchText = formData.referredBy.trim();
+      if (searchText) {
+        const filtered = referralPartners.filter(rp =>
+          rp.fullName.toLowerCase().includes(searchText.toLowerCase())
+        );
+        setFilteredReferralPartners(filtered);
+        setShowReferralPartnerDropdown(filtered.length > 0);
+      } else {
+        setFilteredReferralPartners(referralPartners);
+        setShowReferralPartnerDropdown(true);
+      }
+    }
+  };
+
+  const handleReferredByBlur = () => {
+    // Delay hiding dropdown to allow click on dropdown items
+    setTimeout(() => {
+      setShowReferralPartnerDropdown(false);
+    }, 200);
+  };
+
+  const handleSelectReferralPartner = (rp: User) => {
+    setFormData(prev => ({ ...prev, referredBy: rp.fullName }));
+    setReferredByUserId(rp.userId);
+    setShowReferralPartnerDropdown(false);
+    
+    // Clear error for this field
+    if (errors.referredBy) {
+      setErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors.referredBy;
         return newErrors;
       });
     }
@@ -379,13 +495,16 @@ const AddLeadModal: React.FC<AddLeadModalProps> = ({ show, onHide, onSuccess, le
       newErrors.emailAddress = 'Please enter a valid email address';
     }
 
-    if (!formData.leadSourceId) {
-      newErrors.leadSourceId = 'Lead source is required';
-    }
+    // Skip Lead Source and Referred By validation in edit mode (fields are hidden)
+    if (!isEditMode) {
+      if (!formData.leadSourceId) {
+        newErrors.leadSourceId = 'Lead source is required';
+      }
 
-    // Validate ReferredBy if source is "Referral"
-    if (isReferralSource() && !formData.referredBy.trim()) {
-      newErrors.referredBy = 'Referred by is required for referral leads';
+      // Validate ReferredBy if source is "Referral"
+      if (isReferralSource() && !formData.referredBy.trim()) {
+        newErrors.referredBy = 'Referred by is required for referral leads';
+      }
     }
 
     if (formData.expectedBudget && isNaN(parseFloat(formData.expectedBudget))) {
@@ -408,8 +527,8 @@ const AddLeadModal: React.FC<AddLeadModalProps> = ({ show, onHide, onSuccess, le
     setLoading(true);
 
     try {
-      // Validate leadSourceId before parsing
-      if (!formData.leadSourceId || isNaN(parseInt(formData.leadSourceId))) {
+      // Validate leadSourceId before parsing (skip in edit mode as field is hidden)
+      if (!isEditMode && (!formData.leadSourceId || isNaN(parseInt(formData.leadSourceId)))) {
         setError('Please select a lead source');
         setLoading(false);
         return;
@@ -427,6 +546,9 @@ const AddLeadModal: React.FC<AddLeadModalProps> = ({ show, onHide, onSuccess, le
         referredBy: isReferralPartner && user?.fullName 
           ? user.fullName 
           : (isReferralSource() && formData.referredBy.trim() ? formData.referredBy.trim() : undefined),
+        referredByUserId: isReferralPartner 
+          ? user?.userId 
+          : (isReferralSource() && referredByUserId ? referredByUserId : undefined),
         interestedIn: formData.interestedIn.trim() || undefined,
         expectedBudget: formData.expectedBudget ? parseFloat(formData.expectedBudget) : undefined,
         urgencyLevelId: formData.urgencyLevelId && formData.urgencyLevelId !== '' 
@@ -444,9 +566,12 @@ const AddLeadModal: React.FC<AddLeadModalProps> = ({ show, onHide, onSuccess, le
 
       let response;
       if (isEditMode && lead) {
-        // For update, leadStatusId is required - use form value or fallback to existing lead's status
+        // For update, preserve Lead Source and Referred By from original lead (fields are hidden in edit mode)
+        // baseRequestData already has conditional logic for referredBy based on isReferralSource()
+        // formData.leadSourceId is set from lead.leadSourceId when loading, so isReferralSource() works correctly
         const updateData = {
           ...baseRequestData,
+          leadSourceId: lead.leadSourceId, // Explicitly use original lead's leadSourceId
           leadStatusId: formData.leadStatusId ? parseInt(formData.leadStatusId) : lead.leadStatusId
         };
         console.log('📤 [AddLeadModal] Update lead request:', updateData);
@@ -485,6 +610,10 @@ const AddLeadModal: React.FC<AddLeadModalProps> = ({ show, onHide, onSuccess, le
             followupDate: '',
             notes: ''
           });
+          // Reset combobox state
+          setReferredByUserId(null);
+          setShowReferralPartnerDropdown(false);
+          setFilteredReferralPartners(referralPartners);
         }
 
         // Close modal and refresh parent after showing success message
@@ -727,38 +856,41 @@ const AddLeadModal: React.FC<AddLeadModalProps> = ({ show, onHide, onSuccess, le
                   </Row>
 
                   <Row className="g-3">
-                    <Col xs={12} md={6}>
-                      <Form.Group className="mb-3">
-                        <Form.Label className="fw-medium">
-                          Lead Source <span className="text-danger">*</span>
-                        </Form.Label>
-                        <Form.Select
-                          size="sm"
-                          name="leadSourceId"
-                          value={formData.leadSourceId}
-                          onChange={handleChange}
-                          isInvalid={!!errors.leadSourceId}
-                          disabled={loading || isReferralPartner}
-                        >
-                          <option value="">Select lead source</option>
-                          {leadSources.map((source) => (
-                            <option key={source.leadSourceId} value={source.leadSourceId}>
-                              {source.name}
-                            </option>
-                          ))}
-                        </Form.Select>
-                        <Form.Control.Feedback type="invalid">
-                          {errors.leadSourceId}
-                        </Form.Control.Feedback>
-                        {isReferralPartner && (
-                          <Form.Text className="text-muted small">
-                            Automatically set to "Referral" for Referral Partners.
-                          </Form.Text>
-                        )}
-                      </Form.Group>
-                    </Col>
+                    {/* Lead Source - Hide in edit mode */}
+                    {!isEditMode && (
+                      <Col xs={12} md={6}>
+                        <Form.Group className="mb-3">
+                          <Form.Label className="fw-medium">
+                            Lead Source <span className="text-danger">*</span>
+                          </Form.Label>
+                          <Form.Select
+                            size="sm"
+                            name="leadSourceId"
+                            value={formData.leadSourceId}
+                            onChange={handleChange}
+                            isInvalid={!!errors.leadSourceId}
+                            disabled={loading || isReferralPartner}
+                          >
+                            <option value="">Select lead source</option>
+                            {leadSources.map((source) => (
+                              <option key={source.leadSourceId} value={source.leadSourceId}>
+                                {source.name}
+                              </option>
+                            ))}
+                          </Form.Select>
+                          <Form.Control.Feedback type="invalid">
+                            {errors.leadSourceId}
+                          </Form.Control.Feedback>
+                          {isReferralPartner && (
+                            <Form.Text className="text-muted small">
+                              Automatically set to "Referral" for Referral Partners.
+                            </Form.Text>
+                          )}
+                        </Form.Group>
+                      </Col>
+                    )}
 
-                    <Col xs={12} md={6}>
+                    <Col xs={12} md={isEditMode ? 12 : 6}>
                       <Form.Group className="mb-3">
                         <Form.Label className="fw-medium">Lead Status</Form.Label>
                         <Form.Select
@@ -783,33 +915,119 @@ const AddLeadModal: React.FC<AddLeadModalProps> = ({ show, onHide, onSuccess, le
                   </Row>
 
 
-                  {/* ReferredBy field - Show for Referral source or when user is RP */}
-                  {(isReferralSource() || isReferralPartner) && (
+                  {/* ReferredBy field - Show for Referral source or when user is RP, but hide in edit mode */}
+                  {!isEditMode && (isReferralSource() || isReferralPartner) && (
                     <Row className="g-3">
                       <Col xs={12}>
-                        <Form.Group className="mb-3">
+                        <Form.Group className="mb-3" style={{ position: 'relative' }}>
                           <Form.Label className="fw-medium">
                             Referred By <span className="text-danger">*</span>
                           </Form.Label>
-                          <Form.Control
-                            type="text"
-                            size="sm"
-                            name="referredBy"
-                            value={formData.referredBy}
-                            onChange={handleChange}
-                            placeholder={isReferralPartner ? "" : "Enter referrer name"}
-                            isInvalid={!!errors.referredBy}
-                            disabled={loading || isReferralPartner}
-                            readOnly={isReferralPartner}
-                            maxLength={100}
-                          />
-                          <Form.Control.Feedback type="invalid">
-                            {errors.referredBy}
-                          </Form.Control.Feedback>
-                          {isReferralPartner && (
-                            <Form.Text className="text-muted small">
-                              Auto-populated with your name as the referrer.
-                            </Form.Text>
+                          {isReferralPartner ? (
+                            // Readonly field for Referral Partners
+                            <>
+                              <Form.Control
+                                type="text"
+                                size="sm"
+                                name="referredBy"
+                                value={formData.referredBy}
+                                readOnly
+                                disabled
+                                maxLength={100}
+                              />
+                              <Form.Text className="text-muted small">
+                                Auto-populated with your name as the referrer.
+                              </Form.Text>
+                            </>
+                          ) : (
+                            // Combobox for non-Referral Partners
+                            <>
+                              <InputGroup>
+                                <Form.Control
+                                  ref={referredByInputRef}
+                                  type="text"
+                                  size="sm"
+                                  name="referredBy"
+                                  value={formData.referredBy}
+                                  onChange={handleReferredByChange}
+                                  onFocus={handleReferredByFocus}
+                                  onBlur={handleReferredByBlur}
+                                  placeholder="Type to search Referral Partners or enter free text"
+                                  isInvalid={!!errors.referredBy}
+                                  disabled={loading}
+                                  maxLength={100}
+                                  autoComplete="off"
+                                />
+                                <Form.Control.Feedback type="invalid">
+                                  {errors.referredBy}
+                                </Form.Control.Feedback>
+                              </InputGroup>
+                              {showReferralPartnerDropdown && filteredReferralPartners.length > 0 && (
+                                <div
+                                  ref={dropdownRef}
+                                  className="border rounded shadow-sm bg-white"
+                                  style={{
+                                    position: 'absolute',
+                                    top: '100%',
+                                    left: 0,
+                                    right: 0,
+                                    zIndex: 1050,
+                                    maxHeight: '200px',
+                                    overflowY: 'auto',
+                                    marginTop: '2px'
+                                  }}
+                                >
+                                  {filteredReferralPartners.map((rp) => (
+                                    <div
+                                      key={rp.userId}
+                                      className="px-3 py-2 hover-bg-light"
+                                      style={{
+                                        cursor: 'pointer',
+                                        borderBottom: '1px solid #e9ecef'
+                                      }}
+                                      onMouseDown={(e) => {
+                                        e.preventDefault(); // Prevent blur event
+                                        handleSelectReferralPartner(rp);
+                                      }}
+                                      onMouseEnter={(e) => {
+                                        e.currentTarget.style.backgroundColor = '#f8f9fa';
+                                      }}
+                                      onMouseLeave={(e) => {
+                                        e.currentTarget.style.backgroundColor = 'white';
+                                      }}
+                                    >
+                                      <div className="fw-medium">{rp.fullName}</div>
+                                      <div className="text-muted small">{rp.email}</div>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                              {showReferralPartnerDropdown && filteredReferralPartners.length === 0 && formData.referredBy.trim() && (
+                                <div
+                                  className="border rounded shadow-sm bg-white px-3 py-2 text-muted small"
+                                  style={{
+                                    position: 'absolute',
+                                    top: '100%',
+                                    left: 0,
+                                    right: 0,
+                                    zIndex: 1050,
+                                    marginTop: '2px'
+                                  }}
+                                >
+                                  No matching Referral Partners found. You can enter free text.
+                                </div>
+                              )}
+                              {referredByUserId && (
+                                <Form.Text className="text-success small d-block mt-1">
+                                  Selected Referral Partner
+                                </Form.Text>
+                              )}
+                              {!referredByUserId && formData.referredBy.trim() && (
+                                <Form.Text className="text-muted small d-block mt-1">
+                                  Free text entry
+                                </Form.Text>
+                              )}
+                            </>
                           )}
                         </Form.Group>
                       </Col>
