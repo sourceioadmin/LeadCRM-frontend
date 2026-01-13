@@ -200,6 +200,7 @@ const ManageUsers: React.FC = () => {
   const getAvailableManagers = () => {
     return users.filter(u =>
       u.invitationStatus === 'accepted' &&
+      u.userId && // Ensure userId exists
       (u.roleName === 'Company Admin' || u.roleName === 'Company Manager')
     );
   };
@@ -560,11 +561,9 @@ const ManageUsers: React.FC = () => {
             >
               <option value="">No Manager</option>
               {getAvailableManagers().map(manager => (
-                manager.userId ? (
-                  <option key={manager.userId} value={manager.userId}>
-                    {manager.fullName} ({manager.roleName})
-                  </option>
-                ) : null
+                <option key={manager.userId} value={manager.userId}>
+                  {manager.fullName} ({manager.roleName})
+                </option>
               ))}
             </Form.Select>
             <Form.Text className="text-muted">
