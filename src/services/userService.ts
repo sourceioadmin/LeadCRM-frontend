@@ -147,20 +147,30 @@ export const getCurrentUserProfile = async (): Promise<UserResponse> => {
 
 /**
  * Get all Referral Partners in the company
+ * Uses dedicated endpoint accessible to all authenticated users (not admin-only)
  */
 export const getReferralPartners = async (): Promise<UsersResponse> => {
-  const response = await api.get<UsersResponse>('/user');
-  if (response.data.success && response.data.data) {
-    // Filter to only return active Referral Partners
-    const referralPartners = response.data.data.filter(
-      (user) => (user.roleName === 'Referral Partner' || user.roleId === 5) && user.isActive
-    );
-    return {
-      ...response.data,
-      data: referralPartners
-    };
+  try {
+    // Try the dedicated referral partners endpoint first
+    const response = await api.get<UsersResponse>('/user/referral-partners');
+    return response.data;
+  } catch (error: any) {
+    // Fallback to admin-only /user endpoint if referral-partners endpoint doesn't exist
+    // This maintains backward compatibility during backend deployment
+    console.warn('Referral partners endpoint not available, falling back to /user endpoint:', error.message);
+    const fallbackResponse = await api.get<UsersResponse>('/user');
+    if (fallbackResponse.data.success && fallbackResponse.data.data) {
+      // Filter to only return active Referral Partners
+      const referralPartners = fallbackResponse.data.data.filter(
+        (user) => (user.roleName === 'Referral Partner' || user.roleId === 5) && user.isActive
+      );
+      return {
+        ...fallbackResponse.data,
+        data: referralPartners
+      };
+    }
+    return fallbackResponse.data;
   }
-  return response.data;
 };
 
 export default {

@@ -283,32 +283,32 @@ const AddLeadModal: React.FC<AddLeadModalProps> = ({ show, onHide, onSuccess, le
 
   const loadDropdownOptions = async () => {
     setLoadingOptions(true);
-    try {
-      const [sourcesRes, statusesRes, urgencyRes, usersRes, referralPartnersRes] = await Promise.all([
-        getLeadSources(),
-        getLeadStatuses(),
-        getUrgencyLevels(),
-        getAssignableUsers(),
-        !isReferralPartner ? getReferralPartners() : Promise.resolve({ success: true, data: [], message: '' })
-      ]);
+    let hasErrors = false;
 
+    try {
+      // Load each dropdown option individually to handle failures gracefully
+      const sourcesRes = await getLeadSources();
       if (sourcesRes.success && sourcesRes.data) {
         const activeSources = sourcesRes.data.filter(s => s.isActive);
         setLeadSources(activeSources);
-        
+
         // Auto-select "Referral" source for Referral Partners
         if (!isEditMode && isReferralPartner) {
           const referralSource = activeSources.find(s => s.name.toLowerCase() === 'referral');
           if (referralSource) {
-            setFormData(prev => ({ 
-              ...prev, 
+            setFormData(prev => ({
+              ...prev,
               leadSourceId: referralSource.leadSourceId.toString(),
               referredBy: user?.fullName || '' // Auto-set referredBy to user's name
             }));
           }
         }
+      } else {
+        console.warn('Failed to load lead sources');
+        hasErrors = true;
       }
 
+      const statusesRes = await getLeadStatuses();
       if (statusesRes.success && statusesRes.data) {
         const activeStatuses = statusesRes.data.filter(s => s.isActive);
         setLeadStatuses(activeStatuses);
@@ -320,12 +320,20 @@ const AddLeadModal: React.FC<AddLeadModalProps> = ({ show, onHide, onSuccess, le
             setFormData(prev => ({ ...prev, leadStatusId: newLeadStatus.leadStatusId.toString() }));
           }
         }
+      } else {
+        console.warn('Failed to load lead statuses');
+        hasErrors = true;
       }
 
+      const urgencyRes = await getUrgencyLevels();
       if (urgencyRes.success && urgencyRes.data) {
         setUrgencyLevels(urgencyRes.data.filter(u => u.isActive));
+      } else {
+        console.warn('Failed to load urgency levels');
+        hasErrors = true;
       }
 
+      const usersRes = await getAssignableUsers();
       if (usersRes.success && usersRes.data) {
         setUsers(usersRes.data);
 
@@ -333,12 +341,31 @@ const AddLeadModal: React.FC<AddLeadModalProps> = ({ show, onHide, onSuccess, le
         if (!isEditMode && isTeamMember && user) {
           setFormData(prev => ({ ...prev, assignedToUserId: user.userId.toString() }));
         }
+      } else {
+        console.warn('Failed to load assignable users');
+        hasErrors = true;
       }
 
       // Load Referral Partners for combobox (only for non-RP users)
-      if (!isReferralPartner && referralPartnersRes.success && referralPartnersRes.data) {
-        setReferralPartners(referralPartnersRes.data);
-        setFilteredReferralPartners(referralPartnersRes.data);
+      if (!isReferralPartner) {
+        try {
+          const referralPartnersRes = await getReferralPartners();
+          if (referralPartnersRes.success && referralPartnersRes.data) {
+            setReferralPartners(referralPartnersRes.data);
+            setFilteredReferralPartners(referralPartnersRes.data);
+          } else {
+            console.warn('Failed to load referral partners - referral partner selection will be unavailable');
+          }
+        } catch (referralError) {
+          console.warn('Failed to load referral partners (authorization issue expected for non-admin users):', referralError);
+          // This is expected for Team Members and Managers - they won't be able to select referral partners
+          // but the form will still work for creating leads with other sources
+        }
+      }
+
+      // If critical options failed to load, show error
+      if (hasErrors) {
+        setError('Some form options failed to load. You may still be able to create leads, but some dropdowns might be incomplete.');
       }
     } catch (err) {
       console.error('Failed to load dropdown options:', err);
@@ -952,7 +979,11 @@ const AddLeadModal: React.FC<AddLeadModalProps> = ({ show, onHide, onSuccess, le
                                   onChange={handleReferredByChange}
                                   onFocus={handleReferredByFocus}
                                   onBlur={handleReferredByBlur}
-                                  placeholder="Type to search Referral Partners or enter free text"
+                                  placeholder={
+                                    referralPartners.length > 0
+                                      ? "Type to search Referral Partners or enter free text"
+                                      : "Enter referrer name (free text only - no partner selection available)"
+                                  }
                                   isInvalid={!!errors.referredBy}
                                   disabled={loading}
                                   maxLength={100}
@@ -962,6 +993,12 @@ const AddLeadModal: React.FC<AddLeadModalProps> = ({ show, onHide, onSuccess, le
                                   {errors.referredBy}
                                 </Form.Control.Feedback>
                               </InputGroup>
+                              {referralPartners.length === 0 && (
+                                <Form.Text className="text-warning small d-block mt-1">
+                                  <i className="bi bi-info-circle me-1"></i>
+                                  Referral Partner selection is not available for your user role. You can enter the referrer name manually.
+                                </Form.Text>
+                              )}
                               {showReferralPartnerDropdown && filteredReferralPartners.length > 0 && (
                                 <div
                                   ref={dropdownRef}
