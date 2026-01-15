@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Container, Card, Form, Button, Alert, Spinner, Row, Col } from 'react-bootstrap';
+import { Eye, EyeOff, Lock } from 'lucide-react';
 import { getInvitationDetails, registerInvite, InvitationDetails } from '../services/authService';
 
 const AcceptInvite: React.FC = () => {
@@ -20,6 +21,8 @@ const AcceptInvite: React.FC = () => {
   });
   const [passwordStrength, setPasswordStrength] = useState<string>('');
   const [passwordMatch, setPasswordMatch] = useState<boolean>(true);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   useEffect(() => {
     if (!token) {
@@ -131,9 +134,9 @@ const AcceptInvite: React.FC = () => {
       return;
     }
 
-    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9])[A-Za-z\d@$!%*?&_-]{8,}$/;
     if (!passwordRegex.test(formData.password)) {
-      setError('Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character');
+      setError('Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character (like @, $, !, %, *, ?, &, _, -)');
       return;
     }
 
@@ -148,12 +151,19 @@ const AcceptInvite: React.FC = () => {
       if (response.data.success) {
         // Store user ID for OTP verification
         const userData = response.data.data;
+        console.log('🔐 [AcceptInvite] Registration successful, storing verification data:');
+        console.log('  - userId:', userData.userId);
+        console.log('  - email:', userData.email);
+        console.log('  - fullName:', userData.fullName);
+
         sessionStorage.setItem('pendingVerification', JSON.stringify({
           userId: userData.userId,
           email: userData.email,
           fullName: userData.fullName,
           fromInvitation: true
         }));
+
+        console.log('🔐 [AcceptInvite] Stored in sessionStorage, navigating to OTP verification');
 
         // Navigate to OTP verification
         navigate(`/verify-otp?email=${encodeURIComponent(userData.email)}`);
@@ -265,16 +275,28 @@ const AcceptInvite: React.FC = () => {
                   <Form.Label>
                     Password <span className="text-danger">*</span>
                   </Form.Label>
-                  <Form.Control
-                    type="password"
-                    name="password"
-                    value={formData.password}
-                    onChange={handleChange}
-                    placeholder="Create a password"
-                    minLength={8}
-                    required
-                    disabled={submitting}
-                  />
+                  <div className="input-group">
+                    <span className="input-group-text">
+                      <Lock size={18} />
+                    </span>
+                    <Form.Control
+                      type={showPassword ? "text" : "password"}
+                      name="password"
+                      value={formData.password}
+                      onChange={handleChange}
+                      placeholder="Create a password"
+                      minLength={8}
+                      required
+                      disabled={submitting}
+                    />
+                    <Button
+                      variant="outline-secondary"
+                      onClick={() => setShowPassword(!showPassword)}
+                      disabled={submitting}
+                    >
+                      {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </Button>
+                  </div>
                   {passwordStrength && (
                     <div className="mt-2">
                       <small className={`text-${getPasswordStrengthColor()}`}>
@@ -291,17 +313,29 @@ const AcceptInvite: React.FC = () => {
                   <Form.Label>
                     Confirm Password <span className="text-danger">*</span>
                   </Form.Label>
-                  <Form.Control
-                    type="password"
-                    name="confirmPassword"
-                    value={formData.confirmPassword}
-                    onChange={handleChange}
-                    placeholder="Confirm your password"
-                    required
-                    disabled={submitting}
-                    isInvalid={formData.confirmPassword.length > 0 && !passwordMatch}
-                    isValid={formData.confirmPassword.length > 0 && passwordMatch}
-                  />
+                  <div className="input-group">
+                    <span className="input-group-text">
+                      <Lock size={18} />
+                    </span>
+                    <Form.Control
+                      type={showConfirmPassword ? "text" : "password"}
+                      name="confirmPassword"
+                      value={formData.confirmPassword}
+                      onChange={handleChange}
+                      placeholder="Confirm your password"
+                      required
+                      disabled={submitting}
+                      isInvalid={formData.confirmPassword.length > 0 && !passwordMatch}
+                      isValid={formData.confirmPassword.length > 0 && passwordMatch}
+                    />
+                    <Button
+                      variant="outline-secondary"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      disabled={submitting}
+                    >
+                      {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </Button>
+                  </div>
                   {!passwordMatch && formData.confirmPassword.length > 0 && (
                     <Form.Control.Feedback type="invalid">
                       Passwords do not match

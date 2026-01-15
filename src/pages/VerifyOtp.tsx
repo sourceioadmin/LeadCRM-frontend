@@ -26,16 +26,43 @@ const VerifyOtp: React.FC = () => {
   const [countdown, setCountdown] = useState(0);
 
   useEffect(() => {
-    // Get email from URL params or localStorage
+    // Get email from URL params, sessionStorage (for invitation flow), or localStorage
     const emailFromParams = searchParams.get('email');
     const emailFromStorage = localStorage.getItem('verificationEmail');
 
+    console.log('🔐 [VerifyOtp] Email sources:');
+    console.log('  - URL params:', emailFromParams);
+    console.log('  - localStorage:', emailFromStorage);
+
+    // Check sessionStorage for invitation flow data
+    const pendingVerification = sessionStorage.getItem('pendingVerification');
+    let emailFromSession = null;
+    if (pendingVerification) {
+      try {
+        const verificationData = JSON.parse(pendingVerification);
+        emailFromSession = verificationData.email;
+        console.log('  - sessionStorage:', emailFromSession);
+        console.log('  - sessionStorage data:', verificationData);
+      } catch (e) {
+        console.error('Error parsing pending verification data:', e);
+      }
+    } else {
+      console.log('  - sessionStorage: not found');
+    }
+
     if (emailFromParams) {
+      console.log('🔐 [VerifyOtp] Using email from URL params:', emailFromParams);
       setEmail(emailFromParams);
       localStorage.setItem('verificationEmail', emailFromParams);
+    } else if (emailFromSession) {
+      console.log('🔐 [VerifyOtp] Using email from sessionStorage:', emailFromSession);
+      setEmail(emailFromSession);
+      localStorage.setItem('verificationEmail', emailFromSession);
     } else if (emailFromStorage) {
+      console.log('🔐 [VerifyOtp] Using email from localStorage:', emailFromStorage);
       setEmail(emailFromStorage);
     } else {
+      console.log('🔐 [VerifyOtp] No email found, redirecting to register');
       // No email found, redirect to register
       navigate('/register');
       return;
@@ -83,15 +110,21 @@ const VerifyOtp: React.FC = () => {
     setIsLoading(true);
     setError('');
 
+    console.log('🔐 [VerifyOtp] Verifying OTP for email:', email);
+    console.log('🔐 [VerifyOtp] OTP code:', codeToVerify);
+
     try {
       const response = await verifyOtp({
         email,
         otp: codeToVerify
       });
 
+      console.log('🔐 [VerifyOtp] API response:', response);
+
       if (response.data.success) {
         // Email verified successfully - no auto-login
         localStorage.removeItem('verificationEmail'); // Clean up
+        sessionStorage.removeItem('pendingVerification'); // Clean up invitation data
 
         showSuccess('Email Verified!', 'Email verified successfully. Please login with your credentials.');
         // Navigate to login page after showing success message
@@ -100,6 +133,11 @@ const VerifyOtp: React.FC = () => {
         }, 2000);
       }
     } catch (err: any) {
+      console.error('❌ [VerifyOtp] OTP verification failed:', err);
+      console.error('❌ [VerifyOtp] Error response:', err.response);
+      console.error('❌ [VerifyOtp] Error response data:', err.response?.data);
+      console.error('❌ [VerifyOtp] Error status:', err.response?.status);
+
       const errorMessage = err.response?.data?.message || 'OTP verification failed.';
       setError(errorMessage);
       showError('Verification Failed', errorMessage);
@@ -134,6 +172,7 @@ const VerifyOtp: React.FC = () => {
 
   const handleBackToRegister = () => {
     localStorage.removeItem('verificationEmail');
+    sessionStorage.removeItem('pendingVerification');
     navigate('/register');
   };
 
