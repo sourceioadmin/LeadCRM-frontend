@@ -120,17 +120,24 @@ const VerifyOtp: React.FC = () => {
       });
 
       console.log('🔐 [VerifyOtp] API response:', response);
+      console.log('🔐 [VerifyOtp] Response success:', response.data?.success);
 
-      if (response.data.success) {
+      if (response.data && response.data.success === true) {
         // Email verified successfully - no auto-login
         localStorage.removeItem('verificationEmail'); // Clean up
         sessionStorage.removeItem('pendingVerification'); // Clean up invitation data
 
-        showSuccess('Email Verified!', 'Email verified successfully. Please login with your credentials.');
-        // Navigate to login page after showing success message
-        setTimeout(() => {
-          navigate('/login', { replace: true });
-        }, 2000);
+        console.log('🔐 [VerifyOtp] OTP verification successful, redirecting to login');
+        showSuccess('Email Verified!', 'Email verified successfully. You can now login with your credentials.');
+
+        // Navigate to login page immediately
+        navigate('/login', { replace: true });
+      } else {
+        // Handle unexpected success = false or missing success field
+        console.error('🔐 [VerifyOtp] Unexpected response format:', response.data);
+        const errorMessage = response.data?.message || 'OTP verification failed.';
+        setError(errorMessage);
+        showError('Verification Failed', errorMessage);
       }
     } catch (err: any) {
       console.error('❌ [VerifyOtp] OTP verification failed:', err);
