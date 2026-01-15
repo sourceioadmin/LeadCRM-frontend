@@ -150,8 +150,8 @@ const Register: React.FC = () => {
       setError('Password must be at least 8 characters long');
       return false;
     }
-    if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9])[A-Za-z\d@$!%*?&#_+\-=]{8,}$/.test(formData.password)) {
-      setError('Password must contain uppercase, lowercase, number, and special character (like @, $, !, %, *, ?, &, #, _, +, -, =)');
+    if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(formData.password)) {
+      setError('Password must contain uppercase, lowercase, number, and special character (@, $, !, %, *, ?, &, _)');
       return false;
     }
     if (formData.password !== formData.confirmPassword) {
@@ -364,11 +364,13 @@ const Register: React.FC = () => {
               name="password"
               value={formData.password}
               onChange={handleInputChange}
-              placeholder="Enter password"
+              placeholder="Example: MyPass123!"
               required
             />
             <Form.Text className="text-muted">
-              Must be at least 8 characters with uppercase, lowercase, number, and special character
+              Password must be at least 8 characters and include: uppercase letter, lowercase letter, number, and special character (@, $, !, %, *, ?, &, _)
+              <br />
+              <small>Example: MyPass123!</small>
             </Form.Text>
             {formData.password && (
               <div className="mt-2">

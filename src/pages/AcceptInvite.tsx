@@ -88,7 +88,7 @@ const AcceptInvite: React.FC = () => {
     const hasUpperCase = /[A-Z]/.test(password);
     const hasLowerCase = /[a-z]/.test(password);
     const hasNumbers = /\d/.test(password);
-    const hasSpecialChar = /[^A-Za-z0-9]/.test(password);
+    const hasSpecialChar = /[@$!%*?&]/.test(password);
 
     const strength = [hasUpperCase, hasLowerCase, hasNumbers, hasSpecialChar].filter(Boolean).length;
 
@@ -134,9 +134,9 @@ const AcceptInvite: React.FC = () => {
       return;
     }
 
-    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9])[A-Za-z\d@$!%*?&#_+\-=]{8,}$/;
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
     if (!passwordRegex.test(formData.password)) {
-      setError('Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character (like @, $, !, %, *, ?, &, _, -)');
+      setError('Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character (@, $, !, %, *, ?, &, _)');
       return;
     }
 
@@ -284,7 +284,7 @@ const AcceptInvite: React.FC = () => {
                       name="password"
                       value={formData.password}
                       onChange={handleChange}
-                      placeholder="Create a password"
+                      placeholder="Example: MyPass123!"
                       minLength={8}
                       required
                       disabled={submitting}
@@ -305,7 +305,9 @@ const AcceptInvite: React.FC = () => {
                     </div>
                   )}
                   <Form.Text className="text-muted">
-                    Must be at least 8 characters with uppercase, lowercase, number, and special character
+                    Password must be at least 8 characters and include: uppercase letter, lowercase letter, number, and special character (@, $, !, %, *, ?, &, _)
+                    <br />
+                    <small>Example: MyPass123!</small>
                   </Form.Text>
                 </Form.Group>
 
