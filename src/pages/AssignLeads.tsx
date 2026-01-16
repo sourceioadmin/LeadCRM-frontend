@@ -584,16 +584,24 @@ const AssignLeads: React.FC = () => {
                             </div>
                             <div className="col-6">
                               <small className="text-muted d-block"><i className="bi bi-diagram-3 me-1"></i>Source</small>
-                              <Badge bg="light" text="dark" className="text-truncate" style={{ maxWidth: '100px' }} title={lead.leadSourceName}>
+                              <span className="text-truncate d-block" style={{ maxWidth: '100px' }} title={lead.leadSourceName}>
                                 {lead.leadSourceName}
-                              </Badge>
+                              </span>
                             </div>
                             {lead.urgencyLevelName && (
                               <div className="col-6">
                                 <small className="text-muted d-block"><i className="bi bi-exclamation-triangle me-1"></i>Urgency</small>
-                                <Badge bg={getUrgencyVariant(lead.urgencyLevelName)} className="text-truncate" style={{ maxWidth: '100px' }} title={lead.urgencyLevelName}>
+                                <span 
+                                  className="text-truncate d-block" 
+                                  style={{ 
+                                    maxWidth: '100px',
+                                    color: lead.urgencyLevelName.toLowerCase().includes('immediate') ? '#dc3545' : 'inherit',
+                                    fontWeight: lead.urgencyLevelName.toLowerCase().includes('immediate') ? '600' : 'normal'
+                                  }} 
+                                  title={lead.urgencyLevelName}
+                                >
                                   {lead.urgencyLevelName}
-                                </Badge>
+                                </span>
                               </div>
                             )}
                             {lead.expectedBudget && (
@@ -740,9 +748,14 @@ const AssignLeads: React.FC = () => {
                         {columnVisibility.urgency && (
                           <td>
                             {lead.urgencyLevelName ? (
-                              <Badge bg={getUrgencyVariant(lead.urgencyLevelName)}>
+                              <span
+                                style={{
+                                  color: lead.urgencyLevelName.toLowerCase().includes('immediate') ? '#dc3545' : 'inherit',
+                                  fontWeight: lead.urgencyLevelName.toLowerCase().includes('immediate') ? '600' : 'normal'
+                                }}
+                              >
                                 {lead.urgencyLevelName}
-                              </Badge>
+                              </span>
                             ) : '-'}
                           </td>
                         )}

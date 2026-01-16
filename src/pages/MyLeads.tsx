@@ -596,9 +596,9 @@ const MyLeads: React.FC = () => {
                               <small className="text-muted d-block mb-1">
                                 <i className="bi bi-diagram-3 me-1"></i>Source
                               </small>
-                              <Badge bg="light" text="dark" style={{ fontSize: '0.7rem' }}>
+                              <div style={{ fontSize: '0.875rem' }}>
                                 {lead.leadSourceName}
-                              </Badge>
+                              </div>
                             </div>
                           </div>
                           {lead.urgencyLevelName && (
@@ -606,9 +606,15 @@ const MyLeads: React.FC = () => {
                               <small className="text-muted d-block mb-1">
                                 <i className="bi bi-exclamation-triangle me-1"></i>Urgency
                               </small>
-                              <Badge bg={getUrgencyVariant(lead.urgencyLevelName)} style={{ fontSize: '0.7rem' }}>
+                              <div 
+                                style={{ 
+                                  fontSize: '0.875rem',
+                                  color: lead.urgencyLevelName.toLowerCase().includes('immediate') ? '#dc3545' : 'inherit',
+                                  fontWeight: lead.urgencyLevelName.toLowerCase().includes('immediate') ? '600' : 'normal'
+                                }}
+                              >
                                 {lead.urgencyLevelName}
-                              </Badge>
+                              </div>
                             </div>
                           )}
                           {lead.expectedBudget && (
@@ -756,9 +762,9 @@ const MyLeads: React.FC = () => {
                         {columnVisibility.leadDate && <td className="d-none d-md-table-cell">{formatDate(lead.leadDate)}</td>}
                         {columnVisibility.leadSource && (
                           <td className="d-none d-lg-table-cell">
-                            <Badge bg="light" text="dark" className="text-truncate" style={{ maxWidth: '90px' }} title={lead.leadSourceName}>
+                            <span className="text-truncate d-inline-block" style={{ maxWidth: '90px' }} title={lead.leadSourceName}>
                               {lead.leadSourceName}
-                            </Badge>
+                            </span>
                           </td>
                         )}
                         {columnVisibility.status && (
@@ -770,9 +776,17 @@ const MyLeads: React.FC = () => {
                         )}
                         {columnVisibility.urgency && (
                           <td className="d-none d-lg-table-cell">
-                            <Badge bg={getUrgencyVariant(lead.urgencyLevelName || '')} className="text-truncate" style={{ maxWidth: '90px' }} title={lead.urgencyLevelName}>
+                            <span 
+                              className="text-truncate d-inline-block" 
+                              style={{ 
+                                maxWidth: '90px',
+                                color: lead.urgencyLevelName?.toLowerCase().includes('immediate') ? '#dc3545' : 'inherit',
+                                fontWeight: lead.urgencyLevelName?.toLowerCase().includes('immediate') ? '600' : 'normal'
+                              }} 
+                              title={lead.urgencyLevelName}
+                            >
                               {lead.urgencyLevelName}
-                            </Badge>
+                            </span>
                           </td>
                         )}
                         {columnVisibility.expectedBudget && (
