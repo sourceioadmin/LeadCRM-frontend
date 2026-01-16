@@ -650,23 +650,29 @@ const Dashboard: React.FC = () => {
                   <p className="text-muted mt-2 mb-0">Loading source data...</p>
                 </div>
               ) : leadsBySource.length > 0 ? (
-                <ResponsiveContainer width="100%" height={300}>
+                <ResponsiveContainer width="100%" height={350}>
                   <RechartsPieChart>
                     <Pie
                       data={leadsBySource as any[]}
                       cx="50%"
-                      cy="50%"
-                      outerRadius={80}
+                      cy="45%"
+                      outerRadius={70}
+                      innerRadius={0}
                       dataKey="leadCount"
                       nameKey="sourceName"
-                      label={({ payload }) => `${payload?.sourceName}: ${payload?.percentage}%`}
-                      labelLine={false}
+                      label={({ payload }) => `${payload?.percentage}%`}
+                      labelLine={true}
                     >
                       {leadsBySource.map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={entry.color} />
                       ))}
                     </Pie>
                     <Tooltip content={<CustomPieTooltip />} />
+                    <Legend 
+                      verticalAlign="bottom" 
+                      height={60}
+                      formatter={(value, entry: any) => `${value} (${entry.payload?.percentage}%)`}
+                    />
                   </RechartsPieChart>
                 </ResponsiveContainer>
               ) : (
