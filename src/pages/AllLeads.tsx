@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Button, Table, Badge, Row, Col, Form, InputGroup, Alert, Pagination, Spinner, Dropdown } from 'react-bootstrap';
-import { Edit, Filter, Search, Calendar, Download, CheckSquare, Square, Eye, EyeOff } from 'lucide-react';
+import { Edit, Filter, Search, Calendar, Download, CheckSquare, Square, Eye, EyeOff, Plus } from 'lucide-react';
 import AddLeadModal from '../components/AddLeadModal';
 import { getAllLeads, getLeadSources, getLeadStatuses, getUrgencyLevels, bulkUpdateStatus, exportLeads } from '../services/leadService';
 import { Lead, LeadSource, LeadStatus, Urgency } from '../types/Lead';
@@ -462,6 +462,7 @@ const AllLeads: React.FC = () => {
               <span className="d-none d-sm-inline">Export</span>
             </Button>
             <Button variant="primary" className="flex-fill flex-md-auto" onClick={handleAddLead}>
+              <Plus size={18} className="me-sm-2" />
               <span className="d-none d-sm-inline">Add Lead</span>
             </Button>
           </div>
