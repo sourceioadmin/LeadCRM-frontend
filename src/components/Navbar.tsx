@@ -31,7 +31,7 @@ const Navbar: React.FC<NavbarProps> = ({ onToggleSidebar, sidebarCollapsed, isMo
 
   return (
     <>
-      <BootstrapNavbar className={`topbar ${sidebarCollapsed ? 'collapsed' : ''}`} bg="light" expand="lg">
+      <BootstrapNavbar className={`topbar ${sidebarCollapsed ? 'collapsed' : ''}`} expand="lg">
         <div className="d-flex align-items-center w-100">
           <Button
             variant="link"

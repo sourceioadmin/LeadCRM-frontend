@@ -122,6 +122,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, isMobile, onClose }) => {
                 className={({ isActive }) =>
                   `sidebar-menu-item ${isActive ? 'active' : ''}`
                 }
+                onClick={isMobile ? onClose : undefined}
               >
                 <Icon size={20} />
                 {!collapsed && <span>{displayLabel}</span>}

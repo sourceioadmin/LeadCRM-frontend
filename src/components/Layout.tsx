@@ -30,7 +30,7 @@ const Layout: React.FC = () => {
   };
 
   return (
-    <div className="d-flex flex-column vh-100">
+    <div className="d-flex flex-column" style={{ minHeight: '100vh' }}>
       <Navbar
         onToggleSidebar={toggleSidebar}
         sidebarCollapsed={sidebarCollapsed}
