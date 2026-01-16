@@ -7,7 +7,6 @@ import {
   Card,
   Form,
   Button,
-  Alert,
   ProgressBar,
   Badge
 } from "react-bootstrap";
@@ -61,6 +60,8 @@ const Register: React.FC = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [errorField, setErrorField] = useState<string>(''); // Track which field has error
+  const [passwordFocused, setPasswordFocused] = useState(false); // Track password field focus
   const [otpCode, setOtpCode] = useState('');
   const [userId, setUserId] = useState<number | null>(null);
   const [email, setEmail] = useState('');
@@ -87,6 +88,11 @@ const Register: React.FC = () => {
       ...prev,
       [name]: value
     }));
+    // Clear error when user starts typing in the error field
+    if (errorField === name) {
+      setError('');
+      setErrorField('');
+    }
   };
 
   const getPasswordStrength = (password: string) => {
@@ -107,16 +113,35 @@ const Register: React.FC = () => {
     // Company details validation
     if (!formData.companyName.trim()) {
       setError('Company name is required');
+      setErrorField('companyName');
       return false;
     }
     if (!formData.industry.trim()) {
       setError('Industry is required');
+      setErrorField('industry');
       return false;
     }
     if (!formData.size) {
       setError('Company size is required');
+      setErrorField('size');
       return false;
     }
+    
+    // Phone validation (optional field, but must be valid if provided)
+    if (formData.phone.trim()) {
+      // Remove spaces, hyphens, and parentheses for validation
+      const cleanPhone = formData.phone.replace(/[\s\-\(\)]/g, '');
+      
+      // Check if it matches Indian mobile format: +91 followed by 10 digits OR just 10 digits
+      const indianMobileRegex = /^(\+91)?[6-9]\d{9}$/;
+      
+      if (!indianMobileRegex.test(cleanPhone)) {
+        setError('Please enter a valid 10-digit Indian mobile number (starting with 6-9). You can optionally include +91 prefix.');
+        setErrorField('phone');
+        return false;
+      }
+    }
+    
     return true;
   };
 
@@ -124,38 +149,47 @@ const Register: React.FC = () => {
     // User details validation
     if (!formData.fullName.trim()) {
       setError('Full name is required');
+      setErrorField('fullName');
       return false;
     }
     if (!formData.email.trim()) {
       setError('Email is required');
+      setErrorField('email');
       return false;
     }
     if (!isLikelyRealEmail(formData.email)) {
       setError('Please enter a valid, deliverable email address');
+      setErrorField('email');
       return false;
     }
     if (!formData.username.trim()) {
       setError('Username is required');
+      setErrorField('username');
       return false;
     }
     if (formData.username.length < 3) {
       setError('Username must be at least 3 characters long');
+      setErrorField('username');
       return false;
     }
     if (!formData.password) {
       setError('Password is required');
+      setErrorField('password');
       return false;
     }
     if (formData.password.length < 8) {
       setError('Password must be at least 8 characters long');
+      setErrorField('password');
       return false;
     }
     if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(formData.password)) {
       setError('Password must contain uppercase, lowercase, number, and special character (@, $, !, %, *, ?, &, _)');
+      setErrorField('password');
       return false;
     }
     if (formData.password !== formData.confirmPassword) {
       setError('Passwords do not match');
+      setErrorField('confirmPassword');
       return false;
     }
     return true;
@@ -163,6 +197,7 @@ const Register: React.FC = () => {
 
   const handleNext = () => {
     setError('');
+    setErrorField('');
     if (currentStep === 1 && validateStep1()) {
       setCurrentStep(2);
     } else if (currentStep === 2 && validateStep2()) {
@@ -172,6 +207,7 @@ const Register: React.FC = () => {
 
   const handleBack = () => {
     setError('');
+    setErrorField('');
     if (currentStep === 2) {
       setCurrentStep(1);
     }
@@ -240,7 +276,11 @@ const Register: React.FC = () => {
               onChange={handleInputChange}
               placeholder="Enter company name"
               required
+              isInvalid={errorField === 'companyName'}
             />
+            <Form.Control.Feedback type="invalid">
+              {errorField === 'companyName' && error}
+            </Form.Control.Feedback>
           </Form.Group>
 
           <Form.Group className="mb-3">
@@ -252,7 +292,11 @@ const Register: React.FC = () => {
               onChange={handleInputChange}
               placeholder="e.g., Technology, Healthcare, Finance"
               required
+              isInvalid={errorField === 'industry'}
             />
+            <Form.Control.Feedback type="invalid">
+              {errorField === 'industry' && error}
+            </Form.Control.Feedback>
           </Form.Group>
 
           <Form.Group className="mb-3">
@@ -260,8 +304,15 @@ const Register: React.FC = () => {
             <Form.Select
               name="size"
               value={formData.size}
-              onChange={(e) => setFormData(prev => ({ ...prev, size: e.target.value }))}
+              onChange={(e) => {
+                setFormData(prev => ({ ...prev, size: e.target.value }));
+                if (errorField === 'size') {
+                  setError('');
+                  setErrorField('');
+                }
+              }}
               required
+              isInvalid={errorField === 'size'}
             >
               <option value="">Select company size</option>
               <option value="1-10">1-10 employees</option>
@@ -270,6 +321,9 @@ const Register: React.FC = () => {
               <option value="201-1000">201-1000 employees</option>
               <option value="1000+">1000+ employees</option>
             </Form.Select>
+            <Form.Control.Feedback type="invalid">
+              {errorField === 'size' && error}
+            </Form.Control.Feedback>
           </Form.Group>
 
           <Form.Group className="mb-3">
@@ -290,8 +344,12 @@ const Register: React.FC = () => {
               name="phone"
               value={formData.phone}
               onChange={handleInputChange}
-              placeholder="+1 (555) 123-4567"
+              placeholder="10-digit mobile number"
+              isInvalid={errorField === 'phone'}
             />
+            <Form.Control.Feedback type="invalid">
+              {errorField === 'phone' && error}
+            </Form.Control.Feedback>
           </Form.Group>
 
           <div className="d-flex justify-content-end">
@@ -327,7 +385,11 @@ const Register: React.FC = () => {
               onChange={handleInputChange}
               placeholder="Enter your full name"
               required
+              isInvalid={errorField === 'fullName'}
             />
+            <Form.Control.Feedback type="invalid">
+              {errorField === 'fullName' && error}
+            </Form.Control.Feedback>
           </Form.Group>
 
           <Form.Group className="mb-3">
@@ -339,7 +401,11 @@ const Register: React.FC = () => {
               onChange={handleInputChange}
               placeholder="Enter your email"
               required
+              isInvalid={errorField === 'email'}
             />
+            <Form.Control.Feedback type="invalid">
+              {errorField === 'email' && error}
+            </Form.Control.Feedback>
             <Form.Text className="text-muted">
               We'll send a verification code to this email
             </Form.Text>
@@ -354,7 +420,11 @@ const Register: React.FC = () => {
               onChange={handleInputChange}
               placeholder="Choose a username (min 3 characters)"
               required
+              isInvalid={errorField === 'username'}
             />
+            <Form.Control.Feedback type="invalid">
+              {errorField === 'username' && error}
+            </Form.Control.Feedback>
           </Form.Group>
 
           <Form.Group className="mb-3">
@@ -364,14 +434,20 @@ const Register: React.FC = () => {
               name="password"
               value={formData.password}
               onChange={handleInputChange}
+              onFocus={() => setPasswordFocused(true)}
+              onBlur={() => setPasswordFocused(false)}
               placeholder="Example: MyPass123!"
               required
+              isInvalid={errorField === 'password'}
             />
-            <Form.Text className="text-muted">
-              Password must be at least 8 characters and include: uppercase letter, lowercase letter, number, and special character (@, $, !, %, *, ?, &, _)
-              <br />
-              <small>Example: MyPass123!</small>
-            </Form.Text>
+            <Form.Control.Feedback type="invalid">
+              {errorField === 'password' && error}
+            </Form.Control.Feedback>
+            {(passwordFocused || formData.password) && (
+              <Form.Text className="text-info">
+                Min 8 characters with uppercase, lowercase, number & special character (@$!%*?&_)
+              </Form.Text>
+            )}
             {formData.password && (
               <div className="mt-2">
                 <ProgressBar
@@ -402,7 +478,11 @@ const Register: React.FC = () => {
               onChange={handleInputChange}
               placeholder="Confirm password"
               required
+              isInvalid={errorField === 'confirmPassword'}
             />
+            <Form.Control.Feedback type="invalid">
+              {errorField === 'confirmPassword' && error}
+            </Form.Control.Feedback>
           </Form.Group>
 
           <div className="d-flex justify-content-between">
@@ -456,13 +536,6 @@ const Register: React.FC = () => {
                 </div>
                 <ProgressBar now={getProgressValue()} className="mb-3" />
               </div>
-
-              {/* Error Alert */}
-              {error && (
-                <Alert variant="danger" className="mb-4">
-                  {error}
-                </Alert>
-              )}
 
               {/* Step Content */}
               {currentStep === 1 && renderStep1()}
