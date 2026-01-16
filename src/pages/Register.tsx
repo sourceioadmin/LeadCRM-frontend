@@ -547,7 +547,7 @@ const Register: React.FC = () => {
               {/* Header */}
               <div className="text-center mb-4">
                 <h2 className="text-primary mb-2">Create Your Account</h2>
-                <p className="text-muted">Join Lead Management CRM today</p>
+                <p className="text-muted">Join Leadbox today</p>
               </div>
 
               {/* Progress Bar */}

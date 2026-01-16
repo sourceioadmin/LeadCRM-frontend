@@ -844,12 +844,14 @@ const Settings: React.FC = () => {
                     </Nav.Item>
                   </>
                 )}
+                {/* Hidden: Email Settings Tab
                 <Nav.Item>
                   <Nav.Link eventKey="email" className="d-flex align-items-center">
                     <Mail size={16} className="me-2" />
                     Email Settings
                   </Nav.Link>
                 </Nav.Item>
+                */}
               </Nav>
             </Card.Header>
 
@@ -2065,6 +2067,8 @@ const Settings: React.FC = () => {
                   </div>
                 </Tab.Pane>
 
+                {/* Email Settings Tab - Hidden */}
+                {false && (
                 <Tab.Pane eventKey="email" active={activeTab === 'email'}>
                   <div className="p-4">
                     <div className="d-flex justify-content-between align-items-center mb-3">
@@ -2405,6 +2409,7 @@ const Settings: React.FC = () => {
                     </Modal>
                   </div>
                 </Tab.Pane>
+                )}
               </Tab.Content>
             </Card.Body>
           </Card>

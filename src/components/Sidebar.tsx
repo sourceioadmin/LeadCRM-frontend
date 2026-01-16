@@ -65,10 +65,10 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, isMobile, onClose }) => {
   return (
     <div className={`sidebar ${collapsed ? 'collapsed' : ''}`}>
       <div className="sidebar-logo">
-        {!collapsed && !isMobile && 'LeadCRM'}
+        {!collapsed && !isMobile && 'Leadbox'}
         {!collapsed && isMobile && (
           <div className="d-flex justify-content-between align-items-center">
-            <span>LeadCRM</span>
+            <span>Leadbox</span>
             <button
               className="btn btn-link text-dark p-0 d-flex align-items-center justify-content-center"
               onClick={onClose}

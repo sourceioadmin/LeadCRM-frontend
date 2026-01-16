@@ -183,7 +183,7 @@ const Login: React.FC = () => {
               <div className="text-center mb-4">
                 <LogIn size={48} className="text-primary mb-3" />
                 <h2 className="text-primary mb-2">Welcome Back</h2>
-                <p className="text-muted">Sign in to your Lead Management CRM account</p>
+                <p className="text-muted">Sign in to your Leadbox account</p>
               </div>
 
               {/* Error Alert */}
@@ -283,6 +283,9 @@ const Login: React.FC = () => {
                 </Link>
               </div>
 
+              {/* Google Login - Hidden */}
+              {false && (
+              <>
               {/* Divider */}
               <div className="position-relative mb-4">
                 <hr className="my-4" />
@@ -315,6 +318,8 @@ const Login: React.FC = () => {
                   </>
                 )}
               </Button>
+              </>
+              )}
             </Card.Body>
           </Card>
         </Col>
