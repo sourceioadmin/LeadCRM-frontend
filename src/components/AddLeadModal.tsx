@@ -732,11 +732,6 @@ const AddLeadModal: React.FC<AddLeadModalProps> = ({ show, onHide, onSuccess, le
               <strong>Read Only:</strong> This lead cannot be edited. It is displayed for reference only.
             </Alert>
           )}
-          {error && (
-            <Alert variant="danger" dismissible onClose={() => setError(null)} className="mb-3">
-              {error}
-            </Alert>
-          )}
 
           {success && (
             <div className="success-overlay text-center py-5">

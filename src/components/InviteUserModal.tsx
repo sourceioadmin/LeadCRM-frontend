@@ -15,6 +15,7 @@ const InviteUserModal: React.FC<InviteUserModalProps> = ({ show, onHide, onSucce
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [errorField, setErrorField] = useState<string>(''); // Track which field has error
   const [success, setSuccess] = useState<string | null>(null);
 
   const handleChange = (e: React.ChangeEvent<any>) => {
@@ -23,17 +24,23 @@ const InviteUserModal: React.FC<InviteUserModalProps> = ({ show, onHide, onSucce
       ...prev,
       [name]: name === 'userRoleId' ? parseInt(value) : value
     }));
-    setError(null);
+    // Clear error when user starts typing in the error field
+    if (errorField === name) {
+      setError(null);
+      setErrorField('');
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setErrorField('');
     setSuccess(null);
 
     // Validation
     if (!formData.email) {
       setError('Email is required');
+      setErrorField('email');
       return;
     }
 
@@ -41,6 +48,7 @@ const InviteUserModal: React.FC<InviteUserModalProps> = ({ show, onHide, onSucce
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
       setError('Please enter a valid email address');
+      setErrorField('email');
       return;
     }
 
@@ -77,6 +85,7 @@ const InviteUserModal: React.FC<InviteUserModalProps> = ({ show, onHide, onSucce
     if (!loading) {
       setFormData({ email: '', userRoleId: 4 }); // Reset to Team Member default
       setError(null);
+      setErrorField('');
       setSuccess(null);
       onHide();
     }
@@ -90,12 +99,6 @@ const InviteUserModal: React.FC<InviteUserModalProps> = ({ show, onHide, onSucce
       
       <Form onSubmit={handleSubmit}>
         <Modal.Body>
-          {error && (
-            <Alert variant="danger" dismissible onClose={() => setError(null)}>
-              {error}
-            </Alert>
-          )}
-          
           {success && (
             <Alert variant="success">
               {success}
@@ -114,7 +117,11 @@ const InviteUserModal: React.FC<InviteUserModalProps> = ({ show, onHide, onSucce
               placeholder="Enter email address"
               required
               disabled={loading}
+              isInvalid={errorField === 'email'}
             />
+            <Form.Control.Feedback type="invalid">
+              {errorField === 'email' && error}
+            </Form.Control.Feedback>
             <Form.Text className="text-muted">
               An invitation link will be sent to this email address
             </Form.Text>

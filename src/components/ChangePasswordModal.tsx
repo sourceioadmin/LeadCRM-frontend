@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Modal, Button, Form, Alert, Spinner } from 'react-bootstrap';
+import { Modal, Button, Form, Spinner } from 'react-bootstrap';
 import { Lock, Eye, EyeOff } from 'lucide-react';
 import { changePassword } from '../services/authService';
 
@@ -52,16 +52,16 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ show, onHide 
 
     if (!formData.newPassword.trim()) {
       errors.newPassword = 'New password is required';
-    } else if (formData.newPassword.length < 6) {
-      errors.newPassword = 'New password must be at least 6 characters long';
-    } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(formData.newPassword)) {
-      errors.newPassword = 'New password must contain at least one uppercase letter, one lowercase letter, and one number';
+    } else if (formData.newPassword.length < 8) {
+      errors.newPassword = 'New password must be at least 8 characters long';
+    } else if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(formData.newPassword)) {
+      errors.newPassword = 'Password must contain uppercase, lowercase, number, and special character (@, $, !, %, *, ?, &, _)';
     }
 
     if (!formData.confirmPassword.trim()) {
       errors.confirmPassword = 'Confirm password is required';
     } else if (formData.newPassword !== formData.confirmPassword) {
-      errors.confirmPassword = 'Confirm password must match new password';
+      errors.confirmPassword = 'Passwords do not match';
     }
 
     setValidationErrors(errors);
@@ -152,12 +152,6 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ show, onHide 
 
       <Form onSubmit={handleSubmit}>
         <Modal.Body>
-          {error && (
-            <Alert variant="danger" className="mb-3">
-              {error}
-            </Alert>
-          )}
-
           <Form.Group className="mb-3">
             <Form.Label>Current Password *</Form.Label>
             <div className="position-relative">
@@ -193,7 +187,7 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ show, onHide 
                 onChange={(e) => handleInputChange('newPassword', e.target.value)}
                 isInvalid={!!validationErrors.newPassword}
                 disabled={isLoading}
-                placeholder="Enter your new password"
+                placeholder="Example: MyPass123!"
               />
               <Button
                 variant="link"
@@ -208,8 +202,8 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ show, onHide 
             <Form.Control.Feedback type="invalid">
               {validationErrors.newPassword}
             </Form.Control.Feedback>
-            <Form.Text className="text-muted">
-              Password must be at least 6 characters with uppercase, lowercase, and number.
+            <Form.Text className="text-info">
+              Min 8 characters with uppercase, lowercase, number & special character (@$!%*?&_)
             </Form.Text>
           </Form.Group>
 

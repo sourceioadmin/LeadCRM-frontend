@@ -16,7 +16,9 @@ import {
   CheckCircle,
   Mail,
   Building,
-  User
+  User,
+  Eye,
+  EyeOff
 } from "lucide-react";
 import { useToast } from "../components/Toast";
 import { useAuth } from "../contexts/AuthContext";
@@ -62,6 +64,8 @@ const Register: React.FC = () => {
   const [error, setError] = useState('');
   const [errorField, setErrorField] = useState<string>(''); // Track which field has error
   const [passwordFocused, setPasswordFocused] = useState(false); // Track password field focus
+  const [showPassword, setShowPassword] = useState(false); // Track password visibility
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false); // Track confirm password visibility
   const [otpCode, setOtpCode] = useState('');
   const [userId, setUserId] = useState<number | null>(null);
   const [email, setEmail] = useState('');
@@ -429,18 +433,27 @@ const Register: React.FC = () => {
 
           <Form.Group className="mb-3">
             <Form.Label>Password *</Form.Label>
-            <Form.Control
-              type="password"
-              name="password"
-              value={formData.password}
-              onChange={handleInputChange}
-              onFocus={() => setPasswordFocused(true)}
-              onBlur={() => setPasswordFocused(false)}
-              placeholder="Example: MyPass123!"
-              required
-              isInvalid={errorField === 'password'}
-            />
-            <Form.Control.Feedback type="invalid">
+            <div className="input-group">
+              <Form.Control
+                type={showPassword ? "text" : "password"}
+                name="password"
+                value={formData.password}
+                onChange={handleInputChange}
+                onFocus={() => setPasswordFocused(true)}
+                onBlur={() => setPasswordFocused(false)}
+                placeholder="Example: MyPass123!"
+                required
+                isInvalid={errorField === 'password'}
+              />
+              <Button
+                variant="outline-secondary"
+                onClick={() => setShowPassword(!showPassword)}
+                disabled={isLoading}
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </Button>
+            </div>
+            <Form.Control.Feedback type="invalid" className={errorField === 'password' ? 'd-block' : ''}>
               {errorField === 'password' && error}
             </Form.Control.Feedback>
             {(passwordFocused || formData.password) && (
@@ -471,16 +484,25 @@ const Register: React.FC = () => {
 
           <Form.Group className="mb-4">
             <Form.Label>Confirm Password *</Form.Label>
-            <Form.Control
-              type="password"
-              name="confirmPassword"
-              value={formData.confirmPassword}
-              onChange={handleInputChange}
-              placeholder="Confirm password"
-              required
-              isInvalid={errorField === 'confirmPassword'}
-            />
-            <Form.Control.Feedback type="invalid">
+            <div className="input-group">
+              <Form.Control
+                type={showConfirmPassword ? "text" : "password"}
+                name="confirmPassword"
+                value={formData.confirmPassword}
+                onChange={handleInputChange}
+                placeholder="Confirm password"
+                required
+                isInvalid={errorField === 'confirmPassword'}
+              />
+              <Button
+                variant="outline-secondary"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                disabled={isLoading}
+              >
+                {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </Button>
+            </div>
+            <Form.Control.Feedback type="invalid" className={errorField === 'confirmPassword' ? 'd-block' : ''}>
               {errorField === 'confirmPassword' && error}
             </Form.Control.Feedback>
           </Form.Group>

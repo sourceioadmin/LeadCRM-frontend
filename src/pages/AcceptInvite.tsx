@@ -13,6 +13,7 @@ const AcceptInvite: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [errorField, setErrorField] = useState<string>(''); // Track which field has error
   const [formData, setFormData] = useState({
     fullName: '',
     username: '',
@@ -60,6 +61,12 @@ const AcceptInvite: React.FC = () => {
       ...prev,
       [name]: value
     }));
+
+    // Clear error when user starts typing in the error field
+    if (errorField === name) {
+      setError(null);
+      setErrorField('');
+    }
 
     // Check password strength
     if (name === 'password') {
@@ -117,26 +124,49 @@ const AcceptInvite: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setErrorField('');
 
     // Validation
-    if (!formData.fullName || !formData.username || !formData.password || !formData.confirmPassword) {
-      setError('All fields are required');
+    if (!formData.fullName) {
+      setError('Full name is required');
+      setErrorField('fullName');
       return;
     }
 
-    if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
+    if (!formData.username) {
+      setError('Username is required');
+      setErrorField('username');
+      return;
+    }
+
+    if (!formData.password) {
+      setError('Password is required');
+      setErrorField('password');
       return;
     }
 
     if (formData.password.length < 8) {
       setError('Password must be at least 8 characters long');
+      setErrorField('password');
       return;
     }
 
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
     if (!passwordRegex.test(formData.password)) {
       setError('Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character (@, $, !, %, *, ?, &, _)');
+      setErrorField('password');
+      return;
+    }
+
+    if (!formData.confirmPassword) {
+      setError('Confirm password is required');
+      setErrorField('confirmPassword');
+      return;
+    }
+
+    if (formData.password !== formData.confirmPassword) {
+      setError('Passwords do not match');
+      setErrorField('confirmPassword');
       return;
     }
 
@@ -230,12 +260,6 @@ const AcceptInvite: React.FC = () => {
                 </Alert>
               )}
 
-              {error && (
-                <Alert variant="danger" dismissible onClose={() => setError(null)}>
-                  {error}
-                </Alert>
-              )}
-
               <Form onSubmit={handleSubmit}>
                 <Form.Group className="mb-3">
                   <Form.Label>
@@ -249,7 +273,11 @@ const AcceptInvite: React.FC = () => {
                     placeholder="Enter your full name"
                     required
                     disabled={submitting}
+                    isInvalid={errorField === 'fullName'}
                   />
+                  <Form.Control.Feedback type="invalid">
+                    {errorField === 'fullName' && error}
+                  </Form.Control.Feedback>
                 </Form.Group>
 
                 <Form.Group className="mb-3">
@@ -265,7 +293,11 @@ const AcceptInvite: React.FC = () => {
                     minLength={3}
                     required
                     disabled={submitting}
+                    isInvalid={errorField === 'username'}
                   />
+                  <Form.Control.Feedback type="invalid">
+                    {errorField === 'username' && error}
+                  </Form.Control.Feedback>
                   <Form.Text className="text-muted">
                     Minimum 3 characters
                   </Form.Text>
@@ -288,6 +320,7 @@ const AcceptInvite: React.FC = () => {
                       minLength={8}
                       required
                       disabled={submitting}
+                      isInvalid={errorField === 'password'}
                     />
                     <Button
                       variant="outline-secondary"
@@ -297,6 +330,11 @@ const AcceptInvite: React.FC = () => {
                       {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                     </Button>
                   </div>
+                  {errorField === 'password' && (
+                    <div className="invalid-feedback d-block">
+                      {error}
+                    </div>
+                  )}
                   {passwordStrength && (
                     <div className="mt-2">
                       <small className={`text-${getPasswordStrengthColor()}`}>
@@ -304,10 +342,8 @@ const AcceptInvite: React.FC = () => {
                       </small>
                     </div>
                   )}
-                  <Form.Text className="text-muted">
-                    Password must be at least 8 characters and include: uppercase letter, lowercase letter, number, and special character (@, $, !, %, *, ?, &, _)
-                    <br />
-                    <small>Example: MyPass123!</small>
+                  <Form.Text className="text-info">
+                    Min 8 characters with uppercase, lowercase, number & special character (@$!%*?&_)
                   </Form.Text>
                 </Form.Group>
 
@@ -327,8 +363,8 @@ const AcceptInvite: React.FC = () => {
                       placeholder="Confirm your password"
                       required
                       disabled={submitting}
-                      isInvalid={formData.confirmPassword.length > 0 && !passwordMatch}
-                      isValid={formData.confirmPassword.length > 0 && passwordMatch}
+                      isInvalid={errorField === 'confirmPassword' || (formData.confirmPassword.length > 0 && !passwordMatch)}
+                      isValid={formData.confirmPassword.length > 0 && passwordMatch && errorField !== 'confirmPassword'}
                     />
                     <Button
                       variant="outline-secondary"
@@ -338,10 +374,15 @@ const AcceptInvite: React.FC = () => {
                       {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                     </Button>
                   </div>
-                  {!passwordMatch && formData.confirmPassword.length > 0 && (
-                    <Form.Control.Feedback type="invalid">
+                  {errorField === 'confirmPassword' && (
+                    <div className="invalid-feedback d-block">
+                      {error}
+                    </div>
+                  )}
+                  {!passwordMatch && formData.confirmPassword.length > 0 && errorField !== 'confirmPassword' && (
+                    <div className="invalid-feedback d-block">
                       Passwords do not match
-                    </Form.Control.Feedback>
+                    </div>
                   )}
                 </Form.Group>
 
