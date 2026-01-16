@@ -551,7 +551,7 @@ const MyLeads: React.FC = () => {
                       <Card 
                         className="shadow-sm"
                         style={{
-                          border: '1px solid #e0e0e0',
+                          border: '1.5px solid #c0c0c0',
                           borderRadius: '0.375rem'
                         }}
                       >

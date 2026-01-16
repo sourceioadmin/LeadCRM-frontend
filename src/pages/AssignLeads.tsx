@@ -540,128 +540,117 @@ const AssignLeads: React.FC = () => {
             <div className="table-responsive">
               {/* Mobile Card View (xs/sm screens) */}
               <div className="d-block d-md-none">
-                <div className="row g-3">
+                <div className="row g-2">
                   {leadsData.leads.map((lead) => (
                     <div key={lead.leadId} className="col-12">
-                      <Card className="h-100 shadow-sm">
-                        <Card.Body className="p-3">
-                          <div className="d-flex justify-content-between align-items-start mb-2">
-                            <div className="flex-grow-1">
-                              <h6 className="mb-1 text-truncate" title={lead.clientName}>
-                                {lead.clientName}
-                              </h6>
-                              {lead.companyName && (
-                                <small className="text-muted d-block text-truncate" title={lead.companyName}>
-                                  <i className="bi bi-building me-1"></i>{lead.companyName}
-                                </small>
-                              )}
-                            </div>
-                            <div className="d-flex gap-1">
+                      <Card 
+                        className="shadow-sm"
+                        style={{
+                          border: '1.5px solid #c0c0c0',
+                          borderRadius: '0.375rem'
+                        }}
+                      >
+                        <Card.Body className="p-2">
+                          {/* Row 1: Client Name, Status Badge, Checkbox */}
+                          <div className="d-flex justify-content-between align-items-center" style={{ marginBottom: '0.25rem' }}>
+                            <div className="d-flex align-items-center flex-grow-1 me-1" style={{ minWidth: 0 }}>
                               <Form.Check
                                 type="checkbox"
                                 checked={selectedLeads.has(lead.leadId)}
                                 onChange={() => toggleSelectLead(lead.leadId)}
-                                className="ms-2"
+                                className="me-1"
+                                style={{ transform: 'scale(0.9)' }}
                               />
-                              <Badge bg={getStatusVariant(lead.leadStatusName || '')} className="ms-2 flex-shrink-0">
-                                {lead.leadStatusName}
-                              </Badge>
+                              <h6 className="mb-0 text-truncate fw-bold" title={lead.clientName} style={{ fontSize: '0.9rem' }}>
+                                {lead.clientName}
+                              </h6>
                             </div>
+                            <Badge bg={getStatusVariant(lead.leadStatusName || '')} className="text-nowrap flex-shrink-0" style={{ fontSize: '0.7rem', padding: '0.2rem 0.4rem' }}>
+                              {lead.leadStatusName}
+                            </Badge>
                           </div>
 
-                          <div className="row g-2 text-sm">
-                            {lead.mobileNumber && (
-                              <div className="col-6">
-                                <small className="text-muted d-block"><i className="bi bi-phone me-1"></i>Phone</small>
-                                <span className="text-truncate d-block" title={lead.mobileNumber}>
-                                  {lead.mobileNumber}
-                                </span>
-                              </div>
-                            )}
-                            <div className="col-6">
-                              <small className="text-muted d-block"><i className="bi bi-calendar me-1"></i>Lead Date</small>
-                              <span>{formatDate(lead.leadDate)}</span>
+                          {/* Company */}
+                          {lead.companyName && (
+                            <div className="d-flex align-items-center text-muted" style={{ marginBottom: '0.25rem' }}>
+                              <i className="bi bi-building me-1" style={{ fontSize: '0.8rem' }}></i>
+                              <span className="text-truncate" title={lead.companyName} style={{ fontSize: '0.8rem' }}>
+                                {lead.companyName}
+                              </span>
                             </div>
-                            <div className="col-6">
-                              <small className="text-muted d-block"><i className="bi bi-diagram-3 me-1"></i>Source</small>
-                              <span className="text-truncate d-block" style={{ maxWidth: '100px' }} title={lead.leadSourceName}>
+                          )}
+
+                          {/* Phone */}
+                          {lead.mobileNumber && (
+                            <div className="d-flex align-items-center" style={{ marginBottom: '0.25rem' }}>
+                              <i className="bi bi-phone text-muted me-1" style={{ fontSize: '0.8rem' }}></i>
+                              <span className="text-truncate" title={lead.mobileNumber} style={{ fontSize: '0.8rem' }}>
+                                {lead.mobileNumber}
+                              </span>
+                            </div>
+                          )}
+
+                          {/* Lead Date and Source */}
+                          <div className="d-flex gap-2" style={{ marginBottom: '0.25rem' }}>
+                            <div className="d-flex align-items-center flex-fill" style={{ minWidth: 0 }}>
+                              <i className="bi bi-calendar3 text-muted me-1" style={{ fontSize: '0.8rem' }}></i>
+                              <span className="text-truncate" style={{ fontSize: '0.8rem' }}>
+                                {formatDate(lead.leadDate)}
+                              </span>
+                            </div>
+                            <div className="d-flex align-items-center flex-fill" style={{ minWidth: 0 }}>
+                              <i className="bi bi-diagram-3 text-muted me-1" style={{ fontSize: '0.8rem' }}></i>
+                              <span className="text-truncate" title={lead.leadSourceName} style={{ fontSize: '0.8rem' }}>
                                 {lead.leadSourceName}
                               </span>
                             </div>
-                            {lead.urgencyLevelName && (
-                              <div className="col-6">
-                                <small className="text-muted d-block"><i className="bi bi-exclamation-triangle me-1"></i>Urgency</small>
-                                <span 
-                                  className="text-truncate d-block" 
-                                  style={{ 
-                                    maxWidth: '100px',
-                                    color: lead.urgencyLevelName.toLowerCase().includes('immediate') ? '#dc3545' : 'inherit',
-                                    fontWeight: lead.urgencyLevelName.toLowerCase().includes('immediate') ? '600' : 'normal'
-                                  }} 
-                                  title={lead.urgencyLevelName}
-                                >
-                                  {lead.urgencyLevelName}
-                                </span>
-                              </div>
-                            )}
-                            {lead.expectedBudget && (
-                              <div className="col-6">
-                                <small className="text-muted d-block"><i className="bi bi-cash me-1"></i>Budget</small>
-                                <span className="fw-medium">
-                                  {formatCurrency(lead.expectedBudget)}
-                                </span>
-                              </div>
-                            )}
-                            {lead.followupDate && (
-                              <div className="col-6">
-                                <small className="text-muted d-block"><i className="bi bi-telephone me-1"></i>Follow-up</small>
-                                <span>{formatDate(lead.followupDate)}</span>
-                              </div>
-                            )}
-                            {lead.interestedIn && (
-                              <div className="col-12">
-                                <small className="text-muted d-block"><i className="bi bi-target me-1"></i>Interested In</small>
-                                <span className="text-truncate d-block" title={lead.interestedIn}>
-                                  {lead.interestedIn}
-                                </span>
-                              </div>
-                            )}
-                            {lead.createdByUserName && (
-                              <div className="col-6">
-                                <small className="text-muted d-block"><i className="bi bi-person me-1"></i>Created By</small>
-                                <span>{lead.createdByUserName}</span>
-                              </div>
-                            )}
                           </div>
 
+                          {/* Referral */}
+                          {lead.referredBy && (
+                            <div className="d-flex align-items-center" style={{ marginBottom: '0.25rem' }}>
+                              <i className="bi bi-person-check text-muted me-1" style={{ fontSize: '0.8rem' }}></i>
+                              <span className="text-truncate" title={lead.referredBy} style={{ fontSize: '0.8rem' }}>
+                                {lead.referredBy}
+                              </span>
+                            </div>
+                          )}
+
                           {/* Assign To dropdown for mobile */}
-                          <div className="mt-3 pt-2 border-top">
-                            <Form.Group>
-                              <Form.Label className="small fw-medium">Assign To:</Form.Label>
-                              <Form.Select
-                                size="sm"
-                                disabled={inlineAssigning === lead.leadId}
-                                onChange={(e) => {
-                                  if (e.target.value) {
-                                    handleInlineAssign(lead.leadId, parseInt(e.target.value));
-                                  }
-                                }}
-                                value=""
-                              >
-                                <option value="">Select user...</option>
-                                {assignableUsers.map(user => (
-                                  <option key={user.userId} value={user.userId}>
-                                    {user.fullName} ({user.roleName})
-                                  </option>
-                                ))}
-                              </Form.Select>
-                              {inlineAssigning === lead.leadId && (
-                                <div className="mt-2 text-center">
-                                  <Spinner size="sm" />
-                                  <small className="text-muted ms-2">Assigning...</small>
-                                </div>
-                              )}
-                            </Form.Group>
+                          <div className="mt-1 pt-1 border-top">
+                            <Form.Select
+                              size="sm"
+                              disabled={inlineAssigning === lead.leadId}
+                              onChange={(e) => {
+                                if (e.target.value) {
+                                  handleInlineAssign(lead.leadId, parseInt(e.target.value));
+                                }
+                              }}
+                              value=""
+                              style={{ 
+                                fontSize: '0.75rem',
+                                padding: '0.25rem 0.5rem',
+                                height: 'auto',
+                                backgroundColor: '#f8f9fa',
+                                border: '1px solid #0d6efd',
+                                color: '#0d6efd',
+                                fontWeight: '500',
+                                cursor: 'pointer'
+                              }}
+                            >
+                              <option value="">👤 Assign to...</option>
+                              {assignableUsers.map(user => (
+                                <option key={user.userId} value={user.userId}>
+                                  {user.fullName}
+                                </option>
+                              ))}
+                            </Form.Select>
+                            {inlineAssigning === lead.leadId && (
+                              <div className="mt-1 text-center">
+                                <Spinner size="sm" style={{ width: '0.8rem', height: '0.8rem' }} />
+                                <small className="text-muted ms-1" style={{ fontSize: '0.7rem' }}>Assigning...</small>
+                              </div>
+                            )}
                           </div>
                         </Card.Body>
                       </Card>
