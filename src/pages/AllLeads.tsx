@@ -713,109 +713,89 @@ const AllLeads: React.FC = () => {
                     <div className="row g-3">
                       {leadsData?.leads.leads.map((lead) => (
                         <div key={lead.leadId} className="col-12">
-                          <Card className="h-100 shadow-sm">
-                            <Card.Body className="p-3">
-                              <div className="d-flex justify-content-between align-items-start mb-2">
-                                <div className="flex-grow-1">
-                                  <h6 className="mb-1 text-truncate" title={lead.clientName}>
-                                    {lead.clientName}
-                                  </h6>
-                                  {lead.companyName && (
-                                    <small className="text-muted d-block text-truncate" title={lead.companyName}>
-                                      <i className="bi bi-building me-1"></i>{lead.companyName}
-                                    </small>
-                                  )}
-                                </div>
-                                <div className="d-flex gap-1">
+                          <Card 
+                            className="shadow-sm"
+                            style={{
+                              border: '1px solid #e0e0e0',
+                              borderRadius: '0.375rem'
+                            }}
+                          >
+                            <Card.Body className="p-2">
+                              {/* Row 1: Client Name, Status Badge, Edit Button */}
+                              <div className="d-flex justify-content-between align-items-center" style={{ marginBottom: '0.25rem' }}>
+                                <div className="d-flex align-items-center flex-grow-1 me-1" style={{ minWidth: 0 }}>
                                   <Form.Check
                                     type="checkbox"
                                     checked={selectedLeads.includes(lead.leadId)}
                                     onChange={() => handleSelectLead(lead.leadId)}
-                                    className="ms-2"
+                                    className="me-1"
+                                    style={{ transform: 'scale(0.9)' }}
                                   />
-                                  <Badge bg={getStatusBadgeVariant(lead.leadStatusName || '')} className="ms-2 flex-shrink-0">
+                                  <h6 className="mb-0 text-truncate fw-bold" title={lead.clientName} style={{ fontSize: '0.9rem' }}>
+                                    {lead.clientName}
+                                  </h6>
+                                </div>
+                                <div className="d-flex gap-1 align-items-center flex-shrink-0">
+                                  <Badge bg={getStatusBadgeVariant(lead.leadStatusName || '')} className="text-nowrap" style={{ fontSize: '0.7rem', padding: '0.2rem 0.4rem' }}>
                                     {lead.leadStatusName}
                                   </Badge>
+                                  <Button
+                                    variant="link"
+                                    size="sm"
+                                    onClick={() => handleEditLead(lead)}
+                                    className="p-0 text-primary"
+                                    title="Edit Lead"
+                                  >
+                                    <Edit size={16} />
+                                  </Button>
                                 </div>
                               </div>
 
-                              <div className="row g-2 text-sm">
-                                {lead.mobileNumber && (
-                                  <div className="col-6">
-                                    <small className="text-muted d-block"><i className="bi bi-phone me-1"></i>Phone</small>
-                                    <span className="text-truncate d-block" title={lead.mobileNumber}>
-                                      {lead.mobileNumber}
-                                    </span>
-                                  </div>
-                                )}
-                                {lead.emailAddress && (
-                                  <div className="col-6">
-                                    <small className="text-muted d-block"><i className="bi bi-envelope me-1"></i>Email</small>
-                                    <span className="text-truncate d-block" title={lead.emailAddress}>
-                                      {lead.emailAddress}
-                                    </span>
-                                  </div>
-                                )}
-                                <div className="col-6">
-                                  <small className="text-muted d-block"><i className="bi bi-calendar me-1"></i>Lead Date</small>
-                                  <span>{formatDate(lead.leadDate)}</span>
+                              {/* Company */}
+                              {lead.companyName && (
+                                <div className="d-flex align-items-center text-muted" style={{ marginBottom: '0.25rem' }}>
+                                  <i className="bi bi-building me-1" style={{ fontSize: '0.8rem' }}></i>
+                                  <span className="text-truncate" title={lead.companyName} style={{ fontSize: '0.8rem' }}>
+                                    {lead.companyName}
+                                  </span>
                                 </div>
-                                <div className="col-6">
-                                  <small className="text-muted d-block"><i className="bi bi-diagram-3 me-1"></i>Source</small>
-                                  <span className="text-truncate d-block" title={lead.leadSourceName}>
+                              )}
+
+                              {/* Phone */}
+                              {lead.mobileNumber && (
+                                <div className="d-flex align-items-center" style={{ marginBottom: '0.25rem' }}>
+                                  <i className="bi bi-phone text-muted me-1" style={{ fontSize: '0.8rem' }}></i>
+                                  <span className="text-truncate" title={lead.mobileNumber} style={{ fontSize: '0.8rem' }}>
+                                    {lead.mobileNumber}
+                                  </span>
+                                </div>
+                              )}
+
+                              {/* Lead Date and Source */}
+                              <div className="d-flex gap-2" style={{ marginBottom: '0.25rem' }}>
+                                <div className="d-flex align-items-center flex-fill" style={{ minWidth: 0 }}>
+                                  <i className="bi bi-calendar3 text-muted me-1" style={{ fontSize: '0.8rem' }}></i>
+                                  <span className="text-truncate" style={{ fontSize: '0.8rem' }}>
+                                    {formatDate(lead.leadDate)}
+                                  </span>
+                                </div>
+                                <div className="d-flex align-items-center flex-fill" style={{ minWidth: 0 }}>
+                                  <i className="bi bi-diagram-3 text-muted me-1" style={{ fontSize: '0.8rem' }}></i>
+                                  <span className="text-truncate" title={lead.leadSourceName} style={{ fontSize: '0.8rem' }}>
                                     {lead.leadSourceName}
                                   </span>
                                 </div>
-                                {lead.urgencyLevelName && (
-                                  <div className="col-6">
-                                    <small className="text-muted d-block"><i className="bi bi-exclamation-triangle me-1"></i>Urgency</small>
-                                    <span 
-                                      className="text-truncate d-block" 
-                                      style={{ 
-                                        maxWidth: '100px',
-                                        color: lead.urgencyLevelName.toLowerCase().includes('immediate') ? '#dc3545' : 'inherit',
-                                        fontWeight: lead.urgencyLevelName.toLowerCase().includes('immediate') ? '600' : 'normal'
-                                      }} 
-                                      title={lead.urgencyLevelName}
-                                    >
-                                      {lead.urgencyLevelName}
-                                    </span>
-                                  </div>
-                                )}
-                                {lead.expectedBudget && (
-                                  <div className="col-6">
-                                    <small className="text-muted d-block"><i className="bi bi-cash me-1"></i>Budget</small>
-                                    <span className="fw-medium">
-                                      {formatCurrency(lead.expectedBudget)}
-                                    </span>
-                                  </div>
-                                )}
-                                {lead.followupDate && (
-                                  <div className="col-6">
-                                    <small className="text-muted d-block"><i className="bi bi-telephone me-1"></i>Follow-up</small>
-                                    <span>{formatDate(lead.followupDate)}</span>
-                                  </div>
-                                )}
-                                {lead.assignedToUserName && (
-                                  <div className="col-6">
-                                    <small className="text-muted d-block"><i className="bi bi-person me-1"></i>Assigned</small>
-                                    <span>{lead.assignedToUserName}</span>
-                                  </div>
-                                )}
                               </div>
 
-                              {/* Action buttons for mobile */}
-                              <div className="d-flex gap-2 mt-3 pt-2 border-top">
-                                <Button
-                                  variant="outline-primary"
-                                  size="sm"
-                                  onClick={() => handleEditLead(lead)}
-                                  className="flex-fill"
-                                >
-                                  <Edit size={14} className="me-1" />
-                                  Edit Lead
-                                </Button>
-                              </div>
+                              {/* Referral */}
+                              {lead.referredBy && (
+                                <div className="d-flex align-items-center">
+                                  <i className="bi bi-person-check text-muted me-1" style={{ fontSize: '0.8rem' }}></i>
+                                  <span className="text-truncate" title={lead.referredBy} style={{ fontSize: '0.8rem' }}>
+                                    {lead.referredBy}
+                                  </span>
+                                </div>
+                              )}
                             </Card.Body>
                           </Card>
                         </div>
