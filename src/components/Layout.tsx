@@ -51,7 +51,7 @@ const Layout: React.FC = () => {
           />
         )}
         <div className={`main-content flex-grow-1 ${sidebarCollapsed ? 'sidebar-collapsed' : ''} ${isMobile ? 'mobile' : ''}`}>
-          <Container fluid className="py-3 py-md-4">
+          <Container fluid className="py-3 py-md-4 px-0">
             <Outlet />
           </Container>
         </div>

@@ -280,61 +280,72 @@ const MyLeads: React.FC = () => {
   return (
     <div>
       {/* Mobile-first header: stack vertically on mobile, side-by-side on larger */}
-      <div className="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 gap-3">
-        <div className="flex-grow-1">
+      <div className="mb-4">
+        <div className="mb-3">
           <h2 className="mb-1">{isReferralPartner ? 'My Referred Leads' : 'My Leads'}</h2>
           <p className="text-muted mb-0">
             {isReferralPartner ? 'View leads you have referred' : 'Manage leads assigned to you'}
           </p>
         </div>
-        <div className="d-flex gap-2 flex-wrap align-items-center">
-          <div style={{ width: '300px' }}>
-            <InputGroup size="sm">
-              <InputGroup.Text>
-                <Search size={16} />
-              </InputGroup.Text>
-              <Form.Control
-                placeholder="Search by client name, company, email, mobile..."
-                value={filters.search}
-                onChange={(e) => handleFilterChange('search', e.target.value)}
-              />
-            </InputGroup>
-          </div>
-          <Button
-            variant="outline-secondary"
-            onClick={() => setShowFilters(!showFilters)}
-            className="flex-grow-1 flex-md-grow-0"
-          >
-            <Filter size={18} className="me-2" />
-            <span className="d-none d-sm-inline">{showFilters ? 'Hide Filters' : 'Show Filters'}</span>
-            <span className="d-sm-none">Filters</span>
-          </Button>
-          <Dropdown className="flex-grow-1 flex-md-grow-0">
-            <Dropdown.Toggle variant="outline-secondary" className="w-100">
-              <Eye size={18} className="me-2" />
-              <span className="d-none d-sm-inline">Columns</span>
-            </Dropdown.Toggle>
-            <Dropdown.Menu>
-              {Object.keys(columnVisibility).map((column) => (
-                <Dropdown.Item
-                  key={column}
-                  onClick={() => toggleColumnVisibility(column as keyof ColumnVisibility)}
-                >
-                  {columnVisibility[column as keyof ColumnVisibility] ? <Eye size={14} /> : <EyeOff size={14} />}
-                  <span className="ms-2">{column.replace(/([A-Z])/g, ' $1').trim()}</span>
-                </Dropdown.Item>
-              ))}
-            </Dropdown.Menu>
-          </Dropdown>
-          {!isReferralPartner && (
+        
+        {/* Search Bar - Full width on mobile */}
+        <div className="mb-2">
+          <InputGroup size="sm">
+            <InputGroup.Text>
+              <Search size={16} />
+            </InputGroup.Text>
+            <Form.Control
+              placeholder="Search leads..."
+              value={filters.search}
+              onChange={(e) => handleFilterChange('search', e.target.value)}
+            />
+          </InputGroup>
+        </div>
+
+        {/* Action Buttons - Grid layout on mobile */}
+        <div className="row g-2">
+          <div className="col-4 col-sm-3 col-md-auto">
             <Button
-              variant="primary"
-              onClick={handleAddLead}
-              className="w-100 w-md-auto mt-2 mt-md-0"
+              variant="outline-secondary"
+              onClick={() => setShowFilters(!showFilters)}
+              className="w-100"
+              size="sm"
             >
-              <Plus size={18} className="me-2" />
-              <span className="d-none d-sm-inline">Add Lead</span>
+              <Filter size={16} />
+              <span className="d-none d-lg-inline ms-1">Filters</span>
             </Button>
+          </div>
+          <div className="col-4 col-sm-3 col-md-auto">
+            <Dropdown className="w-100">
+              <Dropdown.Toggle variant="outline-secondary" className="w-100" size="sm">
+                <Eye size={16} />
+                <span className="d-none d-lg-inline ms-1">Columns</span>
+              </Dropdown.Toggle>
+              <Dropdown.Menu>
+                {Object.keys(columnVisibility).map((column) => (
+                  <Dropdown.Item
+                    key={column}
+                    onClick={() => toggleColumnVisibility(column as keyof ColumnVisibility)}
+                  >
+                    {columnVisibility[column as keyof ColumnVisibility] ? <Eye size={14} /> : <EyeOff size={14} />}
+                    <span className="ms-2">{column.replace(/([A-Z])/g, ' $1').trim()}</span>
+                  </Dropdown.Item>
+                ))}
+              </Dropdown.Menu>
+            </Dropdown>
+          </div>
+          {!isReferralPartner && (
+            <div className="col-4 col-sm-3 col-md-auto">
+              <Button
+                variant="primary"
+                onClick={handleAddLead}
+                className="w-100"
+                size="sm"
+              >
+                <Plus size={16} />
+                <span className="d-none d-lg-inline ms-1">Add</span>
+              </Button>
+            </div>
           )}
         </div>
       </div>
@@ -531,127 +542,144 @@ const MyLeads: React.FC = () => {
               )}
             </div>
           ) : (
-            <div className="table-responsive">
+            <>
               {/* Mobile Card View (xs/sm screens) */}
-              <div className="d-block d-md-none">
-                <div className="row g-3">
-                  {leadsData?.leads.leads.map((lead) => (
-                    <div key={lead.leadId} className="col-12">
-                      <Card className="h-100 shadow-sm">
-                        <Card.Body className="p-3">
-                          <div className="d-flex justify-content-between align-items-start mb-2">
-                            <div className="flex-grow-1">
-                              <h6 className="mb-1 text-truncate" title={lead.clientName}>
-                                {lead.clientName}
-                              </h6>
-                              {lead.companyName && (
-                                <small className="text-muted d-block text-truncate" title={lead.companyName}>
-                                  <i className="bi bi-building me-1"></i>{lead.companyName}
-                                </small>
-                              )}
-                            </div>
-                            <Badge bg={getStatusVariant(lead.leadStatusName || '')} className="ms-2 flex-shrink-0">
-                              {lead.leadStatusName}
-                            </Badge>
+              <div className="d-block d-md-none px-0">
+                {leadsData?.leads.leads.map((lead) => (
+                  <Card key={lead.leadId} className="mb-3 shadow-sm">
+                    <Card.Body className="p-3">
+                        <div className="d-flex justify-content-between align-items-start mb-2">
+                          <div className="flex-grow-1 me-2" style={{ minWidth: 0 }}>
+                            <h6 className="mb-1 text-truncate" title={lead.clientName}>
+                              {lead.clientName}
+                            </h6>
+                            {lead.companyName && (
+                              <small className="text-muted d-block text-truncate" title={lead.companyName}>
+                                <i className="bi bi-building me-1"></i>{lead.companyName}
+                              </small>
+                            )}
                           </div>
+                          <Badge bg={getStatusVariant(lead.leadStatusName || '')} className="flex-shrink-0" style={{ fontSize: '0.7rem' }}>
+                            {lead.leadStatusName}
+                          </Badge>
+                        </div>
 
-                          <div className="row g-2 text-sm">
-                            {lead.mobileNumber && (
-                              <div className="col-6">
-                                <small className="text-muted d-block"><i className="bi bi-phone me-1"></i>Phone</small>
-                                <span className="text-truncate d-block" title={lead.mobileNumber}>
-                                  {lead.mobileNumber}
-                                </span>
+                        <div className="mt-2">
+                          {lead.mobileNumber && (
+                            <div className="mb-2">
+                              <small className="text-muted d-block mb-1">
+                                <i className="bi bi-phone me-1"></i>Phone
+                              </small>
+                              <div className="text-truncate" style={{ fontSize: '0.875rem' }} title={lead.mobileNumber}>
+                                {lead.mobileNumber}
                               </div>
-                            )}
-                            {lead.emailAddress && (
-                              <div className="col-6">
-                                <small className="text-muted d-block"><i className="bi bi-envelope me-1"></i>Email</small>
-                                <span className="text-truncate d-block" title={lead.emailAddress}>
-                                  {lead.emailAddress}
-                                </span>
+                            </div>
+                          )}
+                          {lead.emailAddress && (
+                            <div className="mb-2">
+                              <small className="text-muted d-block mb-1">
+                                <i className="bi bi-envelope me-1"></i>Email
+                              </small>
+                              <div className="text-truncate" style={{ fontSize: '0.875rem' }} title={lead.emailAddress}>
+                                {lead.emailAddress}
                               </div>
-                            )}
+                            </div>
+                          )}
+                          <div className="row g-2 mb-2">
                             <div className="col-6">
-                              <small className="text-muted d-block"><i className="bi bi-calendar me-1"></i>Lead Date</small>
-                              <span>{formatDate(lead.leadDate)}</span>
+                              <small className="text-muted d-block mb-1">
+                                <i className="bi bi-calendar me-1"></i>Lead Date
+                              </small>
+                              <div style={{ fontSize: '0.875rem' }}>{formatDate(lead.leadDate)}</div>
                             </div>
                             <div className="col-6">
-                              <small className="text-muted d-block"><i className="bi bi-diagram-3 me-1"></i>Source</small>
-                              <Badge bg="light" text="dark" className="text-truncate" style={{ maxWidth: '100px' }} title={lead.leadSourceName}>
+                              <small className="text-muted d-block mb-1">
+                                <i className="bi bi-diagram-3 me-1"></i>Source
+                              </small>
+                              <Badge bg="light" text="dark" style={{ fontSize: '0.7rem' }}>
                                 {lead.leadSourceName}
                               </Badge>
                             </div>
-                            {lead.urgencyLevelName && (
-                              <div className="col-6">
-                                <small className="text-muted d-block"><i className="bi bi-exclamation-triangle me-1"></i>Urgency</small>
-                                <Badge bg={getUrgencyVariant(lead.urgencyLevelName)} className="text-truncate" style={{ maxWidth: '100px' }} title={lead.urgencyLevelName}>
-                                  {lead.urgencyLevelName}
-                                </Badge>
-                              </div>
-                            )}
-                            {lead.expectedBudget && (
-                              <div className="col-6">
-                                <small className="text-muted d-block"><i className="bi bi-cash me-1"></i>Budget</small>
-                                <span className="fw-medium">
-                                  ${lead.expectedBudget.toLocaleString()}
-                                </span>
-                              </div>
-                            )}
-                            {lead.followupDate && (
-                              <div className="col-6">
-                                <small className="text-muted d-block"><i className="bi bi-telephone me-1"></i>Follow-up</small>
-                                <span>{formatDate(lead.followupDate)}</span>
-                              </div>
-                            )}
-                            {lead.interestedIn && (
-                              <div className="col-12">
-                                <small className="text-muted d-block"><i className="bi bi-target me-1"></i>Interested In</small>
-                                <span className="text-truncate d-block" title={lead.interestedIn}>
-                                  {lead.interestedIn}
-                                </span>
-                              </div>
-                            )}
-                            {lead.notes && (
-                              <div className="col-12">
-                                <small className="text-muted d-block"><i className="bi bi-sticky me-1"></i>Notes</small>
-                                <span className="text-truncate d-block" title={lead.notes}>
-                                  {lead.notes}
-                                </span>
-                              </div>
-                            )}
                           </div>
-
-                          {/* Action buttons for mobile - Hide for readonly leads */}
-                          {!lead.isReadonly && (
-                            <div className="d-flex gap-2 mt-3 pt-2 border-top">
-                              <Button
-                                variant="outline-primary"
-                                size="sm"
-                                onClick={() => handleEditLead(lead)}
-                                className="w-100"
-                              >
-                                <Edit size={14} className="me-1" />
-                                Edit Lead
-                              </Button>
-                            </div>
-                          )}
-                          {lead.isReadonly && (
-                            <div className="d-flex gap-2 mt-3 pt-2 border-top">
-                              <Badge bg="secondary" className="w-100 text-center py-2">
-                                Read Only
+                          {lead.urgencyLevelName && (
+                            <div className="mb-2">
+                              <small className="text-muted d-block mb-1">
+                                <i className="bi bi-exclamation-triangle me-1"></i>Urgency
+                              </small>
+                              <Badge bg={getUrgencyVariant(lead.urgencyLevelName)} style={{ fontSize: '0.7rem' }}>
+                                {lead.urgencyLevelName}
                               </Badge>
                             </div>
                           )}
-                        </Card.Body>
-                      </Card>
-                    </div>
-                  ))}
-                </div>
+                          {lead.expectedBudget && (
+                            <div className="mb-2">
+                              <small className="text-muted d-block mb-1">
+                                <i className="bi bi-cash me-1"></i>Budget
+                              </small>
+                              <div className="fw-medium" style={{ fontSize: '0.875rem' }}>
+                                ${lead.expectedBudget.toLocaleString()}
+                              </div>
+                            </div>
+                          )}
+                          {lead.followupDate && (
+                            <div className="mb-2">
+                              <small className="text-muted d-block mb-1">
+                                <i className="bi bi-telephone me-1"></i>Follow-up
+                              </small>
+                              <div style={{ fontSize: '0.875rem' }}>{formatDate(lead.followupDate)}</div>
+                            </div>
+                          )}
+                          {lead.interestedIn && (
+                            <div className="mb-2">
+                              <small className="text-muted d-block mb-1">
+                                <i className="bi bi-target me-1"></i>Interested In
+                              </small>
+                              <div className="text-truncate" style={{ fontSize: '0.875rem' }} title={lead.interestedIn}>
+                                {lead.interestedIn}
+                              </div>
+                            </div>
+                          )}
+                          {lead.notes && (
+                            <div className="mb-2">
+                              <small className="text-muted d-block mb-1">
+                                <i className="bi bi-sticky me-1"></i>Notes
+                              </small>
+                              <div className="text-truncate" style={{ fontSize: '0.875rem' }} title={lead.notes}>
+                                {lead.notes}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Action buttons for mobile - Hide for readonly leads */}
+                        {!lead.isReadonly && (
+                          <div className="d-flex gap-2 mt-3 pt-2 border-top">
+                            <Button
+                              variant="outline-primary"
+                              size="sm"
+                              onClick={() => handleEditLead(lead)}
+                              className="w-100"
+                            >
+                              <Edit size={14} className="me-1" />
+                              Edit Lead
+                            </Button>
+                          </div>
+                        )}
+                        {lead.isReadonly && (
+                          <div className="d-flex gap-2 mt-3 pt-2 border-top">
+                            <Badge bg="secondary" className="w-100 text-center py-2">
+                              Read Only
+                            </Badge>
+                          </div>
+                        )}
+                      </Card.Body>
+                    </Card>
+                ))}
               </div>
 
-              {/* Desktop Table View (md+ screens) */}
-              <div className="d-none d-md-block">
+            {/* Desktop Table View (md+ screens) */}
+            <div className="d-none d-md-block">
+              <div className="table-responsive">
                 <Table striped hover className="mb-0" style={{ fontSize: '0.875rem' }}>
                   <thead className="table-light">
                     <tr>
@@ -808,6 +836,7 @@ const MyLeads: React.FC = () => {
                 </Table>
               </div>
             </div>
+            </>
           )}
         </Card.Body>
       </Card>
