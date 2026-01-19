@@ -105,6 +105,12 @@ const InviteUserModal: React.FC<InviteUserModalProps> = ({ show, onHide, onSucce
             </Alert>
           )}
 
+          {error && !errorField && (
+            <Alert variant="danger">
+              {error}
+            </Alert>
+          )}
+
           <Form.Group className="mb-3">
             <Form.Label>
               Email Address <span className="text-danger">*</span>
