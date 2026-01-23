@@ -4,6 +4,7 @@ import { Calendar, Clock, Edit, MessageSquare, AlertTriangle } from 'lucide-reac
 import { getUpcomingFollowups, rescheduleFollowup, addNote, updateLead, getLeadStatuses } from '../services/leadService';
 import { Lead, LeadStatus, UpcomingFollowupsResponse, RescheduleFollowupRequest, AddNoteRequest } from '../types/Lead';
 import { formatDate, formatDateForInput, isOverdue as checkIsOverdue, isToday, getTodayForInput } from '../utils/dateUtils';
+import AddLeadModal from '../components/AddLeadModal';
 
 const UpcomingFollowups: React.FC = () => {
   // State management
@@ -20,6 +21,7 @@ const UpcomingFollowups: React.FC = () => {
   const [showRescheduleModal, setShowRescheduleModal] = useState(false);
   const [showEditNotesModal, setShowEditNotesModal] = useState(false);
   const [showStatusConfirmModal, setShowStatusConfirmModal] = useState(false);
+  const [showEditLeadModal, setShowEditLeadModal] = useState(false);
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
   const [pendingStatusChange, setPendingStatusChange] = useState<{ lead: Lead; newStatusId: number } | null>(null);
 
@@ -109,6 +111,11 @@ const UpcomingFollowups: React.FC = () => {
     setSelectedLead(lead);
     setEditNotesForm(''); // Clear form for new note entry
     setShowEditNotesModal(true);
+  };
+
+  const handleEditLead = (lead: Lead) => {
+    setSelectedLead(lead);
+    setShowEditLeadModal(true);
   };
 
   const submitReschedule = async () => {
@@ -467,6 +474,14 @@ const UpcomingFollowups: React.FC = () => {
                             Reschedule
                           </Button>
                           <Button
+                            variant="outline-secondary"
+                            size="sm"
+                            className="flex-grow-1"
+                            onClick={() => handleEditLead(lead)}
+                          >
+                            Edit Lead
+                          </Button>
+                          <Button
                             variant="primary"
                             size="sm"
                             className="flex-grow-1"
@@ -496,6 +511,7 @@ const UpcomingFollowups: React.FC = () => {
                         <th>Follow-up</th>
                         <th className="d-none d-md-table-cell">Assigned</th>
                         <th className="d-none d-lg-table-cell">Notes</th>
+                        <th>Actions</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -568,6 +584,16 @@ const UpcomingFollowups: React.FC = () => {
                             >
                               {lead.notes || 'Add notes'}
                             </div>
+                          </td>
+                          <td>
+                            <Button
+                              variant="outline-secondary"
+                              size="sm"
+                              onClick={() => handleEditLead(lead)}
+                              title="Edit Lead"
+                            >
+                              <Edit size={14} />
+                            </Button>
                           </td>
                         </tr>
                       ))}
@@ -749,6 +775,22 @@ const UpcomingFollowups: React.FC = () => {
           </Button>
         </Modal.Footer>
       </Modal>
+
+      {/* Edit Lead Modal */}
+      <AddLeadModal
+        show={showEditLeadModal}
+        onHide={() => {
+          setShowEditLeadModal(false);
+          setSelectedLead(null);
+        }}
+        onSuccess={() => {
+          setShowEditLeadModal(false);
+          setSelectedLead(null);
+          // Refresh data
+          loadData();
+        }}
+        lead={selectedLead || undefined}
+      />
     </div>
   );
 };
