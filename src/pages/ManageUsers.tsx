@@ -415,7 +415,7 @@ const ManageUsers: React.FC = () => {
                             )}
                           </td>
                           <td>
-                            <Badge bg={getRoleBadgeVariant(user.roleName)} className="text-truncate" style={{ maxWidth: '90px' }}>
+                            <Badge bg={getRoleBadgeVariant(user.roleName)} className="text-truncate" style={{ maxWidth: '90px' }} title={user.roleName}>
                               {user.roleName}
                             </Badge>
                           </td>
