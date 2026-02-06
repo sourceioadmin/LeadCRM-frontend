@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- People icons at top -->
+  <circle cx="22" cy="8" r="4" fill="#1565C0"/>
+  <rect x="18" y="13" width="8" height="6" rx="2" fill="#1565C0"/>
+  <circle cx="32" cy="6" r="4" fill="#1565C0"/>
+  <rect x="28" y="11" width="8" height="6" rx="2" fill="#1565C0"/>
+  <circle cx="42" cy="8" r="4" fill="#1565C0"/>
+  <rect x="38" y="13" width="8" height="6" rx="2" fill="#1565C0"/>
+  
+  <!-- Funnel -->
+  <path d="M12 22 L52 22 L38 38 L38 44 L26 44 L26 38 Z" fill="#14B8A6"/>
+  
+  <!-- Box -->
+  <path d="M16 48 L48 48 L48 58 L16 58 Z" fill="#1565C0"/>
+  <path d="M16 48 L12 44 L52 44 L48 48 Z" fill="#1976D2"/>
+  
+  <!-- Checkmark -->
+  <path d="M24 52 L30 58 L42 48" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>
