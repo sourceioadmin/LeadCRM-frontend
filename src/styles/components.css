@@ -4,20 +4,44 @@
 .sidebar {
   width: 260px;
   background: var(--color-surface);
-  border-right: 1px solid var(--color-border);
+  border-right: none; /* use softer gradient divider instead */
   transition: transform 0.3s ease-in-out;
-  min-height: 100vh;
+  height: calc(100vh - 70px);
   position: fixed;
   left: 0;
   top: 70px; /* Below navbar */
   z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+/* Softer sidebar separator (instead of a harsh full-height border) */
+.sidebar::after {
+  content: "";
+  position: absolute;
+  top: 12px;
+  bottom: 12px;
+  right: 0;
+  width: 1px;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    rgba(148, 163, 184, 0.28),
+    transparent
+  );
+  pointer-events: none;
 }
 
 /* Desktop collapsed behavior */
 @media (min-width: 768px) {
   .sidebar.collapsed {
-    transform: translateX(-220px);
     width: 80px;
+  }
+  
+  .sidebar.collapsed .sidebar-logo {
+    justify-content: center;
+    padding: var(--space-4);
   }
 }
 
@@ -43,12 +67,66 @@
 }
 
 .sidebar-logo {
-  padding: var(--space-6);
-  font-size: var(--text-2xl);
+  padding: var(--space-5);
+  font-size: var(--text-xl);
   font-weight: var(--font-bold);
   color: var(--color-primary);
   border-bottom: 1px solid var(--color-border);
   margin-bottom: var(--space-4);
+  min-height: 70px;
+  display: flex;
+  align-items: center;
+}
+
+.sidebar-mobile-title {
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
+  color: var(--color-text-primary);
+}
+
+.sidebar-mobile-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.sidebar-close-btn {
+  appearance: none;
+  border: none;
+  background: rgba(20, 184, 166, 0.08);
+  color: var(--color-text-primary);
+  border-radius: var(--radius-full);
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s ease, transform 0.1s ease;
+}
+
+.sidebar-close-btn:hover {
+  background: rgba(20, 184, 166, 0.12);
+}
+
+.sidebar-close-btn:active {
+  transform: scale(0.96);
+}
+
+.sidebar-close-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.18);
+}
+
+.sidebar-logo .gap-2 {
+  gap: var(--space-3) !important;
+}
+
+/* Sidebar structure for flex layout */
+.sidebar {
+  display: flex;
+  flex-direction: column;
 }
 
 .sidebar-menu-item {
@@ -75,6 +153,76 @@
   font-weight: var(--font-semibold);
 }
 
+/* ===== SIDEBAR COMPANY INFO ===== */
+.sidebar-company-info {
+  margin-top: auto;
+  padding: var(--space-4);
+  border-top: 1px solid var(--color-border);
+  background: var(--color-background);
+}
+
+.company-logo-container,
+.company-name-container {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  transition: all 0.2s;
+}
+
+.company-logo-container:hover,
+.company-name-container:hover {
+  background: rgba(20, 184, 166, 0.05);
+}
+
+.company-logo-container.collapsed,
+.company-name-container.collapsed {
+  justify-content: center;
+  padding: var(--space-2);
+}
+
+.company-logo {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+.company-logo-container.collapsed .company-logo {
+  width: 32px;
+  height: 32px;
+}
+
+.company-icon {
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
+}
+
+.company-name {
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  color: var(--color-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 160px;
+}
+
+/* Mobile adjustments for company info */
+@media (max-width: 767.98px) {
+  .sidebar-company-info {
+    padding: var(--space-3);
+  }
+  
+  .company-logo {
+    width: 32px;
+    height: 32px;
+  }
+}
+
 /* ===== TOPBAR ===== */
 .topbar {
   height: 70px;
@@ -82,12 +230,12 @@
   border-bottom: 1px solid var(--color-border);
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 0 var(--space-4) 0 var(--space-3);
+  justify-content: flex-start;
+  padding: 0;
   position: fixed !important; /* Force sticky positioning */
   top: 0 !important; /* Always at the top */
   right: 0;
-  left: 0; /* Always full width */
+  left: 0; /* Always full width (including above sidebar) */
   z-index: 1050 !important; /* Higher z-index to stay above everything */
   backdrop-filter: blur(8px); /* Add blur effect for better separation */
   -webkit-backdrop-filter: blur(8px); /* Safari support */
@@ -101,19 +249,12 @@
 
 /* Desktop adjustments */
 @media (min-width: 768px) {
-  .topbar {
-    left: 260px; /* Account for sidebar on desktop */
-  }
-
-  .topbar.sidebar-collapsed {
-    left: 80px; /* Collapsed sidebar width */
-  }
+  /* No special positioning needed for desktop topbar */
 }
 
 /* Mobile adjustments */
 @media (max-width: 767.98px) {
   .topbar {
-    padding: 0 var(--space-3);
     position: fixed !important;
     top: 0 !important;
     left: 0 !important;
@@ -126,6 +267,10 @@
     /* Ensure it stays above mobile content */
     transform: translateZ(0); /* Force hardware acceleration */
     will-change: transform; /* Optimize for mobile scrolling */
+  }
+
+  .topbar-main {
+    padding: 0 var(--space-3);
   }
 
   /* Ensure topbar actions have proper touch targets */
@@ -149,6 +294,70 @@
   }
 }
 
+/* ===== TOPBAR BRAND STRIP (DESKTOP) ===== */
+.topbar-brand-strip {
+  height: 70px;
+  width: 260px;
+  display: flex;
+  align-items: center;
+  padding: 0 var(--space-5);
+  border-right: none; /* use softer gradient divider instead */
+  flex-shrink: 0;
+  position: relative;
+}
+
+.topbar-brand-text {
+  font-size: var(--text-xl);
+  font-weight: var(--font-bold);
+  color: var(--color-primary);
+  line-height: 1;
+}
+
+.topbar-mobile-brand {
+  flex-shrink: 0;
+  min-width: 0;
+}
+
+/* Keep mobile brand readable without crowding actions */
+.topbar-mobile-brand-text {
+  font-size: var(--text-lg);
+  max-width: 140px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.topbar-brand-strip::after {
+  content: "";
+  position: absolute;
+  top: 12px;
+  bottom: 12px;
+  right: 0;
+  width: 1px;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    rgba(148, 163, 184, 0.28),
+    transparent
+  );
+  pointer-events: none;
+}
+
+.topbar.sidebar-collapsed .topbar-brand-strip {
+  width: 80px;
+  justify-content: center;
+  padding: 0;
+}
+
+.topbar.sidebar-collapsed .topbar-brand-text {
+  display: none;
+}
+
+.topbar-main {
+  height: 70px;
+  padding: 0 var(--space-4) 0 var(--space-3);
+}
+
 .topbar-search {
   flex: 1;
   max-width: 500px;
@@ -170,6 +379,54 @@
   display: flex;
   gap: var(--space-4);
   align-items: center;
+}
+
+/* Company badge in topbar */
+.topbar-company-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-full);
+  background: rgba(20, 184, 166, 0.08);
+  color: var(--color-text-primary);
+  max-width: 260px;
+}
+
+.topbar-company-logo {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  flex-shrink: 0;
+}
+
+.topbar-company-fallback-icon {
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
+}
+
+.topbar-company-name {
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px;
+}
+
+/* Mobile: keep company name visible but compact */
+@media (max-width: 767.98px) {
+  .topbar-company-badge {
+    padding: var(--space-2) var(--space-2);
+    max-width: 180px;
+  }
+
+  .topbar-company-name {
+    font-size: var(--text-xs);
+    max-width: 120px;
+  }
 }
 
 /* ===== KANBAN CARDS ===== */
@@ -288,6 +545,18 @@
   border-color: var(--color-lost);
   color: var(--color-lost);
   background: rgba(239, 68, 68, 0.05);
+}
+
+/* ===== MANAGE USERS ===== */
+/* Keep "Role" badges fully visible (no truncation) */
+.manage-users-role-badge {
+  display: inline-flex !important;
+  align-items: center;
+  white-space: nowrap;
+  flex-shrink: 0;
+  max-width: none !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
 }
 
 /* ===== BUTTONS ===== */
@@ -1034,6 +1303,14 @@ input[type="date"].form-control:focus {
     overflow: hidden;
     text-overflow: ellipsis;
     font-size: 0.65rem;
+  }
+
+  /* Manage Users: Role badge should show full label */
+  .card .badge.manage-users-role-badge {
+    max-width: 100% !important;
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
   }
 
   /* Ensure mobile card content doesn't overflow */

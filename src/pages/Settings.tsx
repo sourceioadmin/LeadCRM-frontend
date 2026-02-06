@@ -50,7 +50,7 @@ const getBackendURL = (): string => {
 const BACKEND_BASE_URL = getBackendURL();
 
 const Settings: React.FC = () => {
-  const { user } = useAuth();
+  const { user, updateUser } = useAuth();
   const { showSuccess, showError, showInfo } = useToast();
   const [activeTab, setActiveTab] = useState('company');
 
@@ -248,6 +248,16 @@ const Settings: React.FC = () => {
         setCompanySettings(response.data);
         // Clear the logo preview immediately
         setLogoPreview(null);
+        // Keep AuthContext/localStorage user data in sync (topbar uses this)
+        updateUser({
+          companyName: response.data.companyName,
+          companyLogo: response.data.logo || undefined,
+          logo: response.data.logo || undefined,
+          company: {
+            companyName: response.data.companyName,
+            logo: response.data.logo || undefined
+          }
+        });
         showSuccess('Logo Removed', 'Company logo has been successfully removed');
         console.log('✅ UI updated successfully - logo removed immediately');
       } else {
@@ -306,6 +316,17 @@ const Settings: React.FC = () => {
           setLogoPreview(fullLogoUrl);
           console.log('Updated logo URL:', fullLogoUrl);
         }
+
+        // Keep AuthContext/localStorage user data in sync (topbar uses this)
+        updateUser({
+          companyName: response.data.companyName,
+          companyLogo: response.data.logo || undefined,
+          logo: response.data.logo || undefined,
+          company: {
+            companyName: response.data.companyName,
+            logo: response.data.logo || undefined
+          }
+        });
 
         // Show success notification with details
         if (updatedFields.length > 0) {

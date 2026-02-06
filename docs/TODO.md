@@ -253,6 +253,7 @@ Cursor-Execution-LeadMgmt/
 - [x] Add activate/deactivate toggle switch
 - [x] Add reset password button
 - [x] Create userService with all user management API calls
+- [x] ✅ Fix: Keep "Role" badge fully visible (no truncation) in Manage Users
 
 ---
 

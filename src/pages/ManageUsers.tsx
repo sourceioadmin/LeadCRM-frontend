@@ -285,7 +285,7 @@ const ManageUsers: React.FC = () => {
                             <div className="row g-2 text-sm">
                               <div className="col-6">
                                 <small className="text-muted d-block"><i className="bi bi-shield me-1"></i>Role</small>
-                                <Badge bg={getRoleBadgeVariant(user.roleName)} className="text-truncate" style={{ maxWidth: '100px' }} title={user.roleName}>
+                                <Badge bg={getRoleBadgeVariant(user.roleName)} className="manage-users-role-badge" title={user.roleName}>
                                   {user.roleName}
                                 </Badge>
                               </div>
@@ -415,7 +415,7 @@ const ManageUsers: React.FC = () => {
                             )}
                           </td>
                           <td>
-                            <Badge bg={getRoleBadgeVariant(user.roleName)} className="text-truncate" style={{ maxWidth: '90px' }} title={user.roleName}>
+                            <Badge bg={getRoleBadgeVariant(user.roleName)} className="manage-users-role-badge" title={user.roleName}>
                               {user.roleName}
                             </Badge>
                           </td>

@@ -6,6 +6,7 @@ import { getCurrentUserProfile } from '../services/userService';
 interface AuthContextType {
   user: User | null;
   login: (token: string, userData: User) => void;
+  updateUser: (partialUserData: Partial<User>) => void;
   logout: () => void;
   isAuthenticated: boolean;
   isLoading: boolean;
@@ -88,6 +89,23 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setUser(userData);
   };
 
+  const updateUser = (partialUserData: Partial<User>) => {
+    setUser((prevUser) => {
+      if (!prevUser) return prevUser;
+
+      const updatedUser: User = {
+        ...prevUser,
+        ...partialUserData,
+        company: partialUserData.company
+          ? { ...prevUser.company, ...partialUserData.company }
+          : prevUser.company,
+      };
+
+      localStorage.setItem('userData', JSON.stringify(updatedUser));
+      return updatedUser;
+    });
+  };
+
   const logout = () => {
     localStorage.removeItem('authToken');
     localStorage.removeItem('userData');
@@ -97,6 +115,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const value: AuthContextType = {
     user,
     login,
+    updateUser,
     logout,
     isAuthenticated: !!user,
     isLoading,

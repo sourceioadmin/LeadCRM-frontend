@@ -10,9 +10,21 @@ import {
   Settings,
   BarChart3,
   Plus,
-  TrendingUp
+  TrendingUp,
+  X
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+
+// LeadBox Icon Component
+const LeadboxIcon: React.FC<{ size?: number }> = ({ size = 32 }) => (
+  <img 
+    src="/leadbox-icon.png" 
+    alt="Leadbox" 
+    width={size} 
+    height={size}
+    style={{ objectFit: 'contain' }}
+  />
+);
 
 interface MenuItem {
   path: string;
@@ -64,24 +76,34 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, isMobile, onClose }) => {
 
   return (
     <div className={`sidebar ${collapsed ? 'collapsed' : ''}`}>
-      <div className="sidebar-logo">
-        {!collapsed && !isMobile && 'Leadbox'}
-        {!collapsed && isMobile && (
-          <div className="d-flex justify-content-between align-items-center">
+      <div className="sidebar-logo d-md-none">
+        {!collapsed && !isMobile && (
+          <div className="d-flex align-items-center gap-2">
+            <LeadboxIcon size={36} />
             <span>Leadbox</span>
+          </div>
+        )}
+        {collapsed && !isMobile && (
+          <div className="d-flex justify-content-center">
+            <LeadboxIcon size={32} />
+          </div>
+        )}
+        {!collapsed && isMobile && (
+          <div className="sidebar-mobile-header">
+            <span className="sidebar-mobile-title">Quick Menu</span>
             <button
-              className="btn btn-link text-dark p-0 d-flex align-items-center justify-content-center"
+              type="button"
+              className="sidebar-close-btn"
               onClick={onClose}
               aria-label="Close menu"
-              style={{ minWidth: '44px', minHeight: '44px', fontSize: '1.5rem' }}
             >
-              ✕
+              <X size={20} />
             </button>
           </div>
         )}
       </div>
 
-      <Nav className="flex-column">
+      <Nav className="flex-column flex-grow-1">
         {menuItems
           .filter((item) => {
             // Check if user has required role for specific items

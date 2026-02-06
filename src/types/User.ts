@@ -10,6 +10,10 @@ export interface User {
   isSSOUser?: boolean;
   roleName?: string;
   companyName?: string;
+  companyLogo?: string;
+  // Some backend responses may return the company logo as `logo`
+  logo?: string;
+  company?: Company;
   createdDate?: string;
   updatedDate?: string;
 }
