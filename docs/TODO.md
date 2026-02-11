@@ -526,6 +526,42 @@ Cursor-Execution-LeadMgmt/
 - [x] Add delete button with confirmation
 - [x] Save new order when drag-and-drop completes
 
+### Phase 5.7A: Reprioritize - Lead Import (Excel) Frontend
+
+- [x] Insert "Import Leads from Excel" + "Import History" tasks above Urgency Levels tasks (per stakeholder request)
+
+### Phase 5.7B: Import Leads from Excel (Frontend)
+
+- [x] Create "Import Leads" UI that uploads an Excel file to backend import API
+- [x] Show progress bar during import and disable actions while import is in progress
+- [x] After completion, display:
+  - Total leads in file
+  - Successfully imported leads count
+  - Leads rejected due to duplicate detection (list with name & phone)
+- [x] Do NOT implement duplicate detection logic in the frontend (use backend response only)
+
+### Phase 5.7B2: Align Frontend TODO with Async Import Backend
+
+- [x] Update Phase 5.7B/5.7C tasks to match new backend endpoints: template download, async start, progress polling, history + details
+
+### Phase 5.7B3: Import Leads from Excel (Frontend) - Async Workflow + Template
+
+- [x] Add "Download Excel Template" button using `GET /api/lead-imports/template` (download .xlsx)
+- [x] ✅ Sidebar: Move "Import Leads" link directly below "Add Lead"
+- [x] ✅ Start import using `POST /api/lead-imports` (multipart/form-data, field name: `file`) and capture `leadImportId`
+- [x] Show progress bar driven by polling `GET /api/lead-imports/{id}/progress` (status, processed/total, percent, counts)
+- [x] Disable all actions while status is Queued/Processing
+- [x] On completion, fetch final details via `GET /api/lead-imports/{id}` and display backend summary + rejected duplicate rows
+- [x] Do NOT implement duplicate detection logic in the frontend (render backend `LeadImportRejectedRow` only)
+
+### Phase 5.7C: Import History (Frontend)
+
+- [x] ✅ Add Import History screen (read-only) using `GET /api/lead-imports`
+- [x] ✅ Display previous imports (file name, date, status, counts)
+- [x] ✅ Add details view (modal or page) using `GET /api/lead-imports/{id}` including rejected rows list (row number + name + phone + reason)
+- [x] ✅ Fetch only from backend APIs (no local storage / no frontend business logic)
+- [x] ✅ Add "Download rejected rows" button on Import Details using `GET /api/lead-imports/{id}/rejected-rows/excel` (download blob)
+
 ### Phase 5.7: Manage Urgency Levels Backend
 
 - [ ] Implement `GET /api/settings/urgency-levels` endpoint

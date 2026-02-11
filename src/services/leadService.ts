@@ -323,3 +323,90 @@ export const addNote = async (leadId: number, request: AddNoteRequest): Promise<
   const response = await api.put(`/lead/${leadId}/add-note`, request);
   return response.data;
 };
+
+// -----------------------------
+// Lead Import (Excel)
+// -----------------------------
+
+export interface LeadImportRejectedDuplicate {
+  name?: string;
+  clientName?: string;
+  phone?: string;
+  mobileNumber?: string;
+}
+
+/**
+ * Shape intentionally flexible: backend is the source of truth.
+ * Frontend must only render backend-provided counts/lists (no duplicate logic here).
+ */
+export interface LeadImportResult {
+  fileName?: string;
+  importedAt?: string;
+
+  // counts (backend-dependent naming)
+  totalLeadsInFile?: number;
+  totalLeads?: number;
+  totalCount?: number;
+
+  successfullyImportedLeads?: number;
+  importedLeadsCount?: number;
+  importedCount?: number;
+
+  // duplicates/rejections (backend-dependent naming)
+  rejectedDuplicates?: LeadImportRejectedDuplicate[];
+  duplicateRejectedLeads?: LeadImportRejectedDuplicate[];
+  duplicates?: LeadImportRejectedDuplicate[];
+}
+
+export interface ImportLeadsFromExcelOptions {
+  /**
+   * Upload progress only (0-100). Server-side processing progress is not measurable without
+   * a dedicated backend progress endpoint/stream.
+   */
+  onUploadProgress?: (percent: number) => void;
+}
+
+const getLeadImportEndpoint = (): string => {
+  const envEndpoint = import.meta.env.VITE_LEAD_IMPORT_ENDPOINT as string | undefined;
+  return envEndpoint?.trim() ? envEndpoint.trim() : '/lead/import-excel';
+};
+
+/**
+ * Upload an Excel file for backend-driven lead import.
+ */
+export const importLeadsFromExcel = async (
+  file: File,
+  options?: ImportLeadsFromExcelOptions
+): Promise<ApiResponse<LeadImportResult>> => {
+  const formData = new FormData();
+  formData.append('file', file);
+
+  const tryPost = async (endpoint: string) => {
+    const response = await api.post<ApiResponse<LeadImportResult>>(endpoint, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+      onUploadProgress: (evt) => {
+        if (!options?.onUploadProgress) return;
+        const total = evt.total ?? 0;
+        if (!total) return;
+        const percent = Math.max(0, Math.min(100, Math.round((evt.loaded * 100) / total)));
+        options.onUploadProgress(percent);
+      },
+    });
+    return response.data;
+  };
+
+  const primaryEndpoint = getLeadImportEndpoint();
+
+  // Compatibility fallback for potential older route naming.
+  try {
+    return await tryPost(primaryEndpoint);
+  } catch (err: any) {
+    const status = err?.response?.status;
+    if (status === 404 && primaryEndpoint !== '/lead/import') {
+      return await tryPost('/lead/import');
+    }
+    throw err;
+  }
+};

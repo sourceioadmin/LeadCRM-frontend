@@ -11,6 +11,8 @@ import {
   BarChart3,
   Plus,
   TrendingUp,
+  Upload,
+  Clock,
   X
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
@@ -52,11 +54,17 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, isMobile, onClose }) => {
     // Add Lead - visible to Company Admin, Company Manager, Team Member and Referral Partner
     { path: '/add-lead', icon: Plus, label: 'Add Lead', allowedRoleIds: [2, 3, 4, 5] }, // Company Admin, Company Manager, Team Member and Referral Partner
 
+    // Import Leads - visible to Managers and Admins
+    { path: '/import-leads', icon: Upload, label: 'Import Leads', allowedRoleIds: [1, 2, 3], hiddenForRoles: ['Referral Partner'] }, // System Admin, Company Admin and Company Manager
+
     // My Leads - visible to all roles, but label changes for Referral Partner
     { path: '/my-leads', icon: FileText, label: 'My Leads', altLabel: { 'Referral Partner': 'My Referred Leads' } },
 
     // All Leads - visible to Managers and Admins (different scopes)
     { path: '/all-leads', icon: BarChart3, label: 'All Leads', allowedRoleIds: [1, 2, 3], hiddenForRoles: ['Referral Partner'] }, // System Admin, Company Admin and Company Manager
+
+    // Import History - visible to Managers and Admins (read-only)
+    { path: '/import-history', icon: Clock, label: 'Import History', allowedRoleIds: [1, 2, 3], hiddenForRoles: ['Referral Partner'] }, // System Admin, Company Admin and Company Manager
 
     // Assign Leads - visible to Managers and Admins
     { path: '/assign-leads', icon: UserCheck, label: 'Assign Leads', allowedRoleIds: [1, 2, 3], hiddenForRoles: ['Referral Partner'] }, // System Admin, Company Admin and Company Manager

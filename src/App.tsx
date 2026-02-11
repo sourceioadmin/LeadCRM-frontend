@@ -22,6 +22,8 @@ import WinLossReport from "./pages/WinLossReport";
 import AdditionalReports from "./pages/AdditionalReports";
 import Settings from "./pages/Settings";
 import PrivateRoute from "./components/PrivateRoute";
+import ImportLeads from "./pages/ImportLeads";
+import ImportHistory from "./pages/ImportHistory";
 
 // IMPORTANT: Set your actual Google OAuth Client ID in environment variable VITE_GOOGLE_CLIENT_ID
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || "dummy-client-id.apps.googleusercontent.com";
@@ -41,6 +43,22 @@ const App: React.FC = () => {
               <Route path="add-lead" element={<AddLead />} />
               <Route path="my-leads" element={<MyLeads />} />
               <Route path="all-leads" element={<AllLeads />} />
+              <Route
+                path="import-leads"
+                element={
+                  <PrivateRoute requiredRole="System Admin,Company Admin,Company Manager">
+                    <ImportLeads />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="import-history"
+                element={
+                  <PrivateRoute requiredRole="System Admin,Company Admin,Company Manager">
+                    <ImportHistory />
+                  </PrivateRoute>
+                }
+              />
               <Route path="assign-leads" element={<PrivateRoute requiredRole="Company Admin,Company Manager"><AssignLeads /></PrivateRoute>} />
               <Route path="followups" element={<UpcomingFollowups />} />
               <Route path="reports" element={<Reports />} />

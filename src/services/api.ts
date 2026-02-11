@@ -12,15 +12,27 @@ const getBackendURL = (): string => {
 
 const api: AxiosInstance = axios.create({
   baseURL: getBackendURL(),
-  timeout: 15000,
-  headers: {
-    "Content-Type": "application/json"
-  }
+  timeout: 15000
 });
 
 api.interceptors.request.use(
   (config) => {
     console.log(`📡 [API Request]: ${config.method?.toUpperCase()} -> ${config.baseURL}${config.url}`);
+
+    // IMPORTANT:
+    // Do not force JSON content-type globally. It breaks file uploads (multipart/form-data)
+    // because the browser must set the boundary automatically.
+    const isFormData =
+      typeof FormData !== "undefined" && config.data && config.data instanceof FormData;
+    if (isFormData && config.headers) {
+      // Axios headers can be a plain object or AxiosHeaders; handle both safely.
+      const h: any = config.headers as any;
+      if (typeof h.set === "function") {
+        h.set("Content-Type", undefined);
+      }
+      delete h["Content-Type"];
+      delete h["content-type"];
+    }
 
     const token = localStorage.getItem("authToken");
     if (token) {
