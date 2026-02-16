@@ -54,9 +54,6 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, isMobile, onClose }) => {
     // Add Lead - visible to Company Admin, Company Manager, Team Member and Referral Partner
     { path: '/add-lead', icon: Plus, label: 'Add Lead', allowedRoleIds: [2, 3, 4, 5] }, // Company Admin, Company Manager, Team Member and Referral Partner
 
-    // Import Leads - visible to Managers and Admins
-    { path: '/import-leads', icon: Upload, label: 'Import Leads', allowedRoleIds: [1, 2, 3], hiddenForRoles: ['Referral Partner'] }, // System Admin, Company Admin and Company Manager
-
     // My Leads - visible to all roles, but label changes for Referral Partner
     { path: '/my-leads', icon: FileText, label: 'My Leads', altLabel: { 'Referral Partner': 'My Referred Leads' } },
 
@@ -77,6 +74,9 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, isMobile, onClose }) => {
 
     // Manage Users - Company Admin only
     { path: '/manage-users', icon: Users, label: 'Manage Users', requiredRole: 'Company Admin', hiddenForRoles: ['Referral Partner'] },
+
+    // Import Leads - visible to Managers and Admins
+    { path: '/import-leads', icon: Upload, label: 'Import Leads', allowedRoleIds: [1, 2, 3], hiddenForRoles: ['Referral Partner'] }, // System Admin, Company Admin and Company Manager
 
     // Settings - visible to all roles except Referral Partner
     { path: '/settings', icon: Settings, label: 'Settings', hiddenForRoles: ['Referral Partner'] },

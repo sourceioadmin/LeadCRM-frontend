@@ -547,7 +547,7 @@ Cursor-Execution-LeadMgmt/
 ### Phase 5.7B3: Import Leads from Excel (Frontend) - Async Workflow + Template
 
 - [x] Add "Download Excel Template" button using `GET /api/lead-imports/template` (download .xlsx)
-- [x] ✅ Sidebar: Move "Import Leads" link directly below "Add Lead"
+- [x] ✅ Sidebar: Move "Import Leads" link second last (after "Manage Users" and before "Settings")
 - [x] ✅ Start import using `POST /api/lead-imports` (multipart/form-data, field name: `file`) and capture `leadImportId`
 - [x] Show progress bar driven by polling `GET /api/lead-imports/{id}/progress` (status, processed/total, percent, counts)
 - [x] Disable all actions while status is Queued/Processing
