@@ -203,6 +203,11 @@ const AddLeadModal: React.FC<AddLeadModalProps> = ({ show, onHide, onSuccess, le
       // Set timestamp to prevent immediate closing (fixes mobile touch issues)
       setModalOpenedAt(Date.now());
 
+      // For Referral Partners, default the More Details section to expanded so optional fields are visible
+      if (isReferralPartner) {
+        setIsMoreDetailsExpanded(true);
+      }
+
       // Reset form data for add mode or load data for edit mode
       if (isEditMode && lead) {
         loadLeadData(lead);
@@ -844,7 +849,7 @@ const AddLeadModal: React.FC<AddLeadModalProps> = ({ show, onHide, onSuccess, le
                   </Row>
 
                   <Row className="g-3">
-                    <Col xs={12} md={6}>
+                    <Col xs={12} md={isReferralPartner ? 12 : 6}>
                       <Form.Group className="mb-3">
                         <Form.Label className="fw-medium">Address</Form.Label>
                         <Form.Control
@@ -860,23 +865,26 @@ const AddLeadModal: React.FC<AddLeadModalProps> = ({ show, onHide, onSuccess, le
                       </Form.Group>
                     </Col>
 
-                    <Col xs={12} md={6}>
-                      <Form.Group className="mb-3">
-                        <Form.Label className="fw-medium">City</Form.Label>
-                        <Form.Control
-                          type="text"
-                          size="sm"
-                          name="city"
-                          value={formData.city}
-                          onChange={handleChange}
-                          placeholder="Enter city"
-                          disabled={loading}
-                          maxLength={100}
-                        />
-                      </Form.Group>
-                    </Col>
+                    {!isReferralPartner && (
+                      <Col xs={12} md={6}>
+                        <Form.Group className="mb-3">
+                          <Form.Label className="fw-medium">City</Form.Label>
+                          <Form.Control
+                            type="text"
+                            size="sm"
+                            name="city"
+                            value={formData.city}
+                            onChange={handleChange}
+                            placeholder="Enter city"
+                            disabled={loading}
+                            maxLength={100}
+                          />
+                        </Form.Group>
+                      </Col>
+                    )}
                   </Row>
 
+                  {!isReferralPartner && (
                   <Row className="g-3">
                     {/* Lead Source - Hide in edit mode */}
                     {!isEditMode && (
@@ -935,35 +943,17 @@ const AddLeadModal: React.FC<AddLeadModalProps> = ({ show, onHide, onSuccess, le
                       </Form.Group>
                     </Col>
                   </Row>
+                  )}
 
-
-                  {/* ReferredBy field - Show for Referral source or when user is RP, but hide in edit mode */}
-                  {!isEditMode && (isReferralSource() || isReferralPartner) && (
+                  {/* ReferredBy field - Show for Referral source (non-RP only; RP gets it auto-set, UI hidden) */}
+                  {!isEditMode && isReferralSource() && !isReferralPartner && (
                     <Row className="g-3">
                       <Col xs={12}>
                         <Form.Group className="mb-3" style={{ position: 'relative' }}>
                           <Form.Label className="fw-medium">
                             Referred By <span className="text-danger">*</span>
                           </Form.Label>
-                          {isReferralPartner ? (
-                            // Readonly field for Referral Partners
-                            <>
-                              <Form.Control
-                                type="text"
-                                size="sm"
-                                name="referredBy"
-                                value={formData.referredBy}
-                                readOnly
-                                disabled
-                                maxLength={100}
-                              />
-                              <Form.Text className="text-muted small">
-                                Auto-populated with your name as the referrer.
-                              </Form.Text>
-                            </>
-                          ) : (
-                            // Combobox for non-Referral Partners
-                            <>
+                          <>
                               <InputGroup>
                                 <Form.Control
                                   ref={referredByInputRef}
@@ -1059,8 +1049,7 @@ const AddLeadModal: React.FC<AddLeadModalProps> = ({ show, onHide, onSuccess, le
                                   Free text entry
                                 </Form.Text>
                               )}
-                            </>
-                          )}
+                          </>
                         </Form.Group>
                       </Col>
                     </Row>
@@ -1232,27 +1221,29 @@ const AddLeadModal: React.FC<AddLeadModalProps> = ({ show, onHide, onSuccess, le
                         </Col>
                       )}
 
-                      <Col xs={12} md={isReferralPartner ? 12 : 6}>
-                        <Form.Group className="mb-3">
-                          <Form.Label className="fw-medium">Follow-up Date</Form.Label>
-                          <Form.Control
-                            type="date"
-                            size="sm"
-                            name="followupDate"
-                            value={formData.followupDate}
-                            onChange={handleChange}
-                            onClick={handleDateInputClick}
-                            onFocus={handleDateInputFocus}
-                            disabled={loading}
-                            min={isEditMode ? undefined : getTodayForInput()}
-                          />
-                          {!isEditMode && (
-                            <Form.Text className="text-muted small">
-                              Select a date for the next follow-up
-                            </Form.Text>
-                          )}
-                        </Form.Group>
-                      </Col>
+                      {!isReferralPartner && (
+                        <Col xs={12} md={6}>
+                          <Form.Group className="mb-3">
+                            <Form.Label className="fw-medium">Follow-up Date</Form.Label>
+                            <Form.Control
+                              type="date"
+                              size="sm"
+                              name="followupDate"
+                              value={formData.followupDate}
+                              onChange={handleChange}
+                              onClick={handleDateInputClick}
+                              onFocus={handleDateInputFocus}
+                              disabled={loading}
+                              min={isEditMode ? undefined : getTodayForInput()}
+                            />
+                            {!isEditMode && (
+                              <Form.Text className="text-muted small">
+                                Select a date for the next follow-up
+                              </Form.Text>
+                            )}
+                          </Form.Group>
+                        </Col>
+                      )}
                     </Row>
 
                     <Row className="g-3">
