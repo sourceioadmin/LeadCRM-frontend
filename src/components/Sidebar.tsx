@@ -60,9 +60,6 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, isMobile, onClose }) => {
     // All Leads - visible to Managers and Admins (different scopes)
     { path: '/all-leads', icon: BarChart3, label: 'All Leads', allowedRoleIds: [1, 2, 3], hiddenForRoles: ['Referral Partner'] }, // System Admin, Company Admin and Company Manager
 
-    // Import History - visible to Managers and Admins (read-only)
-    { path: '/import-history', icon: Clock, label: 'Import History', allowedRoleIds: [1, 2, 3], hiddenForRoles: ['Referral Partner'] }, // System Admin, Company Admin and Company Manager
-
     // Assign Leads - visible to Managers and Admins
     { path: '/assign-leads', icon: UserCheck, label: 'Assign Leads', allowedRoleIds: [1, 2, 3], hiddenForRoles: ['Referral Partner'] }, // System Admin, Company Admin and Company Manager
 
@@ -77,6 +74,9 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, isMobile, onClose }) => {
 
     // Import Leads - visible to Managers and Admins
     { path: '/import-leads', icon: Upload, label: 'Import Leads', allowedRoleIds: [1, 2, 3], hiddenForRoles: ['Referral Partner'] }, // System Admin, Company Admin and Company Manager
+
+    // Import History - visible to Managers and Admins (read-only)
+    { path: '/import-history', icon: Clock, label: 'Import History', allowedRoleIds: [1, 2, 3], hiddenForRoles: ['Referral Partner'] }, // System Admin, Company Admin and Company Manager
 
     // Settings - visible to all roles except Referral Partner
     { path: '/settings', icon: Settings, label: 'Settings', hiddenForRoles: ['Referral Partner'] },
