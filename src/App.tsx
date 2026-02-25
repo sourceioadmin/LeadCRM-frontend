@@ -1,7 +1,8 @@
-import React from "react";
+import React, { lazy, Suspense } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { AuthProvider } from "./contexts/AuthContext";
+import { Spinner } from "react-bootstrap";
 
 // Import components (will be created later)
 import Layout from "./components/Layout";
@@ -10,6 +11,9 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import VerifyOtp from "./pages/VerifyOtp";
 import AcceptInvite from "./pages/AcceptInvite";
+
+const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 import ManageUsers from "./pages/ManageUsers";
 import AddLead from "./pages/AddLead";
 import MyLeads from "./pages/MyLeads";
@@ -37,6 +41,22 @@ const App: React.FC = () => {
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/verify-otp" element={<VerifyOtp />} />
+            <Route
+              path="/forgot-password"
+              element={
+                <Suspense fallback={<div className="d-flex justify-content-center align-items-center min-vh-100"><Spinner animation="border" /></div>}>
+                  <ForgotPassword />
+                </Suspense>
+              }
+            />
+            <Route
+              path="/reset-password"
+              element={
+                <Suspense fallback={<div className="d-flex justify-content-center align-items-center min-vh-100"><Spinner animation="border" /></div>}>
+                  <ResetPassword />
+                </Suspense>
+              }
+            />
             <Route path="/accept-invite" element={<AcceptInvite />} />
             <Route path="/" element={<PrivateRoute><Layout /></PrivateRoute>}>
               <Route index element={<Dashboard />} />

@@ -193,8 +193,8 @@ const Login: React.FC = () => {
                 </Alert>
               )}
 
-              {/* Login Form */}
-              <Form onSubmit={handleSubmit}>
+              {/* Login Form - autocomplete hints help password managers save/autofill */}
+              <Form onSubmit={handleSubmit} autoComplete="on">
                 <Form.Group className="mb-3">
                   <Form.Label className="fw-semibold">Email or Username</Form.Label>
                   <div className="input-group">
@@ -204,6 +204,7 @@ const Login: React.FC = () => {
                     <Form.Control
                       type="text"
                       name="emailOrUsername"
+                      autoComplete="username"
                       value={formData.emailOrUsername}
                       onChange={handleInputChange}
                       placeholder="Enter your email or username"
@@ -225,6 +226,7 @@ const Login: React.FC = () => {
                     <Form.Control
                       type={showPassword ? "text" : "password"}
                       name="password"
+                      autoComplete="current-password"
                       value={formData.password}
                       onChange={handleInputChange}
                       placeholder="Enter your password"
@@ -274,9 +276,9 @@ const Login: React.FC = () => {
 
               {/* Links */}
               <div className="text-center mb-4">
-                <Button variant="link" className="text-muted p-0 me-3">
+                <Link to="/forgot-password" className="text-muted me-3 text-decoration-none">
                   Forgot password?
-                </Button>
+                </Link>
                 <span className="text-muted">|</span>
                 <Link to="/register" className="text-primary ms-3 text-decoration-none">
                   Create Account

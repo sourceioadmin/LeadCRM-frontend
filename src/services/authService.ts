@@ -49,6 +49,11 @@ export interface ChangePasswordPayload {
   confirmPassword: string;
 }
 
+export interface ResetPasswordPayload {
+  token: string;
+  newPassword: string;
+}
+
 export const registerUser = (payload: RegisterPayload) => {
   return api.post("/auth/register", payload);
 };
@@ -91,5 +96,13 @@ export const changePassword = (payload: ChangePasswordPayload) => {
   });
 
   return api.post("/auth/change-password", payload);
+};
+
+export const forgotPassword = (email: string) => {
+  return api.post("/auth/forgot-password", { email });
+};
+
+export const resetPassword = (payload: ResetPasswordPayload) => {
+  return api.post("/auth/reset-password", payload);
 };
 
