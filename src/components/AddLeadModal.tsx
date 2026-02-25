@@ -1125,9 +1125,6 @@ const AddLeadModal: React.FC<AddLeadModalProps> = ({ show, onHide, onSuccess, le
                             disabled={loading}
                             maxLength={500}
                           />
-                          <Form.Text className="text-muted small">
-                            {formData.interestedIn.length}/500 characters
-                          </Form.Text>
                         </Form.Group>
                       </Col>
                     </Row>
@@ -1236,11 +1233,6 @@ const AddLeadModal: React.FC<AddLeadModalProps> = ({ show, onHide, onSuccess, le
                               disabled={loading}
                               min={isEditMode ? undefined : getTodayForInput()}
                             />
-                            {!isEditMode && (
-                              <Form.Text className="text-muted small">
-                                Select a date for the next follow-up
-                              </Form.Text>
-                            )}
                           </Form.Group>
                         </Col>
                       )}
