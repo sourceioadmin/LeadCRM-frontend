@@ -205,8 +205,8 @@ const AddLeadModal: React.FC<AddLeadModalProps> = ({ show, onHide, onSuccess, le
       // Set timestamp to prevent immediate closing (fixes mobile touch issues)
       setModalOpenedAt(Date.now());
 
-      // For Referral Partners, default the More Details section to expanded so optional fields are visible
-      if (isReferralPartner) {
+      // For Referral Partners or edit mode, default the More Details section to expanded
+      if (isReferralPartner || (isEditMode && lead)) {
         setIsMoreDetailsExpanded(true);
       }
 
@@ -1242,37 +1242,6 @@ const AddLeadModal: React.FC<AddLeadModalProps> = ({ show, onHide, onSuccess, le
                       )}
                     </div>
                   </>
-                  )}
-
-                  {/* Read-only fields for edit mode */}
-                  {isEditMode && lead && (
-                    <Row className="g-3">
-                      <Col xs={12} md={6}>
-                        <Form.Group className="mb-3">
-                          <Form.Label className="fw-medium">Created Date</Form.Label>
-                          <Form.Control
-                            type="text"
-                            size="sm"
-                            value={formatDate(lead.createdDate)}
-                            disabled
-                            className="bg-light"
-                          />
-                        </Form.Group>
-                      </Col>
-
-                      <Col xs={12} md={6}>
-                        <Form.Group className="mb-3">
-                          <Form.Label className="fw-medium">Created By</Form.Label>
-                          <Form.Control
-                            type="text"
-                            size="sm"
-                            value={lead.createdByUserName || 'Unknown'}
-                            disabled
-                            className="bg-light"
-                          />
-                        </Form.Group>
-                      </Col>
-                    </Row>
                   )}
                 </Card.Body>
               </Card>
