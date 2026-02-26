@@ -722,6 +722,7 @@ const AddLeadModal: React.FC<AddLeadModalProps> = ({ show, onHide, onSuccess, le
       onHide={handleClose}
       size="lg"
       centered
+      fullscreen="sm-down"
       backdrop={loading ? 'static' : true}
       className="add-lead-modal"
     >
