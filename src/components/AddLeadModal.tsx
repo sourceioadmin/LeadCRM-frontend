@@ -101,7 +101,9 @@ const AddLeadModal: React.FC<AddLeadModalProps> = ({ show, onHide, onSuccess, le
   const [referredByUserId, setReferredByUserId] = useState<number | null>(null);
   const [showReferralPartnerDropdown, setShowReferralPartnerDropdown] = useState(false);
   const [filteredReferralPartners, setFilteredReferralPartners] = useState<User[]>([]);
+  const [focusedReferralInput, setFocusedReferralInput] = useState<'mobile' | 'desktop' | null>(null);
   const referredByInputRef = useRef<HTMLInputElement>(null);
+  const referredByInputRefMobile = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Prevent modal from closing immediately after opening (fixes mobile touch issues)
@@ -471,7 +473,8 @@ const AddLeadModal: React.FC<AddLeadModalProps> = ({ show, onHide, onSuccess, le
     }
   };
 
-  const handleReferredByFocus = () => {
+  const handleReferredByFocus = (variant?: 'mobile' | 'desktop') => {
+    if (variant) setFocusedReferralInput(variant);
     if (isReferralSource() && !isReferralPartner && referralPartners.length > 0) {
       const searchText = formData.referredBy.trim();
       if (searchText) {
@@ -491,6 +494,7 @@ const AddLeadModal: React.FC<AddLeadModalProps> = ({ show, onHide, onSuccess, le
     // Delay hiding dropdown to allow click on dropdown items
     setTimeout(() => {
       setShowReferralPartnerDropdown(false);
+      setFocusedReferralInput(null);
     }, 200);
   };
 
@@ -885,84 +889,51 @@ const AddLeadModal: React.FC<AddLeadModalProps> = ({ show, onHide, onSuccess, le
                   </Row>
 
                   {!isReferralPartner && (
-                  <Row className="g-3">
-                    {/* Lead Source - Hide in edit mode */}
-                    {!isEditMode && (
-                      <Col xs={12} md={6}>
-                        <Form.Group className="mb-3">
-                          <Form.Label className="fw-medium">
-                            Lead Source <span className="text-danger">*</span>
-                          </Form.Label>
-                          <Form.Select
-                            size="sm"
-                            name="leadSourceId"
-                            value={formData.leadSourceId}
-                            onChange={handleChange}
-                            isInvalid={!!errors.leadSourceId}
-                            disabled={loading || isReferralPartner}
-                          >
-                            <option value="">Select lead source</option>
-                            {leadSources.map((source) => (
-                              <option key={source.leadSourceId} value={source.leadSourceId}>
-                                {source.name}
-                              </option>
-                            ))}
-                          </Form.Select>
-                          <Form.Control.Feedback type="invalid">
-                            {errors.leadSourceId}
-                          </Form.Control.Feedback>
-                          {isReferralPartner && (
-                            <Form.Text className="text-muted small">
-                              Automatically set to "Referral" for Referral Partners.
-                            </Form.Text>
-                          )}
-                        </Form.Group>
-                      </Col>
-                    )}
-
-                    <Col xs={12} md={isEditMode ? 12 : 6}>
-                      <Form.Group className="mb-3">
-                        <Form.Label className="fw-medium">Lead Status</Form.Label>
-                        <Form.Select
-                          size="sm"
-                          name="leadStatusId"
-                          value={formData.leadStatusId}
-                          onChange={handleChange}
-                          disabled={loading}
-                        >
-                          <option value="">Select lead status</option>
-                          {leadStatuses.map((status) => (
-                            <option key={status.leadStatusId} value={status.leadStatusId}>
-                              {status.name}
-                            </option>
-                          ))}
-                        </Form.Select>
-                        <Form.Text className="text-muted small">
-                          Default: New Lead
-                        </Form.Text>
-                      </Form.Group>
-                    </Col>
-                  </Row>
-                  )}
-
-                  {/* ReferredBy field - Show for Referral source (non-RP only; RP gets it auto-set, UI hidden) */}
-                  {!isEditMode && isReferralSource() && !isReferralPartner && (
-                    <Row className="g-3">
-                      <Col xs={12}>
-                        <Form.Group className="mb-3" style={{ position: 'relative' }}>
-                          <Form.Label className="fw-medium">
-                            Referred By <span className="text-danger">*</span>
-                          </Form.Label>
-                          <>
+                  <>
+                    {/* Mobile: Group Lead Source (Referral) + Referred By, then Lead Status */}
+                    <div className="d-md-none">
+                      {!isEditMode && isReferralSource() && (
+                        <Card className="mb-3 border-primary border-opacity-25 bg-light bg-opacity-50">
+                          <Card.Header className="py-2 px-3 small fw-semibold text-primary">
+                            Referral
+                          </Card.Header>
+                          <Card.Body className="py-3 px-3">
+                            <Form.Group className="mb-3">
+                              <Form.Label className="fw-medium">
+                                Lead Source <span className="text-danger">*</span>
+                              </Form.Label>
+                              <Form.Select
+                                size="sm"
+                                name="leadSourceId"
+                                value={formData.leadSourceId}
+                                onChange={handleChange}
+                                isInvalid={!!errors.leadSourceId}
+                                disabled={loading || isReferralPartner}
+                              >
+                                <option value="">Select lead source</option>
+                                {leadSources.map((source) => (
+                                  <option key={source.leadSourceId} value={source.leadSourceId}>
+                                    {source.name}
+                                  </option>
+                                ))}
+                              </Form.Select>
+                              <Form.Control.Feedback type="invalid">
+                                {errors.leadSourceId}
+                              </Form.Control.Feedback>
+                            </Form.Group>
+                            <Form.Group className="mb-0" style={{ position: 'relative' }}>
+                              <Form.Label className="fw-medium">
+                                Referred By <span className="text-danger">*</span>
+                              </Form.Label>
                               <InputGroup>
                                 <Form.Control
-                                  ref={referredByInputRef}
+                                  ref={referredByInputRefMobile}
                                   type="text"
                                   size="sm"
                                   name="referredBy"
                                   value={formData.referredBy}
                                   onChange={handleReferredByChange}
-                                  onFocus={handleReferredByFocus}
+                                  onFocus={() => handleReferredByFocus('mobile')}
                                   onBlur={handleReferredByBlur}
                                   placeholder={
                                     referralPartners.length > 0
@@ -984,7 +955,7 @@ const AddLeadModal: React.FC<AddLeadModalProps> = ({ show, onHide, onSuccess, le
                                   Referral Partner selection is not available for your user role. You can enter the referrer name manually.
                                 </Form.Text>
                               )}
-                              {showReferralPartnerDropdown && filteredReferralPartners.length > 0 && (
+                              {focusedReferralInput === 'mobile' && showReferralPartnerDropdown && filteredReferralPartners.length > 0 && (
                                 <div
                                   ref={dropdownRef}
                                   className="border rounded shadow-sm bg-white"
@@ -1008,7 +979,7 @@ const AddLeadModal: React.FC<AddLeadModalProps> = ({ show, onHide, onSuccess, le
                                         borderBottom: '1px solid #e9ecef'
                                       }}
                                       onMouseDown={(e) => {
-                                        e.preventDefault(); // Prevent blur event
+                                        e.preventDefault();
                                         handleSelectReferralPartner(rp);
                                       }}
                                       onMouseEnter={(e) => {
@@ -1024,7 +995,7 @@ const AddLeadModal: React.FC<AddLeadModalProps> = ({ show, onHide, onSuccess, le
                                   ))}
                                 </div>
                               )}
-                              {showReferralPartnerDropdown && filteredReferralPartners.length === 0 && formData.referredBy.trim() && (
+                              {focusedReferralInput === 'mobile' && showReferralPartnerDropdown && filteredReferralPartners.length === 0 && formData.referredBy.trim() && (
                                 <div
                                   className="border rounded shadow-sm bg-white px-3 py-2 text-muted small"
                                   style={{
@@ -1049,10 +1020,227 @@ const AddLeadModal: React.FC<AddLeadModalProps> = ({ show, onHide, onSuccess, le
                                   Free text entry
                                 </Form.Text>
                               )}
-                          </>
-                        </Form.Group>
-                      </Col>
-                    </Row>
+                            </Form.Group>
+                          </Card.Body>
+                        </Card>
+                      )}
+                      {(!isEditMode && !isReferralSource()) && (
+                        <Row className="g-3">
+                          <Col xs={12}>
+                            <Form.Group className="mb-3">
+                              <Form.Label className="fw-medium">
+                                Lead Source <span className="text-danger">*</span>
+                              </Form.Label>
+                              <Form.Select
+                                size="sm"
+                                name="leadSourceId"
+                                value={formData.leadSourceId}
+                                onChange={handleChange}
+                                isInvalid={!!errors.leadSourceId}
+                                disabled={loading || isReferralPartner}
+                              >
+                                <option value="">Select lead source</option>
+                                {leadSources.map((source) => (
+                                  <option key={source.leadSourceId} value={source.leadSourceId}>
+                                    {source.name}
+                                  </option>
+                                ))}
+                              </Form.Select>
+                              <Form.Control.Feedback type="invalid">
+                                {errors.leadSourceId}
+                              </Form.Control.Feedback>
+                            </Form.Group>
+                          </Col>
+                        </Row>
+                      )}
+                      <Row className="g-3">
+                        <Col xs={12}>
+                          <Form.Group className="mb-3">
+                            <Form.Label className="fw-medium">Lead Status</Form.Label>
+                            <Form.Select
+                              size="sm"
+                              name="leadStatusId"
+                              value={formData.leadStatusId}
+                              onChange={handleChange}
+                              disabled={loading}
+                            >
+                              <option value="">Select lead status</option>
+                              {leadStatuses.map((status) => (
+                                <option key={status.leadStatusId} value={status.leadStatusId}>
+                                  {status.name}
+                                </option>
+                              ))}
+                            </Form.Select>
+                          </Form.Group>
+                        </Col>
+                      </Row>
+                    </div>
+
+                    {/* Desktop: Lead Source | Lead Status, then Referred By row */}
+                    <div className="d-none d-md-block">
+                      <Row className="g-3">
+                        {!isEditMode && (
+                          <Col xs={12} md={6}>
+                            <Form.Group className="mb-3">
+                              <Form.Label className="fw-medium">
+                                Lead Source <span className="text-danger">*</span>
+                              </Form.Label>
+                              <Form.Select
+                                size="sm"
+                                name="leadSourceId"
+                                value={formData.leadSourceId}
+                                onChange={handleChange}
+                                isInvalid={!!errors.leadSourceId}
+                                disabled={loading || isReferralPartner}
+                              >
+                                <option value="">Select lead source</option>
+                                {leadSources.map((source) => (
+                                  <option key={source.leadSourceId} value={source.leadSourceId}>
+                                    {source.name}
+                                  </option>
+                                ))}
+                              </Form.Select>
+                              <Form.Control.Feedback type="invalid">
+                                {errors.leadSourceId}
+                              </Form.Control.Feedback>
+                              {isReferralPartner && (
+                                <Form.Text className="text-muted small">
+                                  Automatically set to "Referral" for Referral Partners.
+                                </Form.Text>
+                              )}
+                            </Form.Group>
+                          </Col>
+                        )}
+                        <Col xs={12} md={isEditMode ? 12 : 6}>
+                          <Form.Group className="mb-3">
+                            <Form.Label className="fw-medium">Lead Status</Form.Label>
+                            <Form.Select
+                              size="sm"
+                              name="leadStatusId"
+                              value={formData.leadStatusId}
+                              onChange={handleChange}
+                              disabled={loading}
+                            >
+                              <option value="">Select lead status</option>
+                              {leadStatuses.map((status) => (
+                                <option key={status.leadStatusId} value={status.leadStatusId}>
+                                  {status.name}
+                                </option>
+                              ))}
+                            </Form.Select>
+                          </Form.Group>
+                        </Col>
+                      </Row>
+                      {!isEditMode && isReferralSource() && (
+                        <Row className="g-3">
+                          <Col xs={12}>
+                            <Form.Group className="mb-3" style={{ position: 'relative' }}>
+                              <Form.Label className="fw-medium">
+                                Referred By <span className="text-danger">*</span>
+                              </Form.Label>
+                              <>
+                                <InputGroup>
+                                  <Form.Control
+                                    ref={referredByInputRef}
+                                    type="text"
+                                    size="sm"
+                                    name="referredBy"
+                                    value={formData.referredBy}
+                                    onChange={handleReferredByChange}
+                                    onFocus={() => handleReferredByFocus('desktop')}
+                                    onBlur={handleReferredByBlur}
+                                    placeholder={
+                                      referralPartners.length > 0
+                                        ? "Type to search Referral Partners or enter free text"
+                                        : "Enter referrer name (free text only - no partner selection available)"
+                                    }
+                                    isInvalid={!!errors.referredBy}
+                                    disabled={loading}
+                                    maxLength={100}
+                                    autoComplete="off"
+                                  />
+                                  <Form.Control.Feedback type="invalid">
+                                    {errors.referredBy}
+                                  </Form.Control.Feedback>
+                                </InputGroup>
+                                {referralPartners.length === 0 && (
+                                  <Form.Text className="text-warning small d-block mt-1">
+                                    <i className="bi bi-info-circle me-1"></i>
+                                    Referral Partner selection is not available for your user role. You can enter the referrer name manually.
+                                  </Form.Text>
+                                )}
+                                {focusedReferralInput === 'desktop' && showReferralPartnerDropdown && filteredReferralPartners.length > 0 && (
+                                  <div
+                                    ref={dropdownRef}
+                                    className="border rounded shadow-sm bg-white"
+                                    style={{
+                                      position: 'absolute',
+                                      top: '100%',
+                                      left: 0,
+                                      right: 0,
+                                      zIndex: 1050,
+                                      maxHeight: '200px',
+                                      overflowY: 'auto',
+                                      marginTop: '2px'
+                                    }}
+                                  >
+                                    {filteredReferralPartners.map((rp) => (
+                                      <div
+                                        key={rp.userId}
+                                        className="px-3 py-2 hover-bg-light"
+                                        style={{
+                                          cursor: 'pointer',
+                                          borderBottom: '1px solid #e9ecef'
+                                        }}
+                                        onMouseDown={(e) => {
+                                          e.preventDefault();
+                                          handleSelectReferralPartner(rp);
+                                        }}
+                                        onMouseEnter={(e) => {
+                                          e.currentTarget.style.backgroundColor = '#f8f9fa';
+                                        }}
+                                        onMouseLeave={(e) => {
+                                          e.currentTarget.style.backgroundColor = 'white';
+                                        }}
+                                      >
+                                        <div className="fw-medium">{rp.fullName}</div>
+                                        <div className="text-muted small">{rp.email}</div>
+                                      </div>
+                                    ))}
+                                  </div>
+                                )}
+                                {focusedReferralInput === 'desktop' && showReferralPartnerDropdown && filteredReferralPartners.length === 0 && formData.referredBy.trim() && (
+                                  <div
+                                    className="border rounded shadow-sm bg-white px-3 py-2 text-muted small"
+                                    style={{
+                                      position: 'absolute',
+                                      top: '100%',
+                                      left: 0,
+                                      right: 0,
+                                      zIndex: 1050,
+                                      marginTop: '2px'
+                                    }}
+                                  >
+                                    No matching Referral Partners found. You can enter free text.
+                                  </div>
+                                )}
+                                {referredByUserId && (
+                                  <Form.Text className="text-success small d-block mt-1">
+                                    Selected Referral Partner
+                                  </Form.Text>
+                                )}
+                                {!referredByUserId && formData.referredBy.trim() && (
+                                  <Form.Text className="text-muted small d-block mt-1">
+                                    Free text entry
+                                  </Form.Text>
+                                )}
+                              </>
+                            </Form.Group>
+                          </Col>
+                        </Row>
+                      )}
+                    </div>
+                  </>
                   )}
 
                   {/* Read-only fields for edit mode */}
