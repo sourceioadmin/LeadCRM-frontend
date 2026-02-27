@@ -624,9 +624,7 @@ const Dashboard: React.FC = () => {
                 <TrendingUp size={20} className="me-2 text-success" />
                 Sales Conversion Funnel
               </h5>
-              <p className="text-muted small mb-0 mt-1">
-                Leads marked Lost are counted only up to the stage they were in when lost; they are not counted in later stages.
-              </p>
+             
             </Card.Header>
             <Card.Body className="py-4">
               {conversionLoading ? (
