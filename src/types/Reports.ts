@@ -36,7 +36,9 @@ export interface ConversionReport {
   totalConvertedLeads: number;
   /** Total number of leads in the funnel */
   totalLeads: number;
-  /** Funnel stages data */
+  /** Count of leads with status "Lost" in the same filtered set */
+  totalLostLeads: number;
+  /** Funnel stages data (may end with "Lost"; do not assume order or count) */
   funnelStages: FunnelStage[];
   /** Top 5 performing lead sources */
   topLeadSources: TopLeadSource[];

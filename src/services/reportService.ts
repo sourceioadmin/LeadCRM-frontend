@@ -20,9 +20,30 @@ export interface ApiResponse<T> {
   data?: T;
 }
 
+/** Raw funnel stage from API (may use PascalCase) */
+interface RawFunnelStage {
+  stageName?: string;
+  StageName?: string;
+  count?: number;
+  Count?: number;
+  conversionRate?: number;
+  ConversionRate?: number;
+}
+
+/** Normalize funnel stages to camelCase (API may return PascalCase) */
+function normalizeFunnelStages(raw: RawFunnelStage[] | undefined): ConversionReport['funnelStages'] {
+  if (!raw || !Array.isArray(raw)) return [];
+  return raw.map((s) => ({
+    stageName: s.stageName ?? s.StageName ?? '',
+    count: s.count ?? s.Count ?? 0,
+    conversionRate: s.conversionRate ?? s.ConversionRate ?? 0,
+  }));
+}
+
 /**
- * Get conversion funnel report with metrics
- * @param params - Query parameters for filtering the report
+ * Get conversion funnel report with metrics.
+ * Backend uses "Lost exit at stage" semantics: Lost leads are counted only up to the stage they were in when lost, and excluded from later stages. No client-side override.
+ * Normalizes API response to camelCase for frontend use.
  */
 export const getConversionReport = async (params?: ConversionReportRequest): Promise<ApiResponse<ConversionReport>> => {
   // Build query parameters
@@ -36,8 +57,21 @@ export const getConversionReport = async (params?: ConversionReportRequest): Pro
   const queryString = queryParams.toString();
   const url = `/reports/conversion${queryString ? `?${queryString}` : ''}`;
 
-  const response = await api.get(url);
-  return response.data;
+  const response = await api.get<ApiResponse<ConversionReport>>(url);
+  const body = response.data;
+  if (body?.data) {
+    const data = body.data as ConversionReport & { FunnelStages?: RawFunnelStage[]; TotalLostLeads?: number };
+    const rawStages = data.FunnelStages ?? data.funnelStages;
+    const totalLostLeads = data.totalLostLeads ?? data.TotalLostLeads ?? 0;
+    // Use API funnel stages as-is: backend applies "Lost exit at stage" (Lost counted only up to stage when lost)
+    const funnelStages = normalizeFunnelStages(Array.isArray(rawStages) ? rawStages : undefined);
+    body.data = {
+      ...data,
+      totalLostLeads,
+      funnelStages,
+    };
+  }
+  return body;
 };
 
 /**

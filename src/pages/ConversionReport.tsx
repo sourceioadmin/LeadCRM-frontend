@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Card, Row, Col, Form, Button, Alert, Spinner, Table, Badge } from 'react-bootstrap';
-import { Filter, TrendingUp, Calendar, Users, Target, RefreshCw, User } from 'lucide-react';
+import { Filter, TrendingUp, Calendar, Users, Target, RefreshCw, User, XCircle } from 'lucide-react';
 import Chart from 'react-apexcharts';
 import { ApexOptions } from 'apexcharts';
 import { getConversionReport, getTeamPerformance } from '../services/reportService';
@@ -382,6 +382,9 @@ const ConversionReport: React.FC = () => {
       {/* Report Content */}
       {reportData && reportData.totalLeads > 0 && (
         <div>
+          <p className="text-muted small mb-3">
+            Leads marked Lost are counted only up to the stage they were in when lost; they are not counted in later stages.
+          </p>
           {/* Key Metrics Cards */}
           <Row className="mb-4 g-3">
             <Col md={6} lg={3}>
@@ -439,6 +442,22 @@ const ConversionReport: React.FC = () => {
                   <h6 className="text-muted mb-2">Total Leads</h6>
                   <h2 className="text-warning mb-2">{reportData.totalLeads}</h2>
                   <small className="text-muted">in the pipeline</small>
+                </Card.Body>
+              </Card>
+            </Col>
+            <Col md={6} lg={3}>
+              <Card className="h-100 shadow-sm border-0">
+                <Card.Body className="text-center">
+                  <div className="d-flex align-items-center justify-content-center mb-3">
+                    <div className="rounded-circle bg-secondary bg-opacity-10 p-3">
+                      <XCircle size={28} className="text-secondary" />
+                    </div>
+                  </div>
+                  <h6 className="text-muted mb-2">Lost Leads</h6>
+                  <h2 className="text-secondary mb-2">{reportData.totalLostLeads ?? 0}</h2>
+                  <small className="text-muted d-block">
+                    Total: {reportData.totalLeads} | In funnel: {reportData.funnelStages[0]?.count ?? 0} | Lost: {reportData.totalLostLeads ?? 0}
+                  </small>
                 </Card.Body>
               </Card>
             </Col>

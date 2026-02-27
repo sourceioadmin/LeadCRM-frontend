@@ -36,8 +36,10 @@ import {
   LeadsByStatus
 } from '../types/Reports';
 
-// Funnel stage colors
-const FUNNEL_COLORS = ['#6366f1', '#8b5cf6', '#a855f7', '#d946ef', '#ec4899', '#22c55e'];
+// Funnel stage colors (progression stages; Lost is styled separately)
+const FUNNEL_COLORS = ['#6366f1', '#8b5cf6', '#a855f7', '#d946ef', '#ec4899', '#f59e0b', '#22c55e'];
+/** Grey for drop-off "Lost" stage so it's visually distinct */
+const LOST_STAGE_COLOR = '#6b7280';
 
 /**
  * Custom tooltip for pie chart (from AdditionalReports)
@@ -71,8 +73,15 @@ const CustomBarTooltip = ({ active, payload, label }: any) => {
   return null;
 };
 
+/** Per-stage color: grey for "Lost" (drop-off), otherwise palette */
+const getFunnelStageColor = (stages: { stageName: string }[], index: number): string => {
+  const stage = stages[index];
+  return stage?.stageName === 'Lost' ? LOST_STAGE_COLOR : (FUNNEL_COLORS[index % FUNNEL_COLORS.length] ?? LOST_STAGE_COLOR);
+};
+
 /**
- * Generate ApexCharts funnel configuration for dashboard
+ * Generate ApexCharts funnel configuration for dashboard.
+ * Renders all stages from API in order; "Lost" (if present) is styled as drop-off (grey, "Lost %" in tooltip).
  */
 const createFunnelChartOptions = (funnelStages: any[]): ApexOptions => ({
   chart: {
@@ -95,7 +104,7 @@ const createFunnelChartOptions = (funnelStages: any[]): ApexOptions => ({
       isFunnel: true,
     },
   },
-  colors: FUNNEL_COLORS,
+  colors: funnelStages.map((_, i) => getFunnelStageColor(funnelStages, i)),
   dataLabels: {
     enabled: true,
     formatter: function (val: number, opts: { dataPointIndex: number }) {
@@ -147,19 +156,23 @@ const createFunnelChartOptions = (funnelStages: any[]): ApexOptions => ({
       const stage = funnelStages[dataPointIndex];
       if (!stage) return '';
 
-      const conversionText = stage.conversionRate > 0
-        ? `<div style="color: #22c55e; margin-top: 4px;">Conversion Rate: <strong>${stage.conversionRate}%</strong></div>`
+      const isLost = stage.stageName === 'Lost';
+      const rateLabel = isLost ? 'Lost %' : 'Conversion Rate';
+      const rateColor = isLost ? LOST_STAGE_COLOR : '#22c55e';
+      const rateText = (stage.conversionRate > 0 || isLost)
+        ? `<div style="color: ${rateColor}; margin-top: 4px;">${rateLabel}: <strong>${stage.conversionRate}%</strong></div>`
         : '';
 
+      const barColor = getFunnelStageColor(funnelStages, dataPointIndex);
       return `
         <div style="padding: 12px; background: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
-          <div style="font-weight: 600; font-size: 14px; color: ${FUNNEL_COLORS[dataPointIndex]}; margin-bottom: 8px;">
+          <div style="font-weight: 600; font-size: 14px; color: ${barColor}; margin-bottom: 8px;">
             ${stage.stageName}
           </div>
           <div style="color: #374151;">
             Leads: <strong>${stage.count}</strong>
           </div>
-          ${conversionText}
+          ${rateText}
         </div>
       `;
     }
@@ -432,6 +445,9 @@ const Dashboard: React.FC = () => {
    */
   const isReferralPartner = user?.roleName === 'Referral Partner' || user?.userRoleId === 5;
 
+  /** Funnel stages for chart: exclude Lost so it is not shown in the funnel (logic unchanged) */
+  const funnelStagesForChart = (conversionReport?.funnelStages ?? []).filter(s => s.stageName !== 'Lost');
+
   return (
     <div className="dashboard-container">
       {/* Welcome Header */}
@@ -608,6 +624,9 @@ const Dashboard: React.FC = () => {
                 <TrendingUp size={20} className="me-2 text-success" />
                 Sales Conversion Funnel
               </h5>
+              <p className="text-muted small mb-0 mt-1">
+                Leads marked Lost are counted only up to the stage they were in when lost; they are not counted in later stages.
+              </p>
             </Card.Header>
             <Card.Body className="py-4">
               {conversionLoading ? (
@@ -615,13 +634,13 @@ const Dashboard: React.FC = () => {
                   <Spinner animation="border" variant="primary" />
                   <p className="text-muted mt-2 mb-0">Loading funnel data...</p>
                 </div>
-              ) : conversionReport?.funnelStages && conversionReport.funnelStages.length > 0 ? (
+              ) : conversionReport?.funnelStages && funnelStagesForChart.length > 0 ? (
                 <div style={{ width: '100%', minHeight: '300px' }}>
                   <Chart
-                    options={createFunnelChartOptions(conversionReport.funnelStages)}
-                    series={createFunnelChartSeries(conversionReport.funnelStages)}
+                    options={createFunnelChartOptions(funnelStagesForChart)}
+                    series={createFunnelChartSeries(funnelStagesForChart)}
                     type="bar"
-                    height={300}
+                    height={funnelStagesForChart.length >= 8 ? 360 : funnelStagesForChart.length >= 7 ? 340 : 300}
                   />
                 </div>
               ) : (
