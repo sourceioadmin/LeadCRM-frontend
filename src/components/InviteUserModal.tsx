@@ -12,7 +12,6 @@ const InviteUserModal: React.FC<InviteUserModalProps> = ({ show, onHide, onSucce
   const [formData, setFormData] = useState({
     email: '',
     userRoleId: 4, // Default to Team Member
-    phoneNumber: ''
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -60,7 +59,7 @@ const InviteUserModal: React.FC<InviteUserModalProps> = ({ show, onHide, onSucce
       
       if (response.success) {
         setSuccess('Invitation sent successfully!');
-        setFormData({ email: '', userRoleId: 4, phoneNumber: '' }); // Always reset to Team Member
+        setFormData({ email: '', userRoleId: 4 }); // Always reset to Team Member
 
         // Close modal and refresh parent after 2 seconds
         setTimeout(() => {
@@ -84,7 +83,7 @@ const InviteUserModal: React.FC<InviteUserModalProps> = ({ show, onHide, onSucce
 
   const handleClose = () => {
     if (!loading) {
-      setFormData({ email: '', userRoleId: 4, phoneNumber: '' }); // Reset to Team Member default
+      setFormData({ email: '', userRoleId: 4 }); // Reset to Team Member default
       setError(null);
       setErrorField('');
       setSuccess(null);
@@ -131,24 +130,6 @@ const InviteUserModal: React.FC<InviteUserModalProps> = ({ show, onHide, onSucce
             </Form.Control.Feedback>
             <Form.Text className="text-muted">
               An invitation link will be sent to this email address
-            </Form.Text>
-          </Form.Group>
-
-          <Form.Group className="mb-3">
-            <Form.Label>Phone Number</Form.Label>
-            <Form.Control
-              type="tel"
-              name="phoneNumber"
-              value={formData.phoneNumber}
-              onChange={handleChange}
-              placeholder="10-digit mobile number"
-              disabled={loading}
-            />
-            <Form.Control.Feedback type="invalid">
-              {errorField === 'phoneNumber' && error}
-            </Form.Control.Feedback>
-            <Form.Text className="text-muted">
-              Required for WhatsApp notifications. Enter a valid 10-digit Indian mobile number.
             </Form.Text>
           </Form.Group>
 

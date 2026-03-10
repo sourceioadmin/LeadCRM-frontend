@@ -3,7 +3,6 @@ import api from './api';
 export interface InviteUserData {
   email: string;
   userRoleId: number;
-  phoneNumber?: string;
 }
 
 export interface InviteUserResponse {
