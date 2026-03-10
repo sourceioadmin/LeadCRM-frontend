@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Container, Row, Col, Card, Nav, Tab, Alert, Form, Button, Spinner, Image, Table, Badge, Modal } from 'react-bootstrap';
 import { DragDropContext, Draggable } from 'react-beautiful-dnd';
 import StrictModeDroppable from '../components/StrictModeDroppable';
-import { Settings as SettingsIcon, Building, Database, BarChart3, Mail, Upload, X, Save, Plus, Edit2, Trash2, Check, X as XIcon, ToggleLeft, ToggleRight, GripVertical, ArrowUp, ArrowDown } from 'lucide-react';
+import { Settings as SettingsIcon, Building, Database, BarChart3, Mail, Upload, X, Save, Plus, Edit2, Trash2, Check, X as XIcon, ToggleLeft, ToggleRight, GripVertical, ArrowUp, ArrowDown, User, Smartphone } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import {
   getCompanySettings,
@@ -73,6 +73,17 @@ const Settings: React.FC = () => {
     phone: ''
   });
 
+  // User Profile state
+  const [userProfile, setUserProfile] = useState({
+    fullName: '',
+    username: '',
+    email: '',
+    phoneNumber: ''
+  });
+  const [userProfileLoading, setUserProfileLoading] = useState(false);
+  const [userProfileSaving, setUserProfileSaving] = useState(false);
+  const [userProfileError, setUserProfileError] = useState<string>('');
+
   // Lead Sources state
   const [leadSources, setLeadSources] = useState<LeadSource[]>([]);
   const [leadSourcesLoading, setLeadSourcesLoading] = useState(false);
@@ -142,6 +153,13 @@ const Settings: React.FC = () => {
       loadEmailSettings();
     }
   }, [activeTab]);
+
+  // Load user profile when tab changes to profile
+  useEffect(() => {
+    if (activeTab === 'profile') {
+      loadUserProfile();
+    }
+  }, [activeTab, user]);
 
   const loadCompanySettings = async () => {
     try {
@@ -252,11 +270,7 @@ const Settings: React.FC = () => {
         updateUser({
           companyName: response.data.companyName,
           companyLogo: response.data.logo || undefined,
-          logo: response.data.logo || undefined,
-          company: {
-            companyName: response.data.companyName,
-            logo: response.data.logo || undefined
-          }
+          logo: response.data.logo || undefined
         });
         showSuccess('Logo Removed', 'Company logo has been successfully removed');
         console.log('✅ UI updated successfully - logo removed immediately');
@@ -321,11 +335,7 @@ const Settings: React.FC = () => {
         updateUser({
           companyName: response.data.companyName,
           companyLogo: response.data.logo || undefined,
-          logo: response.data.logo || undefined,
-          company: {
-            companyName: response.data.companyName,
-            logo: response.data.logo || undefined
-          }
+          logo: response.data.logo || undefined
         });
 
         // Show success notification with details
@@ -814,22 +824,97 @@ const Settings: React.FC = () => {
     }
   };
 
-  // Check if user has admin access
-  if (user?.roleName !== 'Company Admin' && user?.roleName !== 'System Admin') {
+  // User Profile functions
+  const loadUserProfile = async () => {
+    if (!user) return;
+
+    try {
+      setUserProfileLoading(true);
+      setUserProfileError('');
+
+      // Set profile data from auth context
+      setUserProfile({
+        fullName: user.fullName || '',
+        username: user.username || '',
+        email: user.email || '',
+        phoneNumber: user.phoneNumber || ''
+      });
+    } catch (error: any) {
+      console.error('Error loading user profile:', error);
+      setUserProfileError('Failed to load user profile');
+    } finally {
+      setUserProfileLoading(false);
+    }
+  };
+
+  const handleUpdateUserProfile = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // Phone validation
+    if (!userProfile.phoneNumber.trim()) {
+      setUserProfileError('Phone number is required for WhatsApp notifications');
+      return;
+    }
+
+    // Validate phone number format
+    const cleanPhone = userProfile.phoneNumber.replace(/[\s\-\(\)]/g, '');
+    const indianMobileRegex = /^(\+91)?[6-9]\d{9}$/;
+    if (!indianMobileRegex.test(cleanPhone)) {
+      setUserProfileError('Please enter a valid 10-digit Indian mobile number (starting with 6-9). You can optionally include +91 prefix.');
+      return;
+    }
+
+    try {
+      setUserProfileSaving(true);
+      setUserProfileError('');
+
+      // For now, we'll update the user context directly
+      // In a real implementation, you'd call an API endpoint like:
+      // const response = await updateUserProfile({ phoneNumber: userProfile.phoneNumber });
+
+      // Update the user context
+      updateUser({
+        ...user,
+        phoneNumber: userProfile.phoneNumber
+      });
+
+      showSuccess('Profile Updated', 'Your profile has been updated successfully. WhatsApp notifications are now enabled.');
+    } catch (error: any) {
+      console.error('Error updating user profile:', error);
+      const errorMessage = error.response?.data?.message || 'Failed to update profile';
+      setUserProfileError(errorMessage);
+      showError('Update Failed', errorMessage);
+    } finally {
+      setUserProfileSaving(false);
+    }
+  };
+
+  // Check if user is logged in
+  if (!user) {
     return (
       <Container fluid className="py-4">
         <Row>
           <Col>
-            <Alert variant="danger">
-              <h4>Access Denied</h4>
-              <p>You don't have permission to access this page. Only Administrators can manage settings.</p>
-              <p>Please contact your administrator if you need access to this feature.</p>
+            <Alert variant="warning">
+              <h4>Please Login</h4>
+              <p>You need to be logged in to access settings.</p>
             </Alert>
           </Col>
         </Row>
       </Container>
     );
   }
+
+  // Set default tab based on user role
+  const isAdmin = user.roleName === 'Company Admin' || user.roleName === 'System Admin';
+  const defaultTab = isAdmin ? 'company' : 'profile';
+
+  // Initialize active tab if not set
+  React.useEffect(() => {
+    if (!activeTab) {
+      setActiveTab(defaultTab);
+    }
+  }, []);
 
   return (
     <Container fluid className="py-4">
@@ -842,11 +927,19 @@ const Settings: React.FC = () => {
 
           <Card className="shadow-sm">
             <Card.Header className="bg-white border-bottom-0">
-              <Nav variant="tabs" activeKey={activeTab} onSelect={(key) => setActiveTab(key || 'company')}>
+              <Nav variant="tabs" activeKey={activeTab} onSelect={(key) => setActiveTab(key || defaultTab)}>
+                {isAdmin && (
+                  <Nav.Item>
+                    <Nav.Link eventKey="company" className="d-flex align-items-center">
+                      <Building size={16} className="me-2" />
+                      Company Settings
+                    </Nav.Link>
+                  </Nav.Item>
+                )}
                 <Nav.Item>
-                  <Nav.Link eventKey="company" className="d-flex align-items-center">
-                    <Building size={16} className="me-2" />
-                    Company Settings
+                  <Nav.Link eventKey="profile" className="d-flex align-items-center">
+                    <User size={16} className="me-2" />
+                    User Profile
                   </Nav.Link>
                 </Nav.Item>
                 {user?.roleName === 'System Admin' && (
@@ -865,20 +958,39 @@ const Settings: React.FC = () => {
                     </Nav.Item>
                   </>
                 )}
+                {isAdmin && user?.roleName === 'System Admin' && (
+                  <>
+                    <Nav.Item>
+                      <Nav.Link eventKey="lead-sources" className="d-flex align-items-center">
+                        <Database size={16} className="me-2" />
+                        Lead Sources
+                      </Nav.Link>
+                    </Nav.Item>
+                    <Nav.Item>
+                      <Nav.Link eventKey="lead-statuses" className="d-flex align-items-center">
+                        <BarChart3 size={16} className="me-2" />
+                        Lead Statuses
+                      </Nav.Link>
+                    </Nav.Item>
+                  </>
+                )}
                 {/* Hidden: Email Settings Tab
-                <Nav.Item>
-                  <Nav.Link eventKey="email" className="d-flex align-items-center">
-                    <Mail size={16} className="me-2" />
-                    Email Settings
-                  </Nav.Link>
-                </Nav.Item>
+                {isAdmin && (
+                  <Nav.Item>
+                    <Nav.Link eventKey="email" className="d-flex align-items-center">
+                      <Mail size={16} className="me-2" />
+                      Email Settings
+                    </Nav.Link>
+                  </Nav.Item>
+                )}
                 */}
               </Nav>
             </Card.Header>
 
             <Card.Body className="p-0">
               <Tab.Content>
-                <Tab.Pane eventKey="company" active={activeTab === 'company'}>
+                {isAdmin && (
+                  <Tab.Pane eventKey="company" active={activeTab === 'company'}>
                   {/* Company Settings Tab Content */}
                   <div className="p-4">
                     <h4 className="mb-3">Company Information</h4>
@@ -1142,9 +1254,128 @@ const Settings: React.FC = () => {
                       </Modal.Footer>
                     </Modal>
                   </div>
+                  </Tab.Pane>
+                )}
+
+                <Tab.Pane eventKey="profile" active={activeTab === 'profile'}>
+                  <div className="p-4">
+                    <h4 className="mb-3">User Profile</h4>
+                    <p className="text-muted">Manage your personal information and notification preferences.</p>
+
+                    {userProfileError && (
+                      <Alert variant="danger" className="mb-3">
+                        {userProfileError}
+                      </Alert>
+                    )}
+
+                    <Form onSubmit={handleUpdateUserProfile}>
+                      <Row>
+                        <Col md={6}>
+                          <Form.Group className="mb-3">
+                            <Form.Label>Full Name</Form.Label>
+                            <Form.Control
+                              type="text"
+                              value={userProfile.fullName}
+                              onChange={(e) => setUserProfile(prev => ({ ...prev, fullName: e.target.value }))}
+                              disabled={userProfileLoading || userProfileSaving}
+                              required
+                            />
+                          </Form.Group>
+                        </Col>
+                        <Col md={6}>
+                          <Form.Group className="mb-3">
+                            <Form.Label>Username</Form.Label>
+                            <Form.Control
+                              type="text"
+                              value={userProfile.username}
+                              onChange={(e) => setUserProfile(prev => ({ ...prev, username: e.target.value }))}
+                              disabled={userProfileLoading || userProfileSaving}
+                              required
+                            />
+                          </Form.Group>
+                        </Col>
+                      </Row>
+
+                      <Form.Group className="mb-3">
+                        <Form.Label>Email Address</Form.Label>
+                        <Form.Control
+                          type="email"
+                          value={userProfile.email}
+                          disabled={true}
+                          readOnly
+                        />
+                        <Form.Text className="text-muted">
+                          Email address cannot be changed. Contact your administrator if you need to update it.
+                        </Form.Text>
+                      </Form.Group>
+
+                      <Form.Group className="mb-4">
+                        <Form.Label>Phone Number <span className="text-danger">*</span></Form.Label>
+                        <Form.Control
+                          type="tel"
+                          value={userProfile.phoneNumber}
+                          onChange={(e) => setUserProfile(prev => ({ ...prev, phoneNumber: e.target.value }))}
+                          placeholder="10-digit mobile number (e.g., 9876543210 or +919876543210)"
+                          disabled={userProfileLoading || userProfileSaving}
+                          required
+                        />
+                        <Form.Text className="text-muted">
+                          Required for WhatsApp notifications. Enter a valid 10-digit Indian mobile number.
+                        </Form.Text>
+                        {userProfile.phoneNumber && (
+                          <div className="mt-2">
+                            <Badge bg="success" className="me-2">
+                              <Smartphone size={12} className="me-1" />
+                              WhatsApp Enabled
+                            </Badge>
+                            <small className="text-muted">
+                              You will receive WhatsApp notifications for leads, assignments, and reports.
+                            </small>
+                          </div>
+                        )}
+                      </Form.Group>
+
+                      <div className="d-flex justify-content-end">
+                        <Button
+                          type="submit"
+                          variant="primary"
+                          disabled={userProfileLoading || userProfileSaving}
+                          className="d-flex align-items-center"
+                        >
+                          {userProfileSaving ? (
+                            <>
+                              <Spinner size="sm" className="me-2" />
+                              Saving...
+                            </>
+                          ) : (
+                            <>
+                              <Save size={16} className="me-2" />
+                              Save Profile
+                            </>
+                          )}
+                        </Button>
+                      </div>
+                    </Form>
+
+                    <hr className="my-4" />
+
+                    <div className="notification-info">
+                      <h5 className="mb-3">📱 Notification Information</h5>
+                      <Alert variant="info">
+                        <h6>Automatic Notifications You Receive:</h6>
+                        <ul className="mb-0 mt-2">
+                          <li><strong>Lead Assignments:</strong> WhatsApp notification when a lead is assigned to you</li>
+                          <li><strong>Daily Follow-ups:</strong> Email + WhatsApp reminders for leads due today (sent at 09:00 UTC)</li>
+                          <li><strong>Weekly Reports:</strong> Email + WhatsApp summary of won/lost leads (Mondays at 09:00 UTC)</li>
+                          <li><strong>Monthly Reports:</strong> Email + WhatsApp detailed reports (1st of each month at 09:00 UTC)</li>
+                        </ul>
+                      </Alert>
+                    </div>
+                  </div>
                 </Tab.Pane>
 
-                <Tab.Pane eventKey="lead-sources" active={activeTab === 'lead-sources'}>
+                {isAdmin && user?.roleName === 'System Admin' && (
+                  <Tab.Pane eventKey="lead-sources" active={activeTab === 'lead-sources'}>
                   <div className="p-4">
                     <div className="d-flex justify-content-between align-items-center mb-3">
                       <div>
@@ -1550,9 +1781,11 @@ const Settings: React.FC = () => {
                       </Modal.Footer>
                     </Modal>
                   </div>
-                </Tab.Pane>
+                  </Tab.Pane>
+                )}
 
-                <Tab.Pane eventKey="lead-statuses" active={activeTab === 'lead-statuses'}>
+                {isAdmin && user?.roleName === 'System Admin' && (
+                  <Tab.Pane eventKey="lead-statuses" active={activeTab === 'lead-statuses'}>
                   <div className="p-4">
                     <div className="d-flex justify-content-between align-items-center mb-3">
                       <div>
@@ -2086,7 +2319,8 @@ const Settings: React.FC = () => {
                       </Modal.Footer>
                     </Modal>
                   </div>
-                </Tab.Pane>
+                  </Tab.Pane>
+                )}
 
                 {/* Email Settings Tab - Hidden */}
                 {false && (

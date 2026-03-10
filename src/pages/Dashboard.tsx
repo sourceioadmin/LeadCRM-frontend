@@ -499,6 +499,7 @@ const Dashboard: React.FC = () => {
         </Alert>
       )}
 
+
       {/* Statistics Cards - Hide for Referral Partners */}
       {!isReferralPartner && (
         <Row className="g-3 mb-4">

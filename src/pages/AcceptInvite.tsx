@@ -17,6 +17,7 @@ const AcceptInvite: React.FC = () => {
   const [formData, setFormData] = useState({
     fullName: '',
     username: '',
+    phoneNumber: '',
     password: '',
     confirmPassword: ''
   });
@@ -139,6 +140,21 @@ const AcceptInvite: React.FC = () => {
       return;
     }
 
+    // Phone validation (required)
+    if (!formData.phoneNumber.trim()) {
+      setError('Phone number is required');
+      setErrorField('phoneNumber');
+      return;
+    }
+
+    const cleanPhone = formData.phoneNumber.replace(/[\s\-\(\)]/g, '');
+    const indianMobileRegex = /^(\+91)?[6-9]\d{9}$/;
+    if (!indianMobileRegex.test(cleanPhone)) {
+      setError('Please enter a valid 10-digit Indian mobile number (starting with 6-9). You can optionally include +91 prefix.');
+      setErrorField('phoneNumber');
+      return;
+    }
+
     if (!formData.password) {
       setError('Password is required');
       setErrorField('password');
@@ -175,7 +191,11 @@ const AcceptInvite: React.FC = () => {
     try {
       const response = await registerInvite({
         invitationToken: token!,
-        ...formData
+        fullName: formData.fullName,
+        username: formData.username,
+        phoneNumber: formData.phoneNumber.trim(),
+        password: formData.password,
+        confirmPassword: formData.confirmPassword,
       });
 
       if (response.data.success) {
@@ -300,6 +320,27 @@ const AcceptInvite: React.FC = () => {
                   </Form.Control.Feedback>
                   <Form.Text className="text-muted">
                     Minimum 3 characters
+                  </Form.Text>
+                </Form.Group>
+
+                <Form.Group className="mb-3">
+                  <Form.Label>
+                    Phone Number <span className="text-danger">*</span>
+                  </Form.Label>
+                  <Form.Control
+                    type="tel"
+                    name="phoneNumber"
+                    value={formData.phoneNumber}
+                    onChange={handleChange}
+                    placeholder="10-digit mobile number"
+                    disabled={submitting}
+                    isInvalid={errorField === 'phoneNumber'}
+                  />
+                  <Form.Control.Feedback type="invalid">
+                    {errorField === 'phoneNumber' && error}
+                  </Form.Control.Feedback>
+                  <Form.Text className="text-muted">
+                    Enter a valid 10-digit Indian mobile number
                   </Form.Text>
                 </Form.Group>
 

@@ -28,7 +28,8 @@ const ManageUsers: React.FC = () => {
   // Form state for editing user
   const [editForm, setEditForm] = useState<UpdateUserData>({
     userRoleId: 4, // Default to Team Member
-    managerId: undefined
+    managerId: undefined,
+    phoneNumber: ''
   });
 
   // Check if user has admin access
@@ -83,7 +84,8 @@ const ManageUsers: React.FC = () => {
     setSelectedUser(user);
     setEditForm({
       userRoleId: user.roleId,
-      managerId: user.managerId || undefined
+      managerId: user.managerId || undefined,
+      phoneNumber: user.phoneNumber || ''
     });
     setShowEditModal(true);
   };
@@ -374,6 +376,7 @@ const ManageUsers: React.FC = () => {
                       <tr>
                         <th>Name</th>
                         <th className="d-none d-md-table-cell">Email</th>
+                        <th className="d-none d-lg-table-cell">Phone</th>
                         <th>Role</th>
                         <th className="d-none d-lg-table-cell">Manager</th>
                         <th>Status</th>
@@ -412,6 +415,17 @@ const ManageUsers: React.FC = () => {
                             </div>
                             {user.invitationStatus === 'accepted' && user.isSSOUser && (
                               <Badge bg="info" className="mt-1">SSO</Badge>
+                            )}
+                          </td>
+                          <td className="d-none d-lg-table-cell">
+                            {user.invitationStatus === 'accepted' ? (
+                              user.phoneNumber ? (
+                                <span title={user.phoneNumber}>{user.phoneNumber}</span>
+                              ) : (
+                                <span className="text-muted">-</span>
+                              )
+                            ) : (
+                              <span className="text-muted">-</span>
                             )}
                           </td>
                           <td>
@@ -568,6 +582,20 @@ const ManageUsers: React.FC = () => {
             </Form.Select>
             <Form.Text className="text-muted">
               Assign a manager to this user. Only Company Admins and Managers can be assigned as managers.
+            </Form.Text>
+          </Form.Group>
+
+          <Form.Group className="mb-3">
+            <Form.Label>Phone Number</Form.Label>
+            <Form.Control
+              type="tel"
+              value={editForm.phoneNumber || ''}
+              onChange={(e) => setEditForm(prev => ({ ...prev, phoneNumber: e.target.value }))}
+              placeholder="10-digit mobile number"
+              disabled={updating}
+            />
+            <Form.Text className="text-muted">
+              Required for WhatsApp notifications. Enter a valid 10-digit Indian mobile number.
             </Form.Text>
           </Form.Group>
         </Modal.Body>

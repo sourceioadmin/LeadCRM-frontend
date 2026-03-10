@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Modal, Button, Form, Alert, Spinner, Row, Col, Card, Badge, InputGroup, Dropdown } from 'react-bootstrap';
+import { Smartphone } from 'lucide-react';
 import { createLead, getLead, updateLead, getLeadSources, getLeadStatuses, getUrgencyLevels, getAssignableUsers } from '../services/leadService';
 import { LeadSource, LeadStatus, Urgency, Lead } from '../types/Lead';
 import { useAuth } from '../contexts/AuthContext';
@@ -1072,6 +1073,29 @@ const AddLeadModal: React.FC<AddLeadModalProps> = ({ show, onHide, onSuccess, le
                                 </option>
                               ))}
                             </Form.Select>
+
+                            {/* Notification Alert for Status Changes */}
+                            {(() => {
+                              const selectedStatus = leadStatuses.find(s => s.leadStatusId.toString() === formData.leadStatusId);
+                              const statusName = selectedStatus?.name?.toLowerCase();
+                              const isConverted = statusName === 'converted' || statusName === 'won';
+                              const isLost = statusName === 'lost';
+
+                              if (isConverted || isLost) {
+                                return (
+                                  <Alert variant={isConverted ? "success" : "warning"} className="mt-2 py-2">
+                                    <div className="d-flex align-items-center">
+                                      <Smartphone size={16} className="me-2" />
+                                      <small className="mb-0">
+                                        <strong>Notifications will be sent:</strong>{' '}
+                                        {isConverted ? 'Lead won' : 'Lead lost'} notifications will be sent via email and WhatsApp to admins, managers, and referral partners.
+                                      </small>
+                                    </div>
+                                  </Alert>
+                                );
+                              }
+                              return null;
+                            })()}
                           </Form.Group>
                         </Col>
                       </Row>
@@ -1129,6 +1153,29 @@ const AddLeadModal: React.FC<AddLeadModalProps> = ({ show, onHide, onSuccess, le
                                 </option>
                               ))}
                             </Form.Select>
+
+                            {/* Notification Alert for Status Changes */}
+                            {(() => {
+                              const selectedStatus = leadStatuses.find(s => s.leadStatusId.toString() === formData.leadStatusId);
+                              const statusName = selectedStatus?.name?.toLowerCase();
+                              const isConverted = statusName === 'converted' || statusName === 'won';
+                              const isLost = statusName === 'lost';
+
+                              if (isConverted || isLost) {
+                                return (
+                                  <Alert variant={isConverted ? "success" : "warning"} className="mt-2 py-2">
+                                    <div className="d-flex align-items-center">
+                                      <Smartphone size={16} className="me-2" />
+                                      <small className="mb-0">
+                                        <strong>Notifications will be sent:</strong>{' '}
+                                        {isConverted ? 'Lead won' : 'Lead lost'} notifications will be sent via email and WhatsApp to admins, managers, and referral partners.
+                                      </small>
+                                    </div>
+                                  </Alert>
+                                );
+                              }
+                              return null;
+                            })()}
                           </Form.Group>
                         </Col>
                       </Row>
@@ -1372,6 +1419,18 @@ const AddLeadModal: React.FC<AddLeadModalProps> = ({ show, onHide, onSuccess, le
                                 No team members found. Add team members to assign leads.
                               </Form.Text>
                             )}
+
+                            {/* Notification Preview for Assignment */}
+                            {formData.assignedToUserId && formData.assignedToUserId !== '' && formData.assignedToUserId !== user?.userId?.toString() && (
+                              <Alert variant="info" className="mt-2 py-2">
+                                <div className="d-flex align-items-center">
+                                  <Smartphone size={16} className="me-2 text-primary" />
+                                  <small className="mb-0">
+                                    <strong>WhatsApp Notification:</strong> The assigned user will receive a WhatsApp message about this lead assignment.
+                                  </small>
+                                </div>
+                              </Alert>
+                            )}
                           </Form.Group>
                         </Col>
                       )}
@@ -1391,6 +1450,18 @@ const AddLeadModal: React.FC<AddLeadModalProps> = ({ show, onHide, onSuccess, le
                               disabled={loading}
                               min={isEditMode ? undefined : getTodayForInput()}
                             />
+
+                            {/* Notification Reminder for Follow-up Date */}
+                            {formData.followupDate && (
+                              <Alert variant="info" className="mt-2 py-2">
+                                <div className="d-flex align-items-center">
+                                  <Smartphone size={16} className="me-2 text-primary" />
+                                  <small className="mb-0">
+                                    <strong>Daily Reminder:</strong> The assigned user will receive email and WhatsApp reminders at 09:00 UTC on this date if the lead hasn't been updated.
+                                  </small>
+                                </div>
+                              </Alert>
+                            )}
                           </Form.Group>
                         </Col>
                       )}

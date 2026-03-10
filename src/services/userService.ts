@@ -3,6 +3,7 @@ import api from './api';
 export interface InviteUserData {
   email: string;
   userRoleId: number;
+  phoneNumber?: string;
 }
 
 export interface InviteUserResponse {
@@ -44,6 +45,7 @@ export interface User {
 export interface UpdateUserData {
   userRoleId: number;
   managerId?: number;
+  phoneNumber?: string;
 }
 
 export interface UsersResponse {

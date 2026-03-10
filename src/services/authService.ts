@@ -32,6 +32,7 @@ export interface RegisterInvitePayload {
   invitationToken: string;
   fullName: string;
   username: string;
+  phoneNumber: string;
   password: string;
   confirmPassword: string;
 }

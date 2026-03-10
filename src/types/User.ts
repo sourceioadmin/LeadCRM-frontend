@@ -4,6 +4,7 @@ export interface User {
   fullName: string;
   email: string;
   username: string;
+  phoneNumber?: string;
   userRoleId?: number;
   managerId?: number;
   isActive?: boolean;
