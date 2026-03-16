@@ -28,6 +28,9 @@ import Settings from "./pages/Settings";
 import PrivateRoute from "./components/PrivateRoute";
 import ImportLeads from "./pages/ImportLeads";
 import ImportHistory from "./pages/ImportHistory";
+import PwaInstallPrompt from "./components/PwaInstallPrompt";
+import PwaUpdatePrompt from "./components/PwaUpdatePrompt";
+import OfflineIndicator from "./components/OfflineIndicator";
 
 // IMPORTANT: Set your actual Google OAuth Client ID in environment variable VITE_GOOGLE_CLIENT_ID
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || "dummy-client-id.apps.googleusercontent.com";
@@ -90,6 +93,9 @@ const App: React.FC = () => {
             </Route>
           </Routes>
         </Router>
+        <PwaInstallPrompt />
+        <PwaUpdatePrompt />
+        <OfflineIndicator />
       </AuthProvider>
     </GoogleOAuthProvider>
   );
