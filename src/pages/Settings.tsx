@@ -1357,20 +1357,6 @@ const Settings: React.FC = () => {
                       </div>
                     </Form>
 
-                    <hr className="my-4" />
-
-                    <div className="notification-info">
-                      <h5 className="mb-3">📱 Notification Information</h5>
-                      <Alert variant="info">
-                        <h6>Automatic Notifications You Receive:</h6>
-                        <ul className="mb-0 mt-2">
-                          <li><strong>Lead Assignments:</strong> WhatsApp notification when a lead is assigned to you</li>
-                          <li><strong>Daily Follow-ups:</strong> Email + WhatsApp reminders for leads due today (sent at 09:00 UTC)</li>
-                          <li><strong>Weekly Reports:</strong> Email + WhatsApp summary of won/lost leads (Mondays at 09:00 UTC)</li>
-                          <li><strong>Monthly Reports:</strong> Email + WhatsApp detailed reports (1st of each month at 09:00 UTC)</li>
-                        </ul>
-                      </Alert>
-                    </div>
                   </div>
                 </Tab.Pane>
 
