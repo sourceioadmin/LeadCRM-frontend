@@ -32,6 +32,7 @@ import {
   UpdateEmailSettingsData,
 } from '../services/settingsService';
 import { useToast } from '../components/Toast';
+import { getCurrentUserProfile, updateUserProfile } from '../services/userService';
 
 // Determine backend URL based on current hostname
 const getBackendURL = (): string => {
@@ -78,11 +79,19 @@ const Settings: React.FC = () => {
     fullName: '',
     username: '',
     email: '',
-    phoneNumber: ''
+    phoneNumber: '',
+    companyName: '',
+    roleName: '',
+    isActive: true,
+    isEmailVerified: false,
+    isSSOUser: false,
   });
+  const [originalUserProfile, setOriginalUserProfile] = useState({ fullName: '', phoneNumber: '' });
   const [userProfileLoading, setUserProfileLoading] = useState(false);
   const [userProfileSaving, setUserProfileSaving] = useState(false);
   const [userProfileError, setUserProfileError] = useState<string>('');
+  const [userProfileValidationErrors, setUserProfileValidationErrors] = useState<{ fullName?: string; phoneNumber?: string }>({});
+  const [showProfileSuccessModal, setShowProfileSuccessModal] = useState(false);
 
   // Lead Sources state
   const [leadSources, setLeadSources] = useState<LeadSource[]>([]);
@@ -832,13 +841,25 @@ const Settings: React.FC = () => {
       setUserProfileLoading(true);
       setUserProfileError('');
 
-      // Set profile data from auth context
-      setUserProfile({
-        fullName: user.fullName || '',
-        username: user.username || '',
-        email: user.email || '',
-        phoneNumber: user.phoneNumber || ''
-      });
+      const response = await getCurrentUserProfile();
+      if (response.success && response.data) {
+        const d = response.data;
+        setUserProfile({
+          fullName: d.fullName || '',
+          username: d.username || '',
+          email: d.email || '',
+          phoneNumber: d.phoneNumber || '',
+          companyName: d.companyName || '',
+          roleName: d.roleName || '',
+          isActive: d.isActive ?? true,
+          isEmailVerified: d.isEmailVerified ?? false,
+          isSSOUser: d.isSSOUser ?? false,
+        });
+        setOriginalUserProfile({
+          fullName: d.fullName || '',
+          phoneNumber: d.phoneNumber || '',
+        });
+      }
     } catch (error: any) {
       console.error('Error loading user profile:', error);
       setUserProfileError('Failed to load user profile');
@@ -847,43 +868,64 @@ const Settings: React.FC = () => {
     }
   };
 
+  const validateUserProfile = (): boolean => {
+    const errors: { fullName?: string; phoneNumber?: string } = {};
+    if (!userProfile.fullName.trim()) {
+      errors.fullName = 'Full name is required';
+    } else if (userProfile.fullName.trim().length > 100) {
+      errors.fullName = 'Full name must be 100 characters or fewer';
+    }
+    if (!userProfile.phoneNumber.trim()) {
+      errors.phoneNumber = 'Phone number is required';
+    } else if (userProfile.phoneNumber.trim().length > 20) {
+      errors.phoneNumber = 'Phone number must be 20 characters or fewer';
+    }
+    setUserProfileValidationErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
   const handleUpdateUserProfile = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Phone validation
-    if (!userProfile.phoneNumber.trim()) {
-      setUserProfileError('Phone number is required for WhatsApp notifications');
-      return;
-    }
-
-    // Validate phone number format
-    const cleanPhone = userProfile.phoneNumber.replace(/[\s\-\(\)]/g, '');
-    const indianMobileRegex = /^(\+91)?[6-9]\d{9}$/;
-    if (!indianMobileRegex.test(cleanPhone)) {
-      setUserProfileError('Please enter a valid 10-digit Indian mobile number (starting with 6-9). You can optionally include +91 prefix.');
-      return;
-    }
+    if (!validateUserProfile()) return;
 
     try {
       setUserProfileSaving(true);
       setUserProfileError('');
 
-      // For now, we'll update the user context directly
-      // In a real implementation, you'd call an API endpoint like:
-      // const response = await updateUserProfile({ phoneNumber: userProfile.phoneNumber });
-
-      // Update the user context
-      updateUser({
-        ...user,
-        phoneNumber: userProfile.phoneNumber
+      const response = await updateUserProfile({
+        fullName: userProfile.fullName.trim(),
+        phoneNumber: userProfile.phoneNumber.trim(),
       });
 
-      showSuccess('Profile Updated', 'Your profile has been updated successfully. WhatsApp notifications are now enabled.');
+      if (response.success && response.data) {
+        const d = response.data;
+        setUserProfile(prev => ({
+          ...prev,
+          fullName: d.fullName || prev.fullName,
+          phoneNumber: d.phoneNumber || prev.phoneNumber,
+        }));
+        setOriginalUserProfile({
+          fullName: d.fullName || '',
+          phoneNumber: d.phoneNumber || '',
+        });
+        updateUser({
+          ...user,
+          fullName: d.fullName,
+          phoneNumber: d.phoneNumber,
+        });
+        setShowProfileSuccessModal(true);
+      }
     } catch (error: any) {
       console.error('Error updating user profile:', error);
-      const errorMessage = error.response?.data?.message || 'Failed to update profile';
-      setUserProfileError(errorMessage);
-      showError('Update Failed', errorMessage);
+      const apiErrors: string[] = error.response?.data?.errors;
+      if (apiErrors?.length) {
+        setUserProfileError(apiErrors.join(' '));
+      } else {
+        const errorMessage = error.response?.data?.message || 'Failed to update profile';
+        setUserProfileError(errorMessage);
+        showError('Update Failed', errorMessage);
+      }
     } finally {
       setUserProfileSaving(false);
     }
@@ -1258,105 +1300,131 @@ const Settings: React.FC = () => {
                 )}
 
                 <Tab.Pane eventKey="profile" active={activeTab === 'profile'}>
-                  <div className="p-4">
-                    <h4 className="mb-3">User Profile</h4>
-                    <p className="text-muted">Manage your personal information and notification preferences.</p>
+                  <div className="p-3 p-md-4">
 
-                    {userProfileError && (
-                      <Alert variant="danger" className="mb-3">
-                        {userProfileError}
-                      </Alert>
-                    )}
-
-                    <Form onSubmit={handleUpdateUserProfile}>
-                      <Row>
-                        <Col md={6}>
-                          <Form.Group className="mb-3">
-                            <Form.Label>Full Name</Form.Label>
-                            <Form.Control
-                              type="text"
-                              value={userProfile.fullName}
-                              onChange={(e) => setUserProfile(prev => ({ ...prev, fullName: e.target.value }))}
-                              disabled={userProfileLoading || userProfileSaving}
-                              required
-                            />
-                          </Form.Group>
-                        </Col>
-                        <Col md={6}>
-                          <Form.Group className="mb-3">
-                            <Form.Label>Username</Form.Label>
-                            <Form.Control
-                              type="text"
-                              value={userProfile.username}
-                              onChange={(e) => setUserProfile(prev => ({ ...prev, username: e.target.value }))}
-                              disabled={userProfileLoading || userProfileSaving}
-                              required
-                            />
-                          </Form.Group>
-                        </Col>
-                      </Row>
-
-                      <Form.Group className="mb-3">
-                        <Form.Label>Email Address</Form.Label>
-                        <Form.Control
-                          type="email"
-                          value={userProfile.email}
-                          disabled={true}
-                          readOnly
-                        />
-                        <Form.Text className="text-muted">
-                          Email address cannot be changed. Contact your administrator if you need to update it.
-                        </Form.Text>
-                      </Form.Group>
-
-                      <Form.Group className="mb-4">
-                        <Form.Label>Phone Number <span className="text-danger">*</span></Form.Label>
-                        <Form.Control
-                          type="tel"
-                          value={userProfile.phoneNumber}
-                          onChange={(e) => setUserProfile(prev => ({ ...prev, phoneNumber: e.target.value }))}
-                          placeholder="10-digit mobile number (e.g., 9876543210 or +919876543210)"
-                          disabled={userProfileLoading || userProfileSaving}
-                          required
-                        />
-                        <Form.Text className="text-muted">
-                          Required for WhatsApp notifications. Enter a valid 10-digit Indian mobile number.
-                        </Form.Text>
-                        {userProfile.phoneNumber && (
-                          <div className="mt-2">
-                            <Badge bg="success" className="me-2">
-                              <Smartphone size={12} className="me-1" />
-                              WhatsApp Enabled
-                            </Badge>
-                            <small className="text-muted">
-                              You will receive WhatsApp notifications for leads, assignments, and reports.
-                            </small>
-                          </div>
-                        )}
-                      </Form.Group>
-
-                      <div className="d-flex justify-content-end">
-                        <Button
-                          type="submit"
-                          variant="primary"
-                          disabled={userProfileLoading || userProfileSaving}
-                          className="d-flex align-items-center"
-                        >
-                          {userProfileSaving ? (
-                            <>
-                              <Spinner size="sm" className="me-2" />
-                              Saving...
-                            </>
-                          ) : (
-                            <>
-                              <Save size={16} className="me-2" />
-                              Save Profile
-                            </>
-                          )}
-                        </Button>
+                    {userProfileLoading ? (
+                      <div className="text-center py-5">
+                        <Spinner animation="border" size="sm" className="me-2" />
+                        Loading profile...
                       </div>
-                    </Form>
+                    ) : (
+                      <>
+                        {userProfile.isSSOUser && (
+                          <Alert variant="info" className="mb-3 py-2 small">
+                            Account managed via Google SSO — email and password are controlled by Google.
+                          </Alert>
+                        )}
 
+                        {userProfileError && (
+                          <Alert variant="danger" className="mb-3 py-2 small" dismissible onClose={() => setUserProfileError('')}>
+                            {userProfileError}
+                          </Alert>
+                        )}
+
+                        {/* Compact read-only account info card */}
+                        <div className="rounded border bg-light px-3 py-2 mb-4">
+                          <div className="d-flex flex-wrap gap-2 mb-2">
+                            <Badge bg={userProfile.isActive ? 'success' : 'secondary'}>
+                              {userProfile.isActive ? 'Active' : 'Inactive'}
+                            </Badge>
+                            <Badge bg={userProfile.isEmailVerified ? 'success' : 'warning'}>
+                              {userProfile.isEmailVerified ? 'Email Verified' : 'Unverified'}
+                            </Badge>
+                            {userProfile.isSSOUser && <Badge bg="info">Google SSO</Badge>}
+                          </div>
+                          <div className="small text-muted mb-1">
+                            <span className="fw-semibold text-dark">{userProfile.email}</span>
+                            <span className="mx-2">·</span>
+                            <span>@{userProfile.username}</span>
+                          </div>
+                          <div className="small text-muted">
+                            <span>{userProfile.companyName}</span>
+                            <span className="mx-2">·</span>
+                            <span>{userProfile.roleName}</span>
+                          </div>
+                        </div>
+
+                        {/* Editable fields */}
+                        <Form onSubmit={handleUpdateUserProfile}>
+                          <Row>
+                            <Col xs={12} md={6}>
+                              <Form.Group className="mb-3">
+                                <Form.Label>Full Name <span className="text-danger">*</span></Form.Label>
+                                <Form.Control
+                                  type="text"
+                                  value={userProfile.fullName}
+                                  onChange={(e) => {
+                                    setUserProfile(prev => ({ ...prev, fullName: e.target.value }));
+                                    if (userProfileValidationErrors.fullName) {
+                                      setUserProfileValidationErrors(prev => ({ ...prev, fullName: '' }));
+                                    }
+                                  }}
+                                  isInvalid={!!userProfileValidationErrors.fullName}
+                                  disabled={userProfileSaving}
+                                  maxLength={100}
+                                  size="lg"
+                                  autoComplete="name"
+                                />
+                                <Form.Control.Feedback type="invalid">
+                                  {userProfileValidationErrors.fullName}
+                                </Form.Control.Feedback>
+                              </Form.Group>
+                            </Col>
+                            <Col xs={12} md={6}>
+                              <Form.Group className="mb-4">
+                                <Form.Label>Phone Number <span className="text-danger">*</span></Form.Label>
+                                <Form.Control
+                                  type="tel"
+                                  value={userProfile.phoneNumber}
+                                  onChange={(e) => {
+                                    setUserProfile(prev => ({ ...prev, phoneNumber: e.target.value }));
+                                    if (userProfileValidationErrors.phoneNumber) {
+                                      setUserProfileValidationErrors(prev => ({ ...prev, phoneNumber: '' }));
+                                    }
+                                  }}
+                                  isInvalid={!!userProfileValidationErrors.phoneNumber}
+                                  placeholder="+1234567890"
+                                  disabled={userProfileSaving}
+                                  maxLength={20}
+                                  size="lg"
+                                  autoComplete="tel"
+                                  inputMode="tel"
+                                />
+                                <Form.Control.Feedback type="invalid">
+                                  {userProfileValidationErrors.phoneNumber}
+                                </Form.Control.Feedback>
+                              </Form.Group>
+                            </Col>
+                          </Row>
+
+                          <div className="d-grid d-md-flex justify-content-md-start">
+                            <Button
+                              type="submit"
+                              variant="primary"
+                              size="lg"
+                              disabled={
+                                userProfileSaving ||
+                                (userProfile.fullName.trim() === originalUserProfile.fullName &&
+                                  userProfile.phoneNumber.trim() === originalUserProfile.phoneNumber)
+                              }
+                              className="d-flex align-items-center justify-content-center"
+                            >
+                              {userProfileSaving ? (
+                                <>
+                                  <Spinner size="sm" className="me-2" />
+                                  Saving...
+                                </>
+                              ) : (
+                                <>
+                                  <Save size={16} className="me-2" />
+                                  Save Profile
+                                </>
+                              )}
+                            </Button>
+                          </div>
+                        </Form>
+                      </>
+                    )}
                   </div>
                 </Tab.Pane>
 
@@ -2656,6 +2724,24 @@ const Settings: React.FC = () => {
           </Card>
         </Col>
       </Row>
+
+      {/* Profile Save Success Modal */}
+      <Modal show={showProfileSuccessModal} onHide={() => setShowProfileSuccessModal(false)} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>Profile Saved</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <div className="text-center py-2">
+            <div className="mb-3" style={{ fontSize: '2.5rem' }}>✓</div>
+            <p className="mb-0">Your profile has been updated successfully.</p>
+          </div>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="primary" onClick={() => setShowProfileSuccessModal(false)}>
+            OK
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </Container>
   );
 };

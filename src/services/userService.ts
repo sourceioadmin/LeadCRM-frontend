@@ -138,11 +138,48 @@ export const resetUserPassword = async (id: number): Promise<ResetPasswordRespon
   return response.data;
 };
 
+export interface UserProfileData {
+  userId: number;
+  fullName: string;
+  email: string;
+  username: string;
+  phoneNumber: string;
+  companyId: number;
+  companyName: string;
+  roleName: string;
+  roleId: number;
+  managerId: number | null;
+  isActive: boolean;
+  isEmailVerified: boolean;
+  isSSOUser: boolean;
+  createdDate: string;
+}
+
+export interface UserProfileResponse {
+  success: boolean;
+  message: string;
+  data: UserProfileData;
+  errors?: string[];
+}
+
+export interface UpdateUserProfileData {
+  fullName: string;
+  phoneNumber: string;
+}
+
 /**
  * Get current user profile
  */
-export const getCurrentUserProfile = async (): Promise<UserResponse> => {
-  const response = await api.get<UserResponse>('/user/profile');
+export const getCurrentUserProfile = async (): Promise<UserProfileResponse> => {
+  const response = await api.get<UserProfileResponse>('/user/profile');
+  return response.data;
+};
+
+/**
+ * Update current user's own profile (fullName and phoneNumber)
+ */
+export const updateUserProfile = async (data: UpdateUserProfileData): Promise<UserProfileResponse> => {
+  const response = await api.put<UserProfileResponse>('/user/profile', data);
   return response.data;
 };
 
@@ -182,6 +219,7 @@ export default {
   toggleUserStatus,
   resetUserPassword,
   getCurrentUserProfile,
+  updateUserProfile,
   getReferralPartners
 };
 
