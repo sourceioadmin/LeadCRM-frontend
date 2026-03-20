@@ -98,7 +98,7 @@ const Settings: React.FC = () => {
   const [userProfileSaving, setUserProfileSaving] = useState(false);
   const [userProfileError, setUserProfileError] = useState<string>('');
   const [userProfileValidationErrors, setUserProfileValidationErrors] = useState<{ fullName?: string; phoneNumber?: string }>({});
-  const [showProfileSuccessModal, setShowProfileSuccessModal] = useState(false);
+  const [showProfileConfirmModal, setShowProfileConfirmModal] = useState(false);
 
   // Lead Sources state
   const [leadSources, setLeadSources] = useState<LeadSource[]>([]);
@@ -929,7 +929,6 @@ const Settings: React.FC = () => {
           fullName: d.fullName,
           phoneNumber: d.phoneNumber,
         });
-        setShowProfileSuccessModal(true);
       }
     } catch (error: any) {
       console.error('Error updating user profile:', error);
@@ -943,6 +942,7 @@ const Settings: React.FC = () => {
       }
     } finally {
       setUserProfileSaving(false);
+      setShowProfileConfirmModal(false);
     }
   };
 
@@ -1425,7 +1425,8 @@ const Settings: React.FC = () => {
 
                           <div className="d-grid d-md-flex justify-content-md-start">
                             <Button
-                              type="submit"
+                              type="button"
+                              onClick={() => setShowProfileConfirmModal(true)}
                               variant="primary"
                               size="lg"
                               disabled={
@@ -1448,6 +1449,48 @@ const Settings: React.FC = () => {
                               )}
                             </Button>
                           </div>
+
+                          {/* User Profile Confirmation Modal */}
+                          <Modal show={showProfileConfirmModal} onHide={() => setShowProfileConfirmModal(false)}>
+                            <Modal.Header closeButton>
+                              <Modal.Title>Save Profile</Modal.Title>
+                            </Modal.Header>
+                            <Modal.Body>
+                              <p>Are you sure you want to save these profile settings?</p>
+                              <div className="mt-3">
+                                <strong>Changes to be saved:</strong>
+                                <ul className="mb-0 mt-2">
+                                  {userProfile.fullName.trim() !== originalUserProfile.fullName && (
+                                    <li>Full Name: "{userProfile.fullName.trim()}"</li>
+                                  )}
+                                  {userProfile.phoneNumber.trim() !== originalUserProfile.phoneNumber && (
+                                    <li>Phone: "{userProfile.phoneNumber.trim()}"</li>
+                                  )}
+                                </ul>
+                              </div>
+                            </Modal.Body>
+                            <Modal.Footer>
+                              <Button variant="secondary" onClick={() => setShowProfileConfirmModal(false)}>
+                                Cancel
+                              </Button>
+                              <Button
+                                variant="primary"
+                                onClick={() => {
+                                  handleUpdateUserProfile({ preventDefault: () => {} } as React.FormEvent);
+                                }}
+                                disabled={userProfileSaving}
+                              >
+                                {userProfileSaving ? (
+                                  <>
+                                    <Spinner animation="border" size="sm" className="me-2" />
+                                    Saving...
+                                  </>
+                                ) : (
+                                  'Confirm Save'
+                                )}
+                              </Button>
+                            </Modal.Footer>
+                          </Modal>
                         </Form>
                       </>
                     )}
@@ -2750,24 +2793,6 @@ const Settings: React.FC = () => {
           </Card>
         </Col>
       </Row>
-
-      {/* Profile Save Success Modal */}
-      <Modal show={showProfileSuccessModal} onHide={() => setShowProfileSuccessModal(false)} centered>
-        <Modal.Header closeButton>
-          <Modal.Title>Profile Saved</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <div className="text-center py-2">
-            <div className="mb-3" style={{ fontSize: '2.5rem' }}>✓</div>
-            <p className="mb-0">Your profile has been updated successfully.</p>
-          </div>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="primary" onClick={() => setShowProfileSuccessModal(false)}>
-            OK
-          </Button>
-        </Modal.Footer>
-      </Modal>
     </Container>
   );
 };
