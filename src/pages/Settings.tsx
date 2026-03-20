@@ -124,6 +124,16 @@ const Settings: React.FC = () => {
   const [editStatusName, setEditStatusName] = useState('');
   const [editStatusOrder, setEditStatusOrder] = useState(0);
 
+  // Notification Settings state
+  const [notificationSettings, setNotificationSettings] = useState({
+    emailNotificationsEnabled: true,
+    whatsAppNotificationsEnabled: true,
+  });
+  const [originalNotificationSettings, setOriginalNotificationSettings] = useState({
+    emailNotificationsEnabled: true,
+    whatsAppNotificationsEnabled: true,
+  });
+
   // Email Settings state
   const [emailSettings, setEmailSettings] = useState<EmailSettings | null>(null);
   const [emailSettingsLoading, setEmailSettingsLoading] = useState(false);
@@ -199,6 +209,12 @@ const Settings: React.FC = () => {
           website: response.data.website || '',
           phone: response.data.phone || ''
         });
+        const notifs = {
+          emailNotificationsEnabled: response.data.emailNotificationsEnabled ?? true,
+          whatsAppNotificationsEnabled: response.data.whatsAppNotificationsEnabled ?? true,
+        };
+        setNotificationSettings(notifs);
+        setOriginalNotificationSettings(notifs);
         // Construct full logo URL if logo exists (relative path needs backend base URL)
         const fullLogoUrl = response.data.logo ? `${BACKEND_BASE_URL}${response.data.logo}` : null;
         setLogoPreview(fullLogoUrl);
@@ -329,7 +345,9 @@ const Settings: React.FC = () => {
         size: formData.size || undefined,
         website: formData.website || undefined,
         phone: formData.phone || undefined,
-        logoFile: logoFile || undefined
+        logoFile: logoFile || undefined,
+        emailNotificationsEnabled: notificationSettings.emailNotificationsEnabled,
+        whatsAppNotificationsEnabled: notificationSettings.whatsAppNotificationsEnabled,
       };
 
       const response = await updateCompanySettings(updateData);
@@ -343,10 +361,18 @@ const Settings: React.FC = () => {
         if (response.data.website !== companySettings?.website) updatedFields.push('Website');
         if (response.data.phone !== companySettings?.phone) updatedFields.push('Phone');
         if (logoFile || response.data.logo !== companySettings?.logo) updatedFields.push('Logo');
+        if (response.data.emailNotificationsEnabled !== companySettings?.emailNotificationsEnabled) updatedFields.push('Email Notifications');
+        if (response.data.whatsAppNotificationsEnabled !== companySettings?.whatsAppNotificationsEnabled) updatedFields.push('WhatsApp Notifications');
 
         setCompanySettings(response.data);
         setLogoFile(null); // Clear the selected file after successful upload
         setOriginalCompanyFormData({ ...formData });
+        const savedNotifs = {
+          emailNotificationsEnabled: response.data.emailNotificationsEnabled,
+          whatsAppNotificationsEnabled: response.data.whatsAppNotificationsEnabled,
+        };
+        setNotificationSettings(savedNotifs);
+        setOriginalNotificationSettings(savedNotifs);
 
         // Update logo preview with full URL if logo was updated
         if (response.data.logo) {
@@ -1199,6 +1225,46 @@ const Settings: React.FC = () => {
                           </Col>
                         </Row>
 
+                        <hr className="my-4" />
+                        <h4 className="mb-1">Notifications</h4>
+                        <p className="text-muted mb-3">Control which notification channels are active for your company.</p>
+                        <Row>
+                          <Col md={6}>
+                            <div className="d-flex align-items-center justify-content-between p-3 border rounded mb-3">
+                              <div className="d-flex align-items-center">
+                                <Mail size={20} className="me-3 text-primary" />
+                                <div>
+                                  <div className="fw-semibold">Email Notifications</div>
+                                  <div className="text-muted small">Send notifications via email to team members</div>
+                                </div>
+                              </div>
+                              <Form.Check
+                                type="switch"
+                                id="emailNotificationsSwitch"
+                                checked={notificationSettings.emailNotificationsEnabled}
+                                onChange={(e) => setNotificationSettings(prev => ({ ...prev, emailNotificationsEnabled: e.target.checked }))}
+                              />
+                            </div>
+                          </Col>
+                          <Col md={6}>
+                            <div className="d-flex align-items-center justify-content-between p-3 border rounded mb-3">
+                              <div className="d-flex align-items-center">
+                                <Smartphone size={20} className="me-3 text-success" />
+                                <div>
+                                  <div className="fw-semibold">WhatsApp Notifications</div>
+                                  <div className="text-muted small">Send notifications via WhatsApp to team members</div>
+                                </div>
+                              </div>
+                              <Form.Check
+                                type="switch"
+                                id="whatsAppNotificationsSwitch"
+                                checked={notificationSettings.whatsAppNotificationsEnabled}
+                                onChange={(e) => setNotificationSettings(prev => ({ ...prev, whatsAppNotificationsEnabled: e.target.checked }))}
+                              />
+                            </div>
+                          </Col>
+                        </Row>
+
                         <div className="d-flex justify-content-end">
                           <Button
                             type="submit"
@@ -1212,7 +1278,9 @@ const Settings: React.FC = () => {
                                 formData.size === originalCompanyFormData.size &&
                                 formData.website === originalCompanyFormData.website &&
                                 formData.phone === originalCompanyFormData.phone &&
-                                logoFile === null
+                                logoFile === null &&
+                                notificationSettings.emailNotificationsEnabled === originalNotificationSettings.emailNotificationsEnabled &&
+                                notificationSettings.whatsAppNotificationsEnabled === originalNotificationSettings.whatsAppNotificationsEnabled
                               )
                             }
                           >
@@ -1265,6 +1333,12 @@ const Settings: React.FC = () => {
                             )}
                             {logoFile && (
                               <li>Logo: New file selected ({logoFile.name})</li>
+                            )}
+                            {notificationSettings.emailNotificationsEnabled !== originalNotificationSettings.emailNotificationsEnabled && (
+                              <li>Email Notifications: {notificationSettings.emailNotificationsEnabled ? 'Enabled' : 'Disabled'}</li>
+                            )}
+                            {notificationSettings.whatsAppNotificationsEnabled !== originalNotificationSettings.whatsAppNotificationsEnabled && (
+                              <li>WhatsApp Notifications: {notificationSettings.whatsAppNotificationsEnabled ? 'Enabled' : 'Disabled'}</li>
                             )}
                           </ul>
                           {Object.values(formData).every(value =>

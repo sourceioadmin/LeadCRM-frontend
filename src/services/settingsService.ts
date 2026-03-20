@@ -7,6 +7,8 @@ export interface CompanySettings {
   website?: string;
   phone?: string;
   logo?: string;
+  emailNotificationsEnabled: boolean;
+  whatsAppNotificationsEnabled: boolean;
 }
 
 export interface CompanySettingsResponse {
@@ -24,6 +26,8 @@ export interface UpdateCompanySettingsData {
   phone?: string;
   logoFile?: File;
   removeLogo?: boolean; // Flag to indicate logo should be removed
+  emailNotificationsEnabled: boolean;
+  whatsAppNotificationsEnabled: boolean;
 }
 
 export interface LeadSource {
@@ -111,6 +115,9 @@ export const updateCompanySettings = async (data: UpdateCompanySettingsData): Pr
   } else if (data.removeLogo) {
     formData.append('removeLogo', 'true');
   }
+
+  formData.append('emailNotificationsEnabled', data.emailNotificationsEnabled.toString());
+  formData.append('whatsAppNotificationsEnabled', data.whatsAppNotificationsEnabled.toString());
 
   const response = await api.put<CompanySettingsResponse>('/settings/company', formData, {
     headers: {
