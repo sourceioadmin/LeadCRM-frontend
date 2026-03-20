@@ -31,6 +31,7 @@ export default defineConfig({
       scss: {
         additionalData: `@import "bootstrap/scss/functions";`,
         quietDeps: true, // Suppresses warnings from dependencies
+        silenceDeprecations: ['import'], // Silence @import deprecation until Bootstrap migrates to @use
       },
     },
   },
