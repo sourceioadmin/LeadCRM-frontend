@@ -73,6 +73,13 @@ const Settings: React.FC = () => {
     website: '',
     phone: ''
   });
+  const [originalCompanyFormData, setOriginalCompanyFormData] = useState({
+    companyName: '',
+    industry: '',
+    size: '',
+    website: '',
+    phone: ''
+  });
 
   // User Profile state
   const [userProfile, setUserProfile] = useState({
@@ -179,6 +186,13 @@ const Settings: React.FC = () => {
       if (response.success && response.data) {
         setCompanySettings(response.data);
         setFormData({
+          companyName: response.data.companyName,
+          industry: response.data.industry || '',
+          size: response.data.size || '',
+          website: response.data.website || '',
+          phone: response.data.phone || ''
+        });
+        setOriginalCompanyFormData({
           companyName: response.data.companyName,
           industry: response.data.industry || '',
           size: response.data.size || '',
@@ -332,6 +346,7 @@ const Settings: React.FC = () => {
 
         setCompanySettings(response.data);
         setLogoFile(null); // Clear the selected file after successful upload
+        setOriginalCompanyFormData({ ...formData });
 
         // Update logo preview with full URL if logo was updated
         if (response.data.logo) {
@@ -1188,7 +1203,18 @@ const Settings: React.FC = () => {
                           <Button
                             type="submit"
                             variant="primary"
-                            disabled={saving || !formData.companyName.trim()}
+                            disabled={
+                              saving ||
+                              !formData.companyName.trim() ||
+                              (
+                                formData.companyName === originalCompanyFormData.companyName &&
+                                formData.industry === originalCompanyFormData.industry &&
+                                formData.size === originalCompanyFormData.size &&
+                                formData.website === originalCompanyFormData.website &&
+                                formData.phone === originalCompanyFormData.phone &&
+                                logoFile === null
+                              )
+                            }
                           >
                             {saving ? (
                               <>
