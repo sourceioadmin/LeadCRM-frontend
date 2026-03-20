@@ -1438,3 +1438,22 @@ input[type="date"].form-control:focus {
     overflow-x: auto !important;
   }
 }
+
+/* ===== SETTINGS TABS ===== */
+.nav-tabs .nav-link {
+  color: var(--color-text-secondary);
+  border-color: transparent;
+}
+
+.nav-tabs .nav-link:hover {
+  color: var(--color-text-primary);
+  border-color: transparent;
+}
+
+.nav-tabs .nav-link.active {
+  color: #3B82F6;
+  font-weight: var(--font-semibold);
+  border-color: #dee2e6 #dee2e6 #fff;
+  border-bottom-color: transparent;
+  border-top: 2px solid #3B82F6;
+}
