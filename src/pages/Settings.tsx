@@ -30,6 +30,13 @@ import {
   testEmailSettings,
   EmailSettings,
   UpdateEmailSettingsData,
+  getInterestedInOptionsAll,
+  createInterestedInOption,
+  updateInterestedInOption,
+  deleteInterestedInOption,
+  InterestedInOption,
+  CreateInterestedInOptionData,
+  UpdateInterestedInOptionData,
 } from '../services/settingsService';
 import { useToast } from '../components/Toast';
 import { getCurrentUserProfile, updateUserProfile } from '../services/userService';
@@ -124,6 +131,15 @@ const Settings: React.FC = () => {
   const [editStatusName, setEditStatusName] = useState('');
   const [editStatusOrder, setEditStatusOrder] = useState(0);
 
+  // Interested In Options state
+  const [interestedInOptions, setInterestedInOptions] = useState<InterestedInOption[]>([]);
+  const [interestedInOptionsLoading, setInterestedInOptionsLoading] = useState(false);
+  const [showAddInterestedInModal, setShowAddInterestedInModal] = useState(false);
+  const [editingInterestedIn, setEditingInterestedIn] = useState<InterestedInOption | null>(null);
+  const [deletingInterestedIn, setDeletingInterestedIn] = useState<InterestedInOption | null>(null);
+  const [newInterestedInName, setNewInterestedInName] = useState('');
+  const [editInterestedInName, setEditInterestedInName] = useState('');
+
   // Notification Settings state
   const [notificationSettings, setNotificationSettings] = useState({
     emailNotificationsEnabled: true,
@@ -170,6 +186,13 @@ const Settings: React.FC = () => {
   useEffect(() => {
     if (activeTab === 'lead-statuses') {
       loadLeadStatuses();
+    }
+  }, [activeTab]);
+
+  // Load interested-in options when tab changes to interested-in
+  useEffect(() => {
+    if (activeTab === 'interested-in') {
+      loadInterestedInOptions();
     }
   }, [activeTab]);
 
@@ -580,6 +603,98 @@ const Settings: React.FC = () => {
     } finally {
       setSeeding(false);
     }
+  };
+
+  // Interested In Options handlers
+  const loadInterestedInOptions = async () => {
+    try {
+      setInterestedInOptionsLoading(true);
+      const response = await getInterestedInOptionsAll();
+      if (response.success && response.data) {
+        setInterestedInOptions(response.data);
+      } else {
+        showError('Error', response.message || 'Failed to load interested-in options');
+      }
+    } catch (error) {
+      showError('Error', 'Failed to load interested-in options');
+      console.error('Error loading interested-in options:', error);
+    } finally {
+      setInterestedInOptionsLoading(false);
+    }
+  };
+
+  const handleCreateInterestedInOption = async () => {
+    if (!newInterestedInName.trim()) {
+      showError('Validation Error', 'Option name is required');
+      return;
+    }
+    try {
+      const data: CreateInterestedInOptionData = { name: newInterestedInName.trim() };
+      const response = await createInterestedInOption(data);
+      if (response.success) {
+        showSuccess('Success', 'Option created successfully');
+        setShowAddInterestedInModal(false);
+        setNewInterestedInName('');
+        await loadInterestedInOptions();
+      } else {
+        showError('Error', response.message || 'Failed to create option');
+      }
+    } catch (error) {
+      showError('Error', 'Failed to create option');
+      console.error('Error creating interested-in option:', error);
+    }
+  };
+
+  const handleUpdateInterestedInOption = async (option: InterestedInOption, newName: string, isActive: boolean) => {
+    if (!newName.trim()) {
+      showError('Validation Error', 'Option name is required');
+      return;
+    }
+    try {
+      const data: UpdateInterestedInOptionData = { name: newName.trim(), isActive };
+      const response = await updateInterestedInOption(option.interestedInOptionId, data);
+      if (response.success) {
+        showSuccess('Success', 'Option updated successfully');
+        setEditingInterestedIn(null);
+        setEditInterestedInName('');
+        await loadInterestedInOptions();
+      } else {
+        showError('Error', response.message || 'Failed to update option');
+      }
+    } catch (error) {
+      showError('Error', 'Failed to update option');
+      console.error('Error updating interested-in option:', error);
+    }
+  };
+
+  const handleDeleteInterestedInOption = async (option: InterestedInOption) => {
+    try {
+      const response = await deleteInterestedInOption(option.interestedInOptionId);
+      if (response.success) {
+        showSuccess('Success', 'Option deleted successfully');
+        setDeletingInterestedIn(null);
+        await loadInterestedInOptions();
+      } else {
+        showError('Error', response.message || 'Failed to delete option');
+      }
+    } catch (error) {
+      showError('Error', 'Failed to delete option');
+      console.error('Error deleting interested-in option:', error);
+    }
+  };
+
+  const startEditingInterestedIn = (option: InterestedInOption) => {
+    setEditingInterestedIn(option);
+    setEditInterestedInName(option.name);
+  };
+
+  const cancelEditingInterestedIn = () => {
+    setEditingInterestedIn(null);
+    setEditInterestedInName('');
+  };
+
+  const handleToggleInterestedInActive = async (option: InterestedInOption) => {
+    await handleUpdateInterestedInOption(option, option.name, !option.isActive);
   };
 
   // Lead Status handlers
@@ -1041,21 +1156,13 @@ const Settings: React.FC = () => {
                     </Nav.Item>
                   </>
                 )}
-                {isAdmin && user?.roleName === 'System Admin' && (
-                  <>
-                    <Nav.Item>
-                      <Nav.Link eventKey="lead-sources" className="d-flex align-items-center">
-                        <Database size={16} className="me-2" />
-                        Lead Sources
-                      </Nav.Link>
-                    </Nav.Item>
-                    <Nav.Item>
-                      <Nav.Link eventKey="lead-statuses" className="d-flex align-items-center">
-                        <BarChart3 size={16} className="me-2" />
-                        Lead Statuses
-                      </Nav.Link>
-                    </Nav.Item>
-                  </>
+                {isAdmin && (
+                  <Nav.Item>
+                    <Nav.Link eventKey="interested-in" className="d-flex align-items-center">
+                      <Check size={16} className="me-2" />
+                      Interested In Options
+                    </Nav.Link>
+                  </Nav.Item>
                 )}
                 {/* Hidden: Email Settings Tab
                 {isAdmin && (
@@ -2861,6 +2968,255 @@ const Settings: React.FC = () => {
                     </Modal>
                   </div>
                 </Tab.Pane>
+                )}
+
+                {isAdmin && (
+                  <Tab.Pane eventKey="interested-in" active={activeTab === 'interested-in'}>
+                  <div className="p-4">
+                    <div className="d-flex justify-content-between align-items-center mb-3">
+                      <div>
+                        <h4 className="mb-1">Interested In Options</h4>
+                        <p className="text-muted mb-0">Manage the checklist options available on the Add/Edit Lead form.</p>
+                      </div>
+                      <Button
+                        variant="primary"
+                        onClick={() => setShowAddInterestedInModal(true)}
+                        className="d-flex align-items-center"
+                      >
+                        <Plus size={16} className="me-2" />
+                        Add New Option
+                      </Button>
+                    </div>
+
+                    {interestedInOptionsLoading ? (
+                      <div className="text-center py-4">
+                        <Spinner animation="border" />
+                        <p className="mt-2">Loading options...</p>
+                      </div>
+                    ) : (
+                      <div className="table-responsive">
+                        {/* Mobile Card View */}
+                        <div className="d-block d-md-none">
+                          {interestedInOptions.length === 0 ? (
+                            <div className="text-center py-5 p-3">
+                              <div className="text-muted mb-3">
+                                <Check size={48} className="mb-3 opacity-50" />
+                                <h5>No Options Found</h5>
+                                <p className="mb-3">Add options that clients can select when expressing interest.</p>
+                              </div>
+                              <Button variant="primary" onClick={() => setShowAddInterestedInModal(true)} className="w-100">
+                                <Plus size={16} className="me-2" />
+                                Add Option
+                              </Button>
+                            </div>
+                          ) : (
+                            <div className="row g-3">
+                              {interestedInOptions.map((option) => (
+                                <div key={option.interestedInOptionId} className="col-12">
+                                  <Card className="h-100 shadow-sm">
+                                    <Card.Body className="p-3">
+                                      <div className="d-flex justify-content-between align-items-start mb-2">
+                                        <div className="flex-grow-1">
+                                          {editingInterestedIn?.interestedInOptionId === option.interestedInOptionId ? (
+                                            <Form.Control
+                                              type="text"
+                                              value={editInterestedInName}
+                                              onChange={(e) => setEditInterestedInName(e.target.value)}
+                                              onKeyDown={(e) => {
+                                                if (e.key === 'Enter') handleUpdateInterestedInOption(option, editInterestedInName, option.isActive);
+                                                else if (e.key === 'Escape') cancelEditingInterestedIn();
+                                              }}
+                                              autoFocus
+                                              maxLength={100}
+                                              className="mb-2"
+                                            />
+                                          ) : (
+                                            <h6 className="mb-1 text-truncate" title={option.name}>{option.name}</h6>
+                                          )}
+                                        </div>
+                                        <div className="d-flex gap-1">
+                                          <Badge bg={option.isActive ? 'success' : 'secondary'} className="ms-2 flex-shrink-0">
+                                            {option.isActive ? 'Active' : 'Inactive'}
+                                          </Badge>
+                                        </div>
+                                      </div>
+
+                                      <div className="row g-2 text-sm">
+                                        <div className="col-6">
+                                          <small className="text-muted d-block"><i className="bi bi-hash me-1"></i>ID</small>
+                                          <span>{option.interestedInOptionId}</span>
+                                        </div>
+                                        <div className="col-6">
+                                          <small className="text-muted d-block"><i className="bi bi-calendar me-1"></i>Created</small>
+                                          <span>{option.createdDate ? new Date(option.createdDate).toLocaleDateString() : 'N/A'}</span>
+                                        </div>
+                                      </div>
+
+                                      <div className="d-flex gap-2 mt-3 pt-2 border-top">
+                                        {editingInterestedIn?.interestedInOptionId === option.interestedInOptionId ? (
+                                          <>
+                                            <Button variant="outline-success" size="sm" onClick={() => handleUpdateInterestedInOption(option, editInterestedInName, option.isActive)} className="flex-fill">
+                                              <Check size={14} className="me-1" />Save
+                                            </Button>
+                                            <Button variant="outline-secondary" size="sm" onClick={cancelEditingInterestedIn} className="flex-fill">
+                                              <XIcon size={14} className="me-1" />Cancel
+                                            </Button>
+                                          </>
+                                        ) : (
+                                          <>
+                                            <Button variant="outline-primary" size="sm" onClick={() => startEditingInterestedIn(option)} className="flex-fill">
+                                              <Edit2 size={14} className="me-1" />Edit
+                                            </Button>
+                                            <Button variant="outline-warning" size="sm" onClick={() => handleToggleInterestedInActive(option)} className="flex-fill">
+                                              {option.isActive ? <ToggleRight size={14} className="me-1" /> : <ToggleLeft size={14} className="me-1" />}
+                                              {option.isActive ? 'Deactivate' : 'Activate'}
+                                            </Button>
+                                            <Button variant="outline-danger" size="sm" onClick={() => setDeletingInterestedIn(option)} className="flex-fill">
+                                              <Trash2 size={14} className="me-1" />Delete
+                                            </Button>
+                                          </>
+                                        )}
+                                      </div>
+                                    </Card.Body>
+                                  </Card>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Desktop Table View */}
+                        <div className="d-none d-md-block">
+                          <Table hover className="mb-0">
+                            <thead className="table-light">
+                              <tr>
+                                <th style={{ width: '45%' }}>Name</th>
+                                <th style={{ width: '20%' }}>Status</th>
+                                <th style={{ width: '20%' }}>Created</th>
+                                <th className="text-center">Actions</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {interestedInOptions.length === 0 ? (
+                                <tr>
+                                  <td colSpan={4} className="text-center py-5">
+                                    <div className="text-muted mb-3">
+                                      <Check size={48} className="mb-3 opacity-50" />
+                                      <h5>No Options Found</h5>
+                                      <p>Add options that clients can select when expressing interest.</p>
+                                    </div>
+                                    <Button variant="primary" onClick={() => setShowAddInterestedInModal(true)}>
+                                      <Plus size={16} className="me-2" />
+                                      Add Option
+                                    </Button>
+                                  </td>
+                                </tr>
+                              ) : (
+                                interestedInOptions.map((option) => (
+                                  <tr key={option.interestedInOptionId}>
+                                    <td>
+                                      {editingInterestedIn?.interestedInOptionId === option.interestedInOptionId ? (
+                                        <Form.Control
+                                          type="text"
+                                          value={editInterestedInName}
+                                          onChange={(e) => setEditInterestedInName(e.target.value)}
+                                          onKeyDown={(e) => {
+                                            if (e.key === 'Enter') handleUpdateInterestedInOption(option, editInterestedInName, option.isActive);
+                                            else if (e.key === 'Escape') cancelEditingInterestedIn();
+                                          }}
+                                          autoFocus
+                                          maxLength={100}
+                                        />
+                                      ) : (
+                                        option.name
+                                      )}
+                                    </td>
+                                    <td>
+                                      <Badge bg={option.isActive ? 'success' : 'secondary'}>
+                                        {option.isActive ? 'Active' : 'Inactive'}
+                                      </Badge>
+                                    </td>
+                                    <td>{option.createdDate ? new Date(option.createdDate).toLocaleDateString() : 'N/A'}</td>
+                                    <td className="text-center">
+                                      {editingInterestedIn?.interestedInOptionId === option.interestedInOptionId ? (
+                                        <div className="d-flex gap-1 justify-content-center">
+                                          <Button variant="outline-success" size="sm" onClick={() => handleUpdateInterestedInOption(option, editInterestedInName, option.isActive)}>
+                                            <Check size={14} />
+                                          </Button>
+                                          <Button variant="outline-secondary" size="sm" onClick={cancelEditingInterestedIn}>
+                                            <XIcon size={14} />
+                                          </Button>
+                                        </div>
+                                      ) : (
+                                        <div className="d-flex gap-1 justify-content-center">
+                                          <Button variant="outline-primary" size="sm" title="Edit" onClick={() => startEditingInterestedIn(option)}>
+                                            <Edit2 size={14} />
+                                          </Button>
+                                          <Button variant="outline-warning" size="sm" title={option.isActive ? 'Deactivate' : 'Activate'} onClick={() => handleToggleInterestedInActive(option)}>
+                                            {option.isActive ? <ToggleRight size={14} /> : <ToggleLeft size={14} />}
+                                          </Button>
+                                          <Button variant="outline-danger" size="sm" title="Delete" onClick={() => setDeletingInterestedIn(option)}>
+                                            <Trash2 size={14} />
+                                          </Button>
+                                        </div>
+                                      )}
+                                    </td>
+                                  </tr>
+                                ))
+                              )}
+                            </tbody>
+                          </Table>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Add New Option Modal */}
+                    <Modal show={showAddInterestedInModal} onHide={() => setShowAddInterestedInModal(false)}>
+                      <Modal.Header closeButton>
+                        <Modal.Title>Add New Interested In Option</Modal.Title>
+                      </Modal.Header>
+                      <Modal.Body>
+                        <Form.Group className="mb-3">
+                          <Form.Label>Option Name *</Form.Label>
+                          <Form.Control
+                            type="text"
+                            value={newInterestedInName}
+                            onChange={(e) => setNewInterestedInName(e.target.value)}
+                            placeholder="e.g., Product Demo"
+                            maxLength={100}
+                            onKeyDown={(e) => { if (e.key === 'Enter') handleCreateInterestedInOption(); }}
+                          />
+                          <Form.Text className="text-muted">Maximum 100 characters</Form.Text>
+                        </Form.Group>
+                      </Modal.Body>
+                      <Modal.Footer>
+                        <Button variant="secondary" onClick={() => setShowAddInterestedInModal(false)}>Cancel</Button>
+                        <Button variant="primary" onClick={handleCreateInterestedInOption} disabled={!newInterestedInName.trim()}>
+                          Create Option
+                        </Button>
+                      </Modal.Footer>
+                    </Modal>
+
+                    {/* Delete Confirmation Modal */}
+                    <Modal show={!!deletingInterestedIn} onHide={() => setDeletingInterestedIn(null)}>
+                      <Modal.Header closeButton>
+                        <Modal.Title>Delete Option</Modal.Title>
+                      </Modal.Header>
+                      <Modal.Body>
+                        <p>Are you sure you want to delete <strong>"{deletingInterestedIn?.name}"</strong>?</p>
+                        <Alert variant="warning">
+                          <strong>Note:</strong> This will deactivate the option if it is currently in use by existing leads.
+                        </Alert>
+                      </Modal.Body>
+                      <Modal.Footer>
+                        <Button variant="secondary" onClick={() => setDeletingInterestedIn(null)}>Cancel</Button>
+                        <Button variant="danger" onClick={() => deletingInterestedIn && handleDeleteInterestedInOption(deletingInterestedIn)}>
+                          Delete
+                        </Button>
+                      </Modal.Footer>
+                    </Modal>
+                  </div>
+                  </Tab.Pane>
                 )}
               </Tab.Content>
             </Card.Body>

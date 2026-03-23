@@ -1,5 +1,5 @@
 import api from './api';
-import { Lead, LeadSource, LeadStatus, Urgency, UpcomingFollowupsResponse, RescheduleFollowupRequest, AddNoteRequest } from '../types/Lead';
+import { Lead, LeadSource, LeadStatus, Urgency, InterestedInOption, UpcomingFollowupsResponse, RescheduleFollowupRequest, AddNoteRequest } from '../types/Lead';
 
 // Additional types for My Leads functionality
 export interface PaginatedLeadResponse {
@@ -48,6 +48,7 @@ export interface CreateLeadRequest {
   leadSourceId: number;
   referredBy?: string;
   interestedIn?: string;
+  selectedInterestedInOptionIds?: number[];
   expectedBudget?: number;
   urgencyLevelId?: number;
   leadStatusId?: number;
@@ -65,6 +66,7 @@ export interface UpdateLeadRequest {
   leadSourceId: number;
   referredBy?: string;
   interestedIn?: string;
+  selectedInterestedInOptionIds?: number[];
   expectedBudget?: number;
   urgencyLevelId?: number;
   leadStatusId: number;
@@ -124,6 +126,14 @@ export const getLeadStatuses = async (): Promise<ApiResponse<LeadStatus[]>> => {
  */
 export const getUrgencyLevels = async (): Promise<ApiResponse<Urgency[]>> => {
   const response = await api.get('/urgency-levels');
+  return response.data;
+};
+
+/**
+ * Get active "Interested In" options for the current user's company
+ */
+export const getInterestedInOptions = async (): Promise<ApiResponse<InterestedInOption[]>> => {
+  const response = await api.get('/interested-in-options');
   return response.data;
 };
 

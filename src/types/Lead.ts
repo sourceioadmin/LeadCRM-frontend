@@ -1,3 +1,12 @@
+export interface InterestedInOption {
+  interestedInOptionId: number;
+  companyId: number;
+  name: string;
+  isActive: boolean;
+  createdDate: string;
+  updatedDate?: string;
+}
+
 export interface Lead {
   leadId: number;
   companyId: number;
@@ -12,6 +21,7 @@ export interface Lead {
   leadSourceName?: string; // Added for display
   referredBy?: string;
   interestedIn?: string;
+  selectedInterestedInOptions?: InterestedInOption[]; // Added for display
   expectedBudget?: number;
   urgencyLevelId?: number;
   urgencyLevelName?: string; // Added for display

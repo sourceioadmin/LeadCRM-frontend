@@ -284,3 +284,60 @@ export const testEmailSettings = async (): Promise<TestEmailResponse> => {
   const response = await api.post<TestEmailResponse>('/settings/email/test');
   return response.data;
 };
+
+// Interested In Options interfaces and API calls
+export interface InterestedInOption {
+  interestedInOptionId: number;
+  name: string;
+  isActive: boolean;
+  createdDate: string;
+  updatedDate?: string;
+}
+
+export interface InterestedInOptionsResponse {
+  success: boolean;
+  message: string;
+  data: InterestedInOption[];
+  errors?: string[];
+}
+
+export interface CreateInterestedInOptionData {
+  name: string;
+}
+
+export interface UpdateInterestedInOptionData {
+  name: string;
+  isActive: boolean;
+}
+
+/**
+ * Get all "Interested In" options including inactive (for Settings page — Admin only)
+ */
+export const getInterestedInOptionsAll = async (): Promise<InterestedInOptionsResponse> => {
+  const response = await api.get<InterestedInOptionsResponse>('/interested-in-options/all');
+  return response.data;
+};
+
+/**
+ * Create a new "Interested In" option
+ */
+export const createInterestedInOption = async (data: CreateInterestedInOptionData): Promise<InterestedInOptionsResponse> => {
+  const response = await api.post<InterestedInOptionsResponse>('/interested-in-options', data);
+  return response.data;
+};
+
+/**
+ * Update an existing "Interested In" option
+ */
+export const updateInterestedInOption = async (id: number, data: UpdateInterestedInOptionData): Promise<InterestedInOptionsResponse> => {
+  const response = await api.put<InterestedInOptionsResponse>(`/interested-in-options/${id}`, data);
+  return response.data;
+};
+
+/**
+ * Deactivate (delete) an "Interested In" option
+ */
+export const deleteInterestedInOption = async (id: number): Promise<{ success: boolean; message: string; data: boolean; errors?: string[] }> => {
+  const response = await api.delete<{ success: boolean; message: string; data: boolean; errors?: string[] }>(`/interested-in-options/${id}`);
+  return response.data;
+};

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Modal, Button, Form, Alert, Spinner, Row, Col, Card, Badge, InputGroup, Dropdown } from 'react-bootstrap';
-import { createLead, getLead, updateLead, getLeadSources, getLeadStatuses, getUrgencyLevels, getAssignableUsers } from '../services/leadService';
-import { LeadSource, LeadStatus, Urgency, Lead } from '../types/Lead';
+import { createLead, getLead, updateLead, getLeadSources, getLeadStatuses, getUrgencyLevels, getAssignableUsers, getInterestedInOptions } from '../services/leadService';
+import { LeadSource, LeadStatus, Urgency, InterestedInOption, Lead } from '../types/Lead';
 import { useAuth } from '../contexts/AuthContext';
 import { formatDate, formatDateForInput, getTodayForInput } from '../utils/dateUtils';
 import { getReferralPartners, User } from '../services/userService';
@@ -93,6 +93,8 @@ const AddLeadModal: React.FC<AddLeadModalProps> = ({ show, onHide, onSuccess, le
   const [leadSources, setLeadSources] = useState<LeadSource[]>([]);
   const [leadStatuses, setLeadStatuses] = useState<LeadStatus[]>([]);
   const [urgencyLevels, setUrgencyLevels] = useState<Urgency[]>([]);
+  const [interestedInOptions, setInterestedInOptions] = useState<InterestedInOption[]>([]);
+  const [selectedInterestedInOptionIds, setSelectedInterestedInOptionIds] = useState<number[]>([]);
   const [users, setUsers] = useState<any[]>([]);
   const [loadingOptions, setLoadingOptions] = useState(false);
 
@@ -233,6 +235,7 @@ const AddLeadModal: React.FC<AddLeadModalProps> = ({ show, onHide, onSuccess, le
           followupDate: '',
           notes: ''
         });
+        setSelectedInterestedInOptionIds([]);
         // Reset combobox state
         setReferredByUserId(null);
         setShowReferralPartnerDropdown(false);
@@ -340,6 +343,16 @@ const AddLeadModal: React.FC<AddLeadModalProps> = ({ show, onHide, onSuccess, le
         hasErrors = true;
       }
 
+      try {
+        const interestedInRes = await getInterestedInOptions();
+        if (interestedInRes.success && interestedInRes.data) {
+          setInterestedInOptions(interestedInRes.data);
+        }
+      } catch {
+        // Not a critical failure — form still works without checklist options
+        console.warn('Failed to load interested-in options');
+      }
+
       const usersRes = await getAssignableUsers();
       if (usersRes.success && usersRes.data) {
         setUsers(usersRes.data);
@@ -404,6 +417,13 @@ const AddLeadModal: React.FC<AddLeadModalProps> = ({ show, onHide, onSuccess, le
         followupDate: formatDateForInput(leadData.followupDate),
         notes: leadData.notes || ''
       });
+
+      // Pre-select interested-in options
+      if (leadData.selectedInterestedInOptions) {
+        setSelectedInterestedInOptionIds(leadData.selectedInterestedInOptions.map(o => o.interestedInOptionId));
+      } else {
+        setSelectedInterestedInOptionIds([]);
+      }
 
       // Try to match referredBy with a Referral Partner
       // This will be handled after referral partners are loaded
@@ -585,7 +605,15 @@ const AddLeadModal: React.FC<AddLeadModalProps> = ({ show, onHide, onSuccess, le
         referredByUserId: isReferralPartner 
           ? user?.userId 
           : (isReferralSource() && referredByUserId ? referredByUserId : undefined),
-        interestedIn: formData.interestedIn.trim() || undefined,
+        interestedIn: (() => {
+          const selectedNames = selectedInterestedInOptionIds
+            .map(id => interestedInOptions.find(o => o.interestedInOptionId === id)?.name)
+            .filter(Boolean) as string[];
+          const freeText = formData.interestedIn.trim();
+          const parts = [...selectedNames, ...(freeText ? [freeText] : [])];
+          return parts.length > 0 ? parts.join(', ') : undefined;
+        })(),
+        selectedInterestedInOptionIds: selectedInterestedInOptionIds.length > 0 ? selectedInterestedInOptionIds : [],
         expectedBudget: formData.expectedBudget ? parseFloat(formData.expectedBudget) : undefined,
         urgencyLevelId: formData.urgencyLevelId && formData.urgencyLevelId !== '' 
           ? parseInt(formData.urgencyLevelId) 
@@ -646,6 +674,7 @@ const AddLeadModal: React.FC<AddLeadModalProps> = ({ show, onHide, onSuccess, le
             followupDate: '',
             notes: ''
           });
+          setSelectedInterestedInOptionIds([]);
           // Reset combobox state
           setReferredByUserId(null);
           setShowReferralPartnerDropdown(false);
@@ -707,6 +736,7 @@ const AddLeadModal: React.FC<AddLeadModalProps> = ({ show, onHide, onSuccess, le
           followupDate: '',
           notes: ''
         });
+        setSelectedInterestedInOptionIds([]);
       }
       setErrors({});
       setError(null);
@@ -1274,15 +1304,37 @@ const AddLeadModal: React.FC<AddLeadModalProps> = ({ show, onHide, onSuccess, le
                       <Col xs={12}>
                         <Form.Group className="mb-3">
                           <Form.Label className="fw-medium">Interested In</Form.Label>
+                          {interestedInOptions.length > 0 && (
+                            <div className="mb-2 p-2 border rounded" style={{ background: 'var(--bs-light, #f8f9fa)' }}>
+                              {interestedInOptions.map((option) => (
+                                <Form.Check
+                                  key={option.interestedInOptionId}
+                                  type="checkbox"
+                                  id={`interested-in-${option.interestedInOptionId}`}
+                                  label={option.name}
+                                  checked={selectedInterestedInOptionIds.includes(option.interestedInOptionId)}
+                                  onChange={(e) => {
+                                    if (e.target.checked) {
+                                      setSelectedInterestedInOptionIds(prev => [...prev, option.interestedInOptionId]);
+                                    } else {
+                                      setSelectedInterestedInOptionIds(prev => prev.filter(id => id !== option.interestedInOptionId));
+                                    }
+                                  }}
+                                  disabled={loading || isLeadReadonly}
+                                  className="mb-1"
+                                />
+                              ))}
+                            </div>
+                          )}
                           <Form.Control
                             as="textarea"
-                            rows={3}
+                            rows={2}
                             size="sm"
                             name="interestedIn"
                             value={formData.interestedIn}
                             onChange={handleChange}
-                            placeholder="Enter what the client is interested in"
-                            disabled={loading}
+                            placeholder="Other / Additional notes"
+                            disabled={loading || isLeadReadonly}
                             maxLength={500}
                           />
                         </Form.Group>
