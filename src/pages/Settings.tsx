@@ -2,7 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Container, Row, Col, Card, Nav, Tab, Alert, Form, Button, Spinner, Image, Table, Badge, Modal } from 'react-bootstrap';
 import { DragDropContext, Draggable } from 'react-beautiful-dnd';
 import StrictModeDroppable from '../components/StrictModeDroppable';
-import { Settings as SettingsIcon, Building, Database, BarChart3, Mail, Upload, X, Save, Plus, Edit2, Trash2, Check, X as XIcon, ToggleLeft, ToggleRight, GripVertical, ArrowUp, ArrowDown, User, Smartphone } from 'lucide-react';
+import { Settings as SettingsIcon, Building, Database, BarChart3, Mail, Upload, X, Save, Plus, Edit2, Trash2, Check, X as XIcon, ToggleLeft, ToggleRight, GripVertical, ArrowUp, ArrowDown, User, Smartphone, Bell } from 'lucide-react';
+import { usePushNotification } from '../hooks/usePushNotification';
 import { useAuth } from '../contexts/AuthContext';
 import {
   getCompanySettings,
@@ -60,6 +61,7 @@ const BACKEND_BASE_URL = getBackendURL();
 const Settings: React.FC = () => {
   const { user, updateUser } = useAuth();
   const { showSuccess, showError, showInfo } = useToast();
+  const { sendTestPush, isLoading: pushLoading } = usePushNotification();
   const [activeTab, setActiveTab] = useState('company');
 
   // Company Settings state
@@ -1368,6 +1370,32 @@ const Settings: React.FC = () => {
                                 checked={notificationSettings.whatsAppNotificationsEnabled}
                                 onChange={(e) => setNotificationSettings(prev => ({ ...prev, whatsAppNotificationsEnabled: e.target.checked }))}
                               />
+                            </div>
+                          </Col>
+                        </Row>
+
+                        <Row className="mt-2">
+                          <Col md={6}>
+                            <div className="d-flex align-items-center justify-content-between p-3 border rounded mb-3">
+                              <div className="d-flex align-items-center">
+                                <Bell size={20} className="me-3 text-warning" />
+                                <div>
+                                  <div className="fw-semibold">Push Notifications</div>
+                                  <div className="text-muted small">Test browser push notifications on this device</div>
+                                </div>
+                              </div>
+                              <Button
+                                variant="outline-primary"
+                                size="sm"
+                                onClick={async () => {
+                                  const result = await sendTestPush();
+                                  if (result.success) showSuccess('Push Notification', result.message);
+                                  else showError('Push Notification', result.message);
+                                }}
+                                disabled={pushLoading}
+                              >
+                                {pushLoading ? <><Spinner animation="border" size="sm" className="me-1" />Sending...</> : 'Send Test'}
+                              </Button>
                             </div>
                           </Col>
                         </Row>
