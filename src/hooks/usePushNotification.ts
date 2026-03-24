@@ -19,8 +19,10 @@ export const usePushNotification = () => {
       await subscribeToPush();
       await sendTestNotification();
       return { success: true, message: 'Test notification sent!' };
-    } catch {
-      return { success: false, message: 'Failed to send test notification.' };
+    } catch (err) {
+      console.error('[Push] sendTestPush failed:', err);
+      const message = err instanceof Error ? err.message : 'Failed to send test notification.';
+      return { success: false, message };
     } finally {
       setIsLoading(false);
     }

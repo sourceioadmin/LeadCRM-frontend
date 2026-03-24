@@ -13,10 +13,12 @@ export const subscribeToPush = async (): Promise<PushSubscription> => {
   if (existing) return existing;
 
   const { data } = await api.get<{ data: string }>('/push/vapid-public-key');
+  console.log('[Push] Subscribing with VAPID key:', data.data);
   const subscription = await registration.pushManager.subscribe({
     userVisibleOnly: true,
     applicationServerKey: urlBase64ToUint8Array(data.data),
   });
+  console.log('[Push] Subscription created:', subscription.endpoint);
 
   await api.post('/push/subscribe', subscription.toJSON());
   return subscription;
