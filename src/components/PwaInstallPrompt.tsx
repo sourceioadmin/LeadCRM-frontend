@@ -5,21 +5,35 @@ interface BeforeInstallPromptEvent extends Event {
   userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
 }
 
+const isIos = () =>
+  /iphone|ipad|ipod/i.test(navigator.userAgent);
+
+const isInStandaloneMode = () =>
+  "standalone" in window.navigator &&
+  (window.navigator as Navigator & { standalone: boolean }).standalone === true;
+
 const PwaInstallPrompt = () => {
   const [deferredPrompt, setDeferredPrompt] =
     useState<BeforeInstallPromptEvent | null>(null);
   const [showBanner, setShowBanner] = useState(false);
+  const [iosMode, setIosMode] = useState(false);
 
   useEffect(() => {
+    const dismissed = localStorage.getItem("pwa-install-dismissed");
+    if (dismissed) return;
+
+    // iOS Safari: no beforeinstallprompt, show manual instructions instead
+    if (isIos() && !isInStandaloneMode()) {
+      setIosMode(true);
+      setShowBanner(true);
+      return;
+    }
+
+    // Chrome / Edge / Android: use native install prompt
     const handler = (e: Event) => {
       e.preventDefault();
       setDeferredPrompt(e as BeforeInstallPromptEvent);
-
-      // Only show if the user hasn't dismissed before
-      const dismissed = localStorage.getItem("pwa-install-dismissed");
-      if (!dismissed) {
-        setShowBanner(true);
-      }
+      setShowBanner(true);
     };
 
     window.addEventListener("beforeinstallprompt", handler);
@@ -51,17 +65,21 @@ const PwaInstallPrompt = () => {
       <div style={styles.text}>
         <strong style={styles.title}>Install Leadbox</strong>
         <span style={styles.subtitle}>
-          Add to your home screen for a faster experience
+          {iosMode
+            ? "Tap the Share button, then \"Add to Home Screen\""
+            : "Add to your home screen for a faster experience"}
         </span>
       </div>
       <div style={styles.actions}>
-        <button
-          onClick={handleInstall}
-          style={styles.installBtn}
-          aria-label="Install app"
-        >
-          Install
-        </button>
+        {!iosMode && (
+          <button
+            onClick={handleInstall}
+            style={styles.installBtn}
+            aria-label="Install app"
+          >
+            Install
+          </button>
+        )}
         <button
           onClick={handleDismiss}
           style={styles.dismissBtn}
@@ -121,7 +139,6 @@ const styles: Record<string, React.CSSProperties> = {
     color: "#94A3B8",
     fontFamily: "Poppins, sans-serif",
     fontWeight: 400,
-    whiteSpace: "nowrap",
     overflow: "hidden",
     textOverflow: "ellipsis",
   },
