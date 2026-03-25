@@ -4,14 +4,12 @@ import { Card, Form, Button, Alert, Container, Row, Col, Spinner } from 'react-b
 import { useGoogleLogin } from '@react-oauth/google';
 import { LogIn, Mail, Lock, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import { useToast } from '../components/Toast';
 import { loginUser, googleLogin } from '../services/authService';
 import { LoginPayload, GoogleLoginPayload } from '../services/authService';
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
-  const { showSuccess, showError } = useToast();
 
   const [formData, setFormData] = useState<LoginPayload>({
     emailOrUsername: '',
@@ -86,7 +84,6 @@ const Login: React.FC = () => {
           // Store token and update auth context
           login(token, user);
 
-          showSuccess('Welcome Back!', `Hello ${user.fullName}!`);
           setTimeout(() => {
             navigate('/');
           }, 1500);
@@ -112,7 +109,6 @@ const Login: React.FC = () => {
         console.log('🔐 [Login] Email verification required, redirecting to OTP verification');
         // Store email for verification page and redirect
         localStorage.setItem('verificationEmail', email);
-        showError('Email Verification Required', 'Please verify your email address before logging in.');
         setTimeout(() => {
           navigate('/verify-otp');
         }, 1500);
@@ -121,7 +117,6 @@ const Login: React.FC = () => {
 
       const errorMessage = err.response?.data?.message || 'Login failed. Please try again.';
       setError(errorMessage);
-      showError('Login Failed', errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -147,7 +142,6 @@ const Login: React.FC = () => {
             // Store token and update auth context
             login(token, user);
 
-            showSuccess('Welcome!', `Hello ${user.fullName}!`);
             setTimeout(() => {
               navigate('/');
             }, 1500);
@@ -160,7 +154,6 @@ const Login: React.FC = () => {
       } catch (err: any) {
         const errorMessage = err.response?.data?.message || 'Google login failed. Please try again.';
         setError(errorMessage);
-        showError('Google Login Failed', errorMessage);
       } finally {
         setIsGoogleLoading(false);
       }
@@ -168,7 +161,6 @@ const Login: React.FC = () => {
     onError: (error) => {
       console.error('Google login error:', error);
       setError('Google login failed. Please try again.');
-      showError('Google Login Failed', 'Failed to authenticate with Google');
       setIsGoogleLoading(false);
     }
   });

@@ -11,15 +11,12 @@ import {
   Spinner
 } from "react-bootstrap";
 import { Mail, ArrowLeft } from "lucide-react";
-import { useToast } from "../components/Toast";
 import { forgotPassword } from "../services/authService";
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const ForgotPassword: React.FC = () => {
   const navigate = useNavigate();
-  const { showSuccess, showError } = useToast();
-
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
@@ -55,10 +52,6 @@ const ForgotPassword: React.FC = () => {
     try {
       await forgotPassword(email.trim());
       setSubmitted(true);
-      showSuccess(
-        "Check your email",
-        "If an account exists for this email, you will receive a password reset link."
-      );
       setTimeout(() => {
         navigate("/login");
       }, 2500);
@@ -67,7 +60,6 @@ const ForgotPassword: React.FC = () => {
       const errorMessage =
         axiosErr.response?.data?.message || "Something went wrong. Please try again.";
       setError(errorMessage);
-      showError("Request failed", errorMessage);
     } finally {
       setIsLoading(false);
     }

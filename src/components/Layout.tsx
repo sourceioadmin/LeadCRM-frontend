@@ -1,15 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
-import { Container, ToastContainer } from 'react-bootstrap';
+import { Container } from 'react-bootstrap';
 import Navbar from './Navbar';
 import Sidebar from './Sidebar';
-import Toast from './Toast';
-import { useToast } from './Toast';
 
 const Layout: React.FC = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(true); // Start collapsed on mobile
   const [isMobile, setIsMobile] = useState(false);
-  const { toasts, removeToast } = useToast();
 
   // Check if we're on mobile and set initial state
   useEffect(() => {
@@ -57,10 +54,6 @@ const Layout: React.FC = () => {
         </div>
       </div>
 
-      {/* Toast Notifications */}
-      {toasts.map((toast) => (
-        <Toast key={toast.id} toast={toast} onClose={removeToast} />
-      ))}
     </div>
   );
 };

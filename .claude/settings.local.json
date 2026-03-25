@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep -E \"\\\\.\\(cs|ts\\)$\")",
+      "Bash(node -e \"const r = require\\(''''./node_modules/workbox-routing/index.mjs''''\\); console.log\\(Object.keys\\(r\\)\\)\")",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
+    ]
+  }
+}

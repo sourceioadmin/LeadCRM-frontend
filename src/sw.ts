@@ -11,15 +11,20 @@ declare const self: ServiceWorkerGlobalScope;
 self.skipWaiting();
 clientsClaim();
 
-precacheAndRoute(self.__WB_MANIFEST);
+const manifest = self.__WB_MANIFEST;
+precacheAndRoute(manifest);
 cleanupOutdatedCaches();
 
-// App shell fallback for navigation
-registerRoute(
-  new NavigationRoute(createHandlerBoundToURL('index.html'), {
-    denylist: [/^\/api\//],
-  })
-);
+// App shell fallback for navigation — only in production where index.html is precached.
+// In dev mode VitePWA injects an empty manifest ([]), so createHandlerBoundToURL would
+// throw WorkboxError('non-precached-url') and crash the service worker evaluation.
+if ((manifest as unknown[]).length > 0) {
+  registerRoute(
+    new NavigationRoute(createHandlerBoundToURL('index.html'), {
+      denylist: [/^\/api\//],
+    })
+  );
+}
 
 // Google Fonts
 registerRoute(
@@ -83,5 +88,5 @@ self.addEventListener('push', (event) => {
 
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
-  event.waitUntil(clients.openWindow('/'));
+  event.waitUntil(self.clients.openWindow('/'));
 });

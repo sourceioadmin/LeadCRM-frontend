@@ -10,13 +10,11 @@ import {
   Form
 } from "react-bootstrap";
 import { Mail, ArrowLeft } from "lucide-react";
-import { useToast } from "../components/Toast";
 import { verifyOtp, resendOtp } from "../services/authService";
 
 const VerifyOtp: React.FC = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { showSuccess, showError } = useToast();
 
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [email, setEmail] = useState('');
@@ -128,7 +126,6 @@ const VerifyOtp: React.FC = () => {
         sessionStorage.removeItem('pendingVerification'); // Clean up invitation data
 
         console.log('🔐 [VerifyOtp] OTP verification successful, redirecting to login');
-        showSuccess('Email Verified!', 'Email verified successfully. You can now login with your credentials.');
 
         // Navigate to login page immediately
         navigate('/login', { replace: true });
@@ -137,7 +134,6 @@ const VerifyOtp: React.FC = () => {
         console.error('🔐 [VerifyOtp] Unexpected response format:', response.data);
         const errorMessage = response.data?.message || 'OTP verification failed.';
         setError(errorMessage);
-        showError('Verification Failed', errorMessage);
       }
     } catch (err: any) {
       console.error('❌ [VerifyOtp] OTP verification failed:', err);
@@ -147,7 +143,6 @@ const VerifyOtp: React.FC = () => {
 
       const errorMessage = err.response?.data?.message || 'OTP verification failed.';
       setError(errorMessage);
-      showError('Verification Failed', errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -163,7 +158,6 @@ const VerifyOtp: React.FC = () => {
       const response = await resendOtp(email);
       if (response.data.success) {
         setCountdown(60); // Start 60 second countdown
-        showSuccess('OTP Sent', 'A new verification code has been sent to your email.');
         // Clear OTP inputs
         setOtp(['', '', '', '', '', '']);
         document.getElementById('otp-0')?.focus();
@@ -171,7 +165,6 @@ const VerifyOtp: React.FC = () => {
     } catch (err: any) {
       const errorMessage = err.response?.data?.message || 'Failed to resend OTP.';
       setError(errorMessage);
-      showError('Resend Failed', errorMessage);
     } finally {
       setIsResending(false);
     }

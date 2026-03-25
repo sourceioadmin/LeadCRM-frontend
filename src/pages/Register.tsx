@@ -20,7 +20,6 @@ import {
   Eye,
   EyeOff
 } from "lucide-react";
-import { useToast } from "../components/Toast";
 import { useAuth } from "../contexts/AuthContext";
 import { registerUser, verifyOtp, resendOtp } from "../services/authService";
 
@@ -69,7 +68,6 @@ const Register: React.FC = () => {
   const [otpCode, setOtpCode] = useState('');
   const [userId, setUserId] = useState<number | null>(null);
   const [email, setEmail] = useState('');
-  const { showSuccess, showError } = useToast();
   const { login } = useAuth();
   const [isResending, setIsResending] = useState(false);
 
@@ -246,7 +244,6 @@ const Register: React.FC = () => {
       if (response.data.success) {
         // Store email for OTP verification page
         localStorage.setItem('verificationEmail', formData.email);
-        showSuccess('Registration Successful', 'Redirecting to email verification...');
         setTimeout(() => {
           navigate(`/verify-otp?email=${encodeURIComponent(formData.email)}`);
         }, 1500);
@@ -254,7 +251,6 @@ const Register: React.FC = () => {
     } catch (err: any) {
       const errorMessage = err.response?.data?.message || 'Registration failed. Please try again.';
       setError(errorMessage);
-      showError('Registration Failed', errorMessage);
     } finally {
       setIsLoading(false);
     }

@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Toast as BootstrapToast, ToastContainer } from 'react-bootstrap';
+import React, { useState, useEffect, createContext, useContext } from 'react';
+import { Toast as BootstrapToast } from 'react-bootstrap';
 
 export interface ToastMessage {
   id: string;
@@ -8,23 +8,30 @@ export interface ToastMessage {
   message: string;
 }
 
-interface ToastProps {
-  toast: ToastMessage;
-  onClose: (id: string) => void;
-  delay?: number;
+interface ToastContextValue {
+  showSuccess: (title: string, message: string) => void;
+  showError: (title: string, message: string) => void;
+  showWarning: (title: string, message: string) => void;
+  showInfo: (title: string, message: string) => void;
 }
 
-const Toast: React.FC<ToastProps> = ({ toast, onClose, delay = 5000 }) => {
+const ToastContext = createContext<ToastContextValue | null>(null);
+
+interface ToastItemProps {
+  toast: ToastMessage;
+  onClose: (id: string) => void;
+}
+
+const ToastItem: React.FC<ToastItemProps> = ({ toast, onClose }) => {
   const [show, setShow] = useState(true);
 
   useEffect(() => {
     const timer = setTimeout(() => {
       setShow(false);
-      setTimeout(() => onClose(toast.id), 300); // Wait for animation
-    }, delay);
-
+      setTimeout(() => onClose(toast.id), 300);
+    }, 5000);
     return () => clearTimeout(timer);
-  }, [toast.id, onClose, delay]);
+  }, [toast.id, onClose]);
 
   const getVariant = () => {
     switch (toast.type) {
@@ -36,37 +43,29 @@ const Toast: React.FC<ToastProps> = ({ toast, onClose, delay = 5000 }) => {
     }
   };
 
+  const handleClose = () => {
+    setShow(false);
+    setTimeout(() => onClose(toast.id), 300);
+  };
+
   return (
     <BootstrapToast
       show={show}
-      onClose={() => {
-        setShow(false);
-        setTimeout(() => onClose(toast.id), 300);
-      }}
+      onClose={handleClose}
       delay={5000}
       autohide
       bg={getVariant()}
       className="border-0 shadow-lg"
-      style={{
-        position: 'fixed',
-        top: '20px',
-        right: '20px',
-        zIndex: 1060,
-        minWidth: '350px',
-        maxWidth: '400px'
-      }}
+      style={{ minWidth: '300px', maxWidth: '400px' }}
     >
       <BootstrapToast.Header className="bg-transparent border-0">
         <strong className="me-auto text-white">{toast.title}</strong>
         <button
           type="button"
           className="btn-close btn-close-white"
-          onClick={() => {
-            setShow(false);
-            setTimeout(() => onClose(toast.id), 300);
-          }}
+          onClick={handleClose}
           aria-label="Close"
-        ></button>
+        />
       </BootstrapToast.Header>
       <BootstrapToast.Body className="text-white">
         {toast.message}
@@ -75,53 +74,49 @@ const Toast: React.FC<ToastProps> = ({ toast, onClose, delay = 5000 }) => {
   );
 };
 
-export default Toast;
-
-// Toast Manager Hook
-export const useToast = () => {
+export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
 
   const addToast = (type: ToastMessage['type'], title: string, message: string) => {
     const id = Date.now().toString();
-    const newToast: ToastMessage = {
-      id,
-      type,
-      title,
-      message,
-    };
-    setToasts(prev => [...prev, newToast]);
+    setToasts(prev => [...prev, { id, type, title, message }]);
   };
 
   const removeToast = (id: string) => {
-    setToasts(prev => prev.filter(toast => toast.id !== id));
+    setToasts(prev => prev.filter(t => t.id !== id));
   };
 
-  const showSuccess = (title: string, message: string) => {
-    console.log('Toast showSuccess called:', title, message);
-    addToast('success', title, message);
+  const value: ToastContextValue = {
+    showSuccess: (title, message) => addToast('success', title, message),
+    showError: (title, message) => addToast('error', title, message),
+    showWarning: (title, message) => addToast('warning', title, message),
+    showInfo: (title, message) => addToast('info', title, message),
   };
 
-  const showError = (title: string, message: string) => {
-    console.log('Toast showError called:', title, message);
-    addToast('error', title, message);
-  };
+  return (
+    <ToastContext.Provider value={value}>
+      {children}
+      <div
+        style={{
+          position: 'fixed',
+          top: '20px',
+          right: '20px',
+          zIndex: 1060,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '8px',
+        }}
+      >
+        {toasts.map(toast => (
+          <ToastItem key={toast.id} toast={toast} onClose={removeToast} />
+        ))}
+      </div>
+    </ToastContext.Provider>
+  );
+};
 
-  const showWarning = (title: string, message: string) => {
-    console.log('Toast showWarning called:', title, message);
-    addToast('warning', title, message);
-  };
-
-  const showInfo = (title: string, message: string) => {
-    console.log('Toast showInfo called:', title, message);
-    addToast('info', title, message);
-  };
-
-  return {
-    toasts,
-    removeToast,
-    showSuccess,
-    showError,
-    showWarning,
-    showInfo,
-  };
+export const useToast = (): ToastContextValue => {
+  const ctx = useContext(ToastContext);
+  if (!ctx) throw new Error('useToast must be used within a ToastProvider');
+  return ctx;
 };

@@ -2,6 +2,7 @@ import React, { lazy, Suspense } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { AuthProvider } from "./contexts/AuthContext";
+import { ToastProvider } from "./components/Toast";
 import { Spinner } from "react-bootstrap";
 
 // Import components (will be created later)
@@ -37,6 +38,7 @@ const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || "dummy-client-
 const App: React.FC = () => {
   return (
     <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+      <ToastProvider>
       <AuthProvider>
         <Router>
           <Routes>
@@ -95,6 +97,7 @@ const App: React.FC = () => {
         <PwaInstallPrompt />
         <OfflineIndicator />
       </AuthProvider>
+      </ToastProvider>
     </GoogleOAuthProvider>
   );
 };

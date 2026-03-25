@@ -11,13 +11,11 @@ import {
   Spinner
 } from "react-bootstrap";
 import { Lock, Eye, EyeOff, ArrowLeft } from "lucide-react";
-import { useToast } from "../components/Toast";
 import { resetPassword } from "../services/authService";
 
 const ResetPassword: React.FC = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { showSuccess, showError } = useToast();
 
   // Send token exactly as in the URL (router already decodes query string). Backend NormalizeToken() trims and URL-decodes before lookup.
   const token = searchParams.get("token") ?? "";
@@ -70,7 +68,6 @@ const ResetPassword: React.FC = () => {
     setIsLoading(true);
     try {
       await resetPassword({ token, newPassword });
-      showSuccess("Password reset", "Your password has been reset. You can now sign in.");
       setTimeout(() => {
         navigate("/login");
       }, 1500);
@@ -85,7 +82,6 @@ const ResetPassword: React.FC = () => {
         (Array.isArray(data?.errors) ? data.errors.join(" ") : undefined) ||
         "Failed to reset password. The link may have expired.";
       setError(errorMessage);
-      showError("Reset failed", errorMessage);
     } finally {
       setIsLoading(false);
     }

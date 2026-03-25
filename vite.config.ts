@@ -1,13 +1,13 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
-import basicSsl from "@vitejs/plugin-basic-ssl";
 import { VitePWA } from "vite-plugin-pwa";
 
 // https://vitejs.dev/config/
+// Note: basicSsl was removed. Browsers block service worker registration over self-signed HTTPS.
+// http://localhost is already a secure context — service workers and Push API work without HTTPS in dev.
 export default defineConfig({
   plugins: [
     react(),
-    basicSsl(),
     VitePWA({
       strategies: 'injectManifest',
       srcDir: 'src',
@@ -55,6 +55,7 @@ export default defineConfig({
       },
       devOptions: {
         enabled: true, // Enable PWA in dev mode for testing
+        type: 'module', // Required: sw.ts uses ES module imports (workbox); without this the browser loads it as a classic script and the SW fails to install, causing navigator.serviceWorker.ready to hang forever
       },
     }),
   ],
