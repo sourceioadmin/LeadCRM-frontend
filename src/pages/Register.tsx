@@ -40,21 +40,9 @@ interface RegisterFormData {
   confirmPassword: string;
 }
 
-const disposableDomains = [
-  "example.com",
-  "test.com",
-  "tempmail.com",
-  "fake.com",
-  "invalid.com",
-  "testmail.com"
-];
-
 const isLikelyRealEmail = (email: string) => {
   const emailRegex = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
-  if (!emailRegex.test(email)) return false;
-  const domain = email.split("@")[1]?.toLowerCase();
-  if (!domain) return false;
-  return !disposableDomains.includes(domain);
+  return emailRegex.test(email);
 };
 
 const Register: React.FC = () => {
