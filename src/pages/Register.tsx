@@ -35,6 +35,7 @@ interface RegisterFormData {
   fullName: string;
   email: string;
   username: string;
+  phoneNumber: string;
   password: string;
   confirmPassword: string;
 }
@@ -80,6 +81,7 @@ const Register: React.FC = () => {
     fullName: '',
     email: '',
     username: '',
+    phoneNumber: '',
     password: '',
     confirmPassword: ''
   });
@@ -189,6 +191,18 @@ const Register: React.FC = () => {
       setErrorField('password');
       return false;
     }
+    if (!formData.phoneNumber.trim()) {
+      setError('Phone number is required');
+      setErrorField('phoneNumber');
+      return false;
+    }
+    const cleanPhoneNumber = formData.phoneNumber.replace(/[\s\-\(\)]/g, '');
+    const phoneNumberRegex = /^\+?\d{7,20}$/;
+    if (!phoneNumberRegex.test(cleanPhoneNumber)) {
+      setError('Phone number is not valid');
+      setErrorField('phoneNumber');
+      return false;
+    }
     if (formData.password !== formData.confirmPassword) {
       setError('Passwords do not match');
       setErrorField('confirmPassword');
@@ -227,6 +241,7 @@ const Register: React.FC = () => {
         fullName: formData.fullName,
         email: formData.email,
         username: formData.username,
+        phoneNumber: formData.phoneNumber,
         password: formData.password,
         confirmPassword: formData.confirmPassword
       };
@@ -338,7 +353,7 @@ const Register: React.FC = () => {
           </Form.Group>
 
           <Form.Group className="mb-4">
-            <Form.Label>Phone</Form.Label>
+            <Form.Label>Company Phone</Form.Label>
             <Form.Control
               type="tel"
               name="phone"
@@ -425,6 +440,24 @@ const Register: React.FC = () => {
             <Form.Control.Feedback type="invalid">
               {errorField === 'username' && error}
             </Form.Control.Feedback>
+          </Form.Group>
+
+          <Form.Group className="mb-3">
+            <Form.Label>Phone Number *</Form.Label>
+            <Form.Control
+              type="tel"
+              name="phoneNumber"
+              value={formData.phoneNumber}
+              onChange={handleInputChange}
+              required
+              isInvalid={errorField === 'phoneNumber'}
+            />
+            <Form.Control.Feedback type="invalid">
+              {errorField === 'phoneNumber' && error}
+            </Form.Control.Feedback>
+            <Form.Text className="text-muted">
+              Used for WhatsApp notifications
+            </Form.Text>
           </Form.Group>
 
           <Form.Group className="mb-3">

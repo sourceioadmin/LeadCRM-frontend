@@ -4,7 +4,13 @@
       "Bash(grep -E \"\\\\.\\(cs|ts\\)$\")",
       "Bash(node -e \"const r = require\\(''''./node_modules/workbox-routing/index.mjs''''\\); console.log\\(Object.keys\\(r\\)\\)\")",
       "Bash(git add:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "WebSearch",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:www.builder.io)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:5173)",
+      "mcp__plugin_chrome-devtools-mcp_chrome-devtools__take_screenshot",
+      "mcp__plugin_chrome-devtools-mcp_chrome-devtools__navigate_page"
     ]
   }
 }
