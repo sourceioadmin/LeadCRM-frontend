@@ -9,796 +9,711 @@
     body {
       font-family: Arial, sans-serif;
       font-size: 11pt;
-      line-height: 1.7;
+      line-height: 1.8;
       color: #222;
-      max-width: 900px;
+      max-width: 960px;
       margin: 0 auto;
       padding: 40px 48px;
       background: #fff;
     }
 
-    /* ===== Cover Page ===== */
+    /* ===== Cover ===== */
     .cover {
       text-align: center;
       padding: 80px 0 60px;
       border-bottom: 3px solid #0d9488;
       margin-bottom: 60px;
-      page-break-after: always;
     }
     .cover .app-name {
       font-size: 42pt;
       font-weight: 700;
       color: #0d9488;
+      letter-spacing: 2px;
       margin: 0;
     }
     .cover .subtitle {
-      font-size: 18pt;
+      font-size: 16pt;
       color: #555;
-      margin: 8px 0 0;
+      margin: 10px 0 30px;
     }
-    .cover .doc-type {
-      font-size: 13pt;
-      color: #888;
-      margin-top: 24px;
+    .cover .role-badge {
+      display: inline-block;
+      background: #0d9488;
+      color: #fff;
+      border-radius: 20px;
+      padding: 6px 22px;
+      font-size: 11pt;
+      font-weight: 600;
       letter-spacing: 1px;
     }
-    .cover .version {
+    .cover .doc-meta {
+      margin-top: 30px;
+      color: #888;
       font-size: 10pt;
-      color: #aaa;
-      margin-top: 40px;
     }
 
-    /* ===== TOC ===== */
+    /* ===== Table of Contents ===== */
     .toc {
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
+      background: #f0fdfa;
+      border: 1px solid #99f6e4;
       border-radius: 8px;
       padding: 28px 36px;
-      margin-bottom: 52px;
-      page-break-after: always;
+      margin-bottom: 50px;
     }
     .toc h2 {
-      font-size: 16pt;
+      margin-top: 0;
       color: #0d9488;
-      margin: 0 0 16px;
+      font-size: 14pt;
+      border-bottom: 2px solid #99f6e4;
+      padding-bottom: 8px;
     }
     .toc ol {
       margin: 0;
-      padding-left: 24px;
+      padding-left: 20px;
     }
     .toc li {
-      margin: 6px 0;
-      font-size: 11pt;
+      margin: 5px 0;
     }
-    .toc li a {
+    .toc a {
       color: #0d9488;
       text-decoration: none;
-    }
-    .toc ol ol {
-      margin-top: 4px;
-      list-style-type: decimal;
-    }
-    .toc ol ol li {
       font-size: 10.5pt;
-      margin: 3px 0;
+    }
+    .toc a:hover {
+      text-decoration: underline;
     }
 
-    /* ===== Headings ===== */
-    h1 {
-      font-size: 22pt;
+    /* ===== Section ===== */
+    .section {
+      margin-bottom: 60px;
+      padding-bottom: 40px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    .section:last-child {
+      border-bottom: none;
+    }
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+    .section-number {
+      background: #0d9488;
+      color: #fff;
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 13pt;
+      flex-shrink: 0;
+    }
+    h2.section-title {
+      font-size: 17pt;
       color: #0d9488;
-      border-bottom: 2px solid #0d9488;
-      padding-bottom: 8px;
-      margin-top: 52px;
-      margin-bottom: 20px;
+      margin: 0;
     }
-    h2 {
-      font-size: 15pt;
-      color: #0f766e;
-      margin-top: 36px;
-      margin-bottom: 12px;
-    }
-    h3 {
-      font-size: 12pt;
-      color: #374151;
-      margin-top: 24px;
-      margin-bottom: 8px;
+    h3.subsection-title {
+      font-size: 13pt;
+      color: #1f6b67;
+      margin-top: 28px;
+      margin-bottom: 10px;
+      border-left: 4px solid #0d9488;
+      padding-left: 10px;
     }
 
-    /* ===== Step Lists ===== */
-    ol.steps {
-      padding-left: 24px;
-    }
-    ol.steps li {
-      margin: 10px 0;
-    }
-
-    /* ===== Screenshots ===== */
-    .screenshot-wrap {
+    /* ===== Screenshot ===== */
+    .screenshot-block {
       margin: 20px 0 28px;
-      text-align: center;
     }
-    .screenshot-wrap img {
-      max-width: 100%;
-      border: 1px solid #e2e8f0;
+    .screenshot-block img {
+      width: 100%;
+      max-width: 780px;
+      display: block;
+      border: 1px solid #d1d5db;
       border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+      margin: 0 auto;
     }
-    .screenshot-wrap .caption {
-      font-size: 9.5pt;
+    .screenshot-caption {
+      text-align: center;
+      font-size: 9pt;
       color: #888;
       margin-top: 6px;
       font-style: italic;
     }
-    .screenshot-placeholder {
-      background: #f0fdfa;
-      border: 2px dashed #0d9488;
-      border-radius: 8px;
-      padding: 32px 16px;
-      text-align: center;
-      color: #0d9488;
-      font-size: 10pt;
-      font-style: italic;
-      margin: 20px 0 28px;
-    }
 
-    /* ===== Callout Boxes ===== */
-    .tip, .note, .warning {
-      border-radius: 6px;
-      padding: 12px 16px;
-      margin: 16px 0;
+    /* ===== Steps ===== */
+    .steps {
+      padding-left: 0;
+      list-style: none;
+      margin: 14px 0;
+      counter-reset: step-counter;
+    }
+    .steps li {
+      counter-increment: step-counter;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 10px;
       font-size: 10.5pt;
     }
+    .steps li::before {
+      content: counter(step-counter);
+      background: #ccfbf1;
+      color: #0d9488;
+      border-radius: 50%;
+      min-width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 9pt;
+      flex-shrink: 0;
+    }
+
+    /* ===== Tips / Notes ===== */
     .tip {
       background: #f0fdfa;
       border-left: 4px solid #0d9488;
+      border-radius: 4px;
+      padding: 12px 16px;
+      margin: 16px 0;
+      font-size: 10pt;
+      color: #1f6b67;
     }
-    .note {
-      background: #eff6ff;
-      border-left: 4px solid #3b82f6;
+    .tip strong {
+      color: #0d9488;
     }
     .warning {
-      background: #fff7ed;
-      border-left: 4px solid #f97316;
-    }
-    .tip::before { content: "💡 Tip: "; font-weight: bold; }
-    .note::before { content: "📌 Note: "; font-weight: bold; }
-    .warning::before { content: "⚠️ Important: "; font-weight: bold; }
-
-    /* ===== Badge / Inline UI Reference ===== */
-    kbd {
-      background: #f1f5f9;
-      border: 1px solid #cbd5e1;
+      background: #fffbeb;
+      border-left: 4px solid #f59e0b;
       border-radius: 4px;
-      padding: 1px 6px;
-      font-family: Arial, sans-serif;
+      padding: 12px 16px;
+      margin: 16px 0;
       font-size: 10pt;
+      color: #78350f;
+    }
+    .warning strong {
+      color: #b45309;
     }
 
-    /* ===== Role Table ===== */
-    table {
+    /* ===== Field Table ===== */
+    .field-table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 10.5pt;
-      margin: 16px 0;
+      font-size: 10pt;
+      margin: 14px 0;
     }
-    th {
+    .field-table th {
       background: #0d9488;
-      color: white;
+      color: #fff;
       padding: 8px 12px;
       text-align: left;
     }
-    td {
+    .field-table td {
       padding: 8px 12px;
       border-bottom: 1px solid #e5e7eb;
+      vertical-align: top;
     }
-    tr:nth-child(even) td {
+    .field-table tr:nth-child(even) td {
       background: #f9fafb;
     }
-
-    /* ===== Page breaks for print / Google Docs ===== */
-    h1 {
-      page-break-before: always;
+    .required {
+      color: #dc2626;
+      font-weight: bold;
     }
-    h1:first-of-type {
-      page-break-before: avoid;
+
+    /* ===== Print ===== */
+    @media print {
+      body { padding: 20px; }
+      .toc { page-break-after: always; }
+      .section { page-break-inside: avoid; }
     }
   </style>
 </head>
 <body>
 
-<!-- ==================== COVER ==================== -->
-<div class="cover">
-  <p class="app-name">Leadbox</p>
-  <p class="subtitle">Lead Management CRM</p>
-  <p class="doc-type">COMPANY ADMIN — USER GUIDE</p>
-  <p class="version">Version 1.0 &nbsp;|&nbsp; March 2026</p>
-</div>
+  <!-- Cover -->
+  <div class="cover">
+    <p class="app-name">Leadbox</p>
+    <p class="subtitle">User Guide</p>
+    <span class="role-badge">Company Admin</span>
+    <p class="doc-meta">Version 2.0 &nbsp;|&nbsp; March 2026</p>
+  </div>
 
-<!-- ==================== TABLE OF CONTENTS ==================== -->
-<div class="toc">
-  <h2>Table of Contents</h2>
-  <ol>
-    <li><a href="#section1">Welcome to Leadbox</a></li>
-    <li><a href="#section2">Getting Started</a>
-      <ol>
-        <li><a href="#s2-1">Creating Your Account</a></li>
-        <li><a href="#s2-2">Verifying Your Email (OTP)</a></li>
-        <li><a href="#s2-3">Logging In</a></li>
-        <li><a href="#s2-4">Forgot Your Password?</a></li>
-      </ol>
-    </li>
-    <li><a href="#section3">Your Dashboard</a></li>
-    <li><a href="#section4">Managing Leads</a>
-      <ol>
-        <li><a href="#s4-1">Adding a New Lead</a></li>
-        <li><a href="#s4-2">Viewing My Leads</a></li>
-        <li><a href="#s4-3">Viewing All Company Leads</a></li>
-        <li><a href="#s4-4">Editing a Lead</a></li>
-        <li><a href="#s4-5">Assigning Leads to Team Members</a></li>
-        <li><a href="#s4-6">Bulk Actions</a></li>
-      </ol>
-    </li>
-    <li><a href="#section5">Follow-Ups</a></li>
-    <li><a href="#section6">Reports</a>
-      <ol>
-        <li><a href="#s6-1">Conversion Report</a></li>
-        <li><a href="#s6-2">Win vs. Loss Report</a></li>
-        <li><a href="#s6-3">Additional Analytics</a></li>
-      </ol>
-    </li>
-    <li><a href="#section7">Importing Leads in Bulk</a></li>
-    <li><a href="#section8">Managing Your Team</a></li>
-    <li><a href="#section9">Settings</a>
-      <ol>
-        <li><a href="#s9-1">Company Profile</a></li>
-        <li><a href="#s9-2">User Profile</a></li>
-        <li><a href="#s9-3">Interested In Options</a></li>
-      </ol>
-    </li>
-  </ol>
-</div>
+  <!-- Table of Contents -->
+  <div class="toc">
+    <h2>Table of Contents</h2>
+    <ol>
+      <li><a href="#s1">Creating Your Account</a></li>
+      <li><a href="#s2">Verifying Your Email</a></li>
+      <li><a href="#s3">Logging In</a></li>
+      <li><a href="#s4">Your Dashboard</a></li>
+      <li><a href="#s5">Setting Up Your Company</a></li>
+      <li><a href="#s6">Setting Up "Interested In" Options</a></li>
+      <li><a href="#s7">Managing Your Team</a></li>
+      <li><a href="#s8">Adding a Lead</a></li>
+      <li><a href="#s9">Viewing Your Leads</a></li>
+      <li><a href="#s10">Viewing All Company Leads</a></li>
+      <li><a href="#s11">Assigning Leads to Team Members</a></li>
+      <li><a href="#s12">Follow-ups</a></li>
+      <li><a href="#s13">Reports</a></li>
+      <li><a href="#s14">Importing Leads in Bulk</a></li>
+    </ol>
+  </div>
 
+  <!-- Section 1: Creating Your Account -->
+  <div class="section" id="s1">
+    <div class="section-header">
+      <div class="section-number">1</div>
+      <h2 class="section-title">Creating Your Account</h2>
+    </div>
+    <p>Before you can use Leadbox, you need to create an account for your company. This is a two-step process — first you enter your company details, then your personal login details.</p>
 
-<!-- ==================== SECTION 1 ==================== -->
-<h1 id="section1">1. Welcome to Leadbox</h1>
+    <h3 class="subsection-title">Step 1 — Company Details</h3>
+    <p>Open the Leadbox website and click <strong>Create Account</strong> on the login page. You will see a form asking for your company information.</p>
 
-<p><strong>Leadbox</strong> is your company's all-in-one lead management tool. It helps you and your team keep track of every potential customer (lead) — from the moment they show interest right through to closing the sale.</p>
+    <div class="screenshot-block">
+      <img src="screenshots/01-register-step1.png" alt="Registration Step 1 — Company Details (empty form)" />
+      <p class="screenshot-caption">The first step of registration — enter your company details here.</p>
+    </div>
 
-<p>As a <strong>Company Admin</strong>, you have full control over your company's setup. Here is a quick summary of what you can do:</p>
+    <table class="field-table">
+      <tr><th>Field</th><th>What to enter</th><th>Required?</th></tr>
+      <tr><td>Company Name</td><td>The full name of your business</td><td><span class="required">Yes</span></td></tr>
+      <tr><td>Industry</td><td>Your industry, e.g. Technology, Healthcare, Finance</td><td><span class="required">Yes</span></td></tr>
+      <tr><td>Company Size</td><td>Select how many employees your company has</td><td><span class="required">Yes</span></td></tr>
+      <tr><td>Website</td><td>Your company website address</td><td>Optional</td></tr>
+      <tr><td>Company Phone</td><td>Your company's main contact number</td><td>Optional</td></tr>
+    </table>
 
-<table>
-  <tr>
-    <th>Feature</th>
-    <th>What It Does</th>
-  </tr>
-  <tr>
-    <td>Dashboard</td>
-    <td>See a live summary of all your company's leads and activity</td>
-  </tr>
-  <tr>
-    <td>Add Lead</td>
-    <td>Record a new potential customer</td>
-  </tr>
-  <tr>
-    <td>My Leads / All Leads</td>
-    <td>Browse and manage all leads in your company</td>
-  </tr>
-  <tr>
-    <td>Assign Leads</td>
-    <td>Hand over unassigned leads to your team members</td>
-  </tr>
-  <tr>
-    <td>Follow-Ups</td>
-    <td>See which leads need a call or response today</td>
-  </tr>
-  <tr>
-    <td>Reports</td>
-    <td>Understand how well your team is converting leads</td>
-  </tr>
-  <tr>
-    <td>Import Leads</td>
-    <td>Upload a spreadsheet of leads all at once</td>
-  </tr>
-  <tr>
-    <td>Manage Users</td>
-    <td>Invite team members and manage their roles</td>
-  </tr>
-  <tr>
-    <td>Settings</td>
-    <td>Customise your company profile and lead categories</td>
-  </tr>
-</table>
+    <div class="screenshot-block">
+      <img src="screenshots/01b-register-step1-filled.png" alt="Registration Step 1 — filled in" />
+      <p class="screenshot-caption">Example of a filled-in Company Details form.</p>
+    </div>
 
-
-<!-- ==================== SECTION 2 ==================== -->
-<h1 id="section2">2. Getting Started</h1>
-
-<h2 id="s2-1">2.1 Creating Your Account</h2>
-
-<p>You only need to do this once when setting up Leadbox for your company for the first time.</p>
-
-<ol class="steps">
-  <li>Open Leadbox in your web browser.</li>
-  <li>Click <strong>Create Account</strong> on the login page.</li>
-  <li>Fill in <strong>Step 1 – Company Details</strong>:
-    <ul>
-      <li><strong>Company Name</strong> – your business name</li>
-      <li><strong>Industry</strong> – pick the closest match from the list</li>
-      <li><strong>Company Size</strong> – number of employees</li>
-      <li><strong>Website</strong> and <strong>Phone</strong> are optional</li>
+    <ul class="steps">
+      <li>Fill in your <strong>Company Name</strong> — this is how your business will appear in Leadbox.</li>
+      <li>Type your <strong>Industry</strong>, for example: Technology.</li>
+      <li>Select the <strong>Company Size</strong> that best matches your team.</li>
+      <li>Optionally enter your <strong>Website</strong> and <strong>Company Phone</strong>.</li>
+      <li>Click <strong>Next: Personal Details</strong> to continue.</li>
     </ul>
-  </li>
-  <li>Click <strong>Next</strong>.</li>
-  <li>Fill in <strong>Step 2 – Your Details</strong>:
-    <ul>
-      <li><strong>Full Name</strong>, <strong>Email</strong>, <strong>Username</strong></li>
-      <li><strong>Phone Number</strong> – used for WhatsApp notifications</li>
-      <li><strong>Password</strong> – must be at least 8 characters and include an uppercase letter, a number, and a special character (e.g. @, !, $)</li>
+
+    <h3 class="subsection-title">Step 2 — Your Personal Details</h3>
+    <p>Now enter your own name and login credentials. This creates your Company Admin account.</p>
+
+    <div class="screenshot-block">
+      <img src="screenshots/02-register-step2.png" alt="Registration Step 2 — User Details (empty form)" />
+      <p class="screenshot-caption">Step 2 of registration — enter your personal and login details.</p>
+    </div>
+
+    <table class="field-table">
+      <tr><th>Field</th><th>What to enter</th><th>Required?</th></tr>
+      <tr><td>Full Name</td><td>Your first and last name</td><td><span class="required">Yes</span></td></tr>
+      <tr><td>Email Address</td><td>Your work email — a verification code will be sent here</td><td><span class="required">Yes</span></td></tr>
+      <tr><td>Username</td><td>A short name you will use to log in (minimum 3 characters)</td><td><span class="required">Yes</span></td></tr>
+      <tr><td>Phone Number</td><td>Your mobile number (used for WhatsApp notifications)</td><td><span class="required">Yes</span></td></tr>
+      <tr><td>Password</td><td>A strong password: at least 8 characters, with uppercase, lowercase, a number, and a special character (e.g. Admin@123)</td><td><span class="required">Yes</span></td></tr>
+      <tr><td>Confirm Password</td><td>Type your password again exactly as above</td><td><span class="required">Yes</span></td></tr>
+    </table>
+
+    <div class="screenshot-block">
+      <img src="screenshots/02b-register-step2-filled.png" alt="Registration Step 2 — filled in" />
+      <p class="screenshot-caption">Example of a filled-in User Details form.</p>
+    </div>
+
+    <ul class="steps">
+      <li>Enter your <strong>Full Name</strong> as you'd like it to appear in the system.</li>
+      <li>Enter your <strong>Email Address</strong> — make sure it's correct, as a verification code will be sent to it.</li>
+      <li>Choose a <strong>Username</strong> — this is what you'll use to log in.</li>
+      <li>Enter your <strong>Phone Number</strong>.</li>
+      <li>Create a <strong>Password</strong> that meets the strength requirements shown on screen.</li>
+      <li>Re-enter the same password in <strong>Confirm Password</strong>.</li>
+      <li>Click <strong>Create Account</strong>.</li>
     </ul>
-  </li>
-  <li>Click <strong>Create Account</strong>. You will be sent a 6-digit verification code by email.</li>
-</ol>
 
-<div class="screenshot-wrap">
-  <img src="screenshots/02-register-step1.png" alt="Registration Step 1 – Company Details" />
-  <div class="caption">Step 1: Enter your company details</div>
-</div>
+    <div class="tip"><strong>Tip:</strong> Write down your email, username and password somewhere safe. You will need them every time you log in.</div>
+  </div>
 
-<div class="screenshot-wrap">
-  <img src="screenshots/03-register-step2.png" alt="Registration Step 2 – User Details" />
-  <div class="caption">Step 2: Enter your personal details and create a password</div>
-</div>
+  <!-- Section 2: Verifying Your Email -->
+  <div class="section" id="s2">
+    <div class="section-header">
+      <div class="section-number">2</div>
+      <h2 class="section-title">Verifying Your Email</h2>
+    </div>
+    <p>After creating your account, Leadbox will send a 6-digit code to the email address you provided. You need to enter this code to confirm your identity.</p>
 
-<div class="tip">Your password strength is shown in real time. Aim for a "Strong" rating before submitting.</div>
+    <div class="screenshot-block">
+      <img src="screenshots/03-verify-otp.png" alt="Email verification OTP screen" />
+      <p class="screenshot-caption">Enter the 6-digit code sent to your email to verify your account.</p>
+    </div>
 
-
-<h2 id="s2-2">2.2 Verifying Your Email (OTP)</h2>
-
-<ol class="steps">
-  <li>After registration, you will be taken to the <strong>Email Verification</strong> page automatically.</li>
-  <li>Check your email inbox for a message from Leadbox containing a <strong>6-digit code</strong>.</li>
-  <li>Enter the code in the boxes on screen.</li>
-  <li>Click <strong>Verify</strong>. You will be logged in immediately.</li>
-</ol>
-
-<div class="screenshot-wrap">
-  <img src="screenshots/04-verify-otp.png" alt="OTP Verification Page" />
-  <div class="caption">Enter the 6-digit code sent to your email</div>
-</div>
-
-<div class="tip">Didn't receive the code? Click <strong>Resend OTP</strong> to get a new one.</div>
-
-
-<h2 id="s2-3">2.3 Logging In</h2>
-
-<ol class="steps">
-  <li>Go to the Leadbox login page.</li>
-  <li>Enter your <strong>Email</strong> or <strong>Username</strong> and your <strong>Password</strong>.</li>
-  <li>Optional: Tick <strong>Remember me for 7 days</strong> so you don't have to log in every day.</li>
-  <li>Click <strong>Sign In</strong>. You will land on your Dashboard.</li>
-</ol>
-
-<div class="screenshot-wrap">
-  <img src="screenshots/01-login.png" alt="Login Page" />
-  <div class="caption">The Leadbox login screen</div>
-</div>
-
-
-<h2 id="s2-4">2.4 Forgot Your Password?</h2>
-
-<ol class="steps">
-  <li>On the login page, click <strong>Forgot password?</strong></li>
-  <li>Enter the email address linked to your account.</li>
-  <li>Click <strong>Send Reset Link</strong>. Check your email for a password reset link.</li>
-  <li>Click the link in the email and enter your new password.</li>
-  <li>Click <strong>Reset Password</strong> and log in with your new password.</li>
-</ol>
-
-
-<!-- ==================== SECTION 3 ==================== -->
-<h1 id="section3">3. Your Dashboard</h1>
-
-<p>The Dashboard is the first thing you see after logging in. It gives you an instant snapshot of your company's lead activity.</p>
-
-<div class="screenshot-wrap">
-  <img src="screenshots/05-dashboard.png" alt="Dashboard" />
-  <div class="caption">The main Dashboard — your command centre</div>
-</div>
-
-<h2>What do the stat cards mean?</h2>
-
-<table>
-  <tr>
-    <th>Card</th>
-    <th>What it shows</th>
-  </tr>
-  <tr>
-    <td>Total Leads</td>
-    <td>All leads added to your company so far</td>
-  </tr>
-  <tr>
-    <td>Unassigned Leads</td>
-    <td>Leads that haven't been given to a team member yet</td>
-  </tr>
-  <tr>
-    <td>Today's Follow-Ups</td>
-    <td>Leads that are scheduled for follow-up today</td>
-  </tr>
-  <tr>
-    <td>Conversion Rate</td>
-    <td>Percentage of leads that became "Won" (closed deals)</td>
-  </tr>
-</table>
-
-<h2>Charts</h2>
-<ul>
-  <li><strong>Sales Conversion Funnel</strong> – shows how many leads are at each stage (e.g. New → Contacted → Proposal → Won). The grey bar shows leads that were Lost.</li>
-  <li><strong>Leads by Source</strong> – a pie chart showing where your leads are coming from (Website, Referral, etc.).</li>
-  <li><strong>Leads by Status</strong> – a bar chart breaking down leads by their current stage.</li>
-</ul>
-
-<h2>Quick Add Lead</h2>
-<p>You'll see a <strong>+ Add Lead</strong> button in the top right area, or a floating circular button at the bottom right corner. Click either to quickly add a new lead without leaving the Dashboard.</p>
-
-<div class="tip">Click the <strong>Refresh</strong> icon near the top right to reload the dashboard with the latest data.</div>
-
-
-<!-- ==================== SECTION 4 ==================== -->
-<h1 id="section4">4. Managing Leads</h1>
-
-<h2 id="s4-1">4.1 Adding a New Lead</h2>
-
-<p>A "lead" is a potential customer. Every time someone shows interest in your product or service, add them as a lead.</p>
-
-<ol class="steps">
-  <li>Click <strong>Add Lead</strong> in the left sidebar, or use the <strong>+ button</strong> on any page.</li>
-  <li>Fill in the form:
-    <ul>
-      <li><strong>Client Name</strong> – the contact person's name</li>
-      <li><strong>Company Name</strong> – their business (if applicable)</li>
-      <li><strong>Email</strong> and <strong>Phone</strong></li>
-      <li><strong>Lead Source</strong> – where this lead came from (Website, Referral, etc.)</li>
-      <li><strong>Status</strong> – what stage they're at (e.g. New, Contacted)</li>
-      <li><strong>Interested In</strong> – which of your products/services they're interested in</li>
-      <li><strong>Expected Budget</strong> – how much they're likely to spend</li>
-      <li><strong>Follow-Up Date</strong> – when you plan to contact them next</li>
-      <li><strong>Notes</strong> – anything else worth remembering</li>
+    <ul class="steps">
+      <li>Check your email inbox for a message from Leadbox with a 6-digit code.</li>
+      <li>Type the code into the six boxes shown on screen — one digit per box.</li>
+      <li>Click <strong>Verify Email</strong>.</li>
+      <li>Once verified, you will be taken to the login page.</li>
     </ul>
-  </li>
-  <li>Click <strong>Add Lead</strong> to save.</li>
-</ol>
 
-<div class="screenshot-wrap">
-  <img src="screenshots/06-add-lead-modal.png" alt="Add Lead Modal" />
-  <div class="caption">The Add Lead form — fill in as many details as you can</div>
-</div>
+    <div class="tip"><strong>Tip:</strong> If you didn't receive the code, check your Spam or Junk folder. You can also click <strong>Resend</strong> to get a new code.</div>
+  </div>
 
-<div class="tip">Not all fields are required. You can always come back and edit the lead later to add more details.</div>
+  <!-- Section 3: Logging In -->
+  <div class="section" id="s3">
+    <div class="section-header">
+      <div class="section-number">3</div>
+      <h2 class="section-title">Logging In</h2>
+    </div>
+    <p>Every time you want to use Leadbox, you will start at the login page. Enter your email and password to get in.</p>
 
+    <div class="screenshot-block">
+      <img src="screenshots/04-login-filled.png" alt="Login page with credentials filled in" />
+      <p class="screenshot-caption">Enter your email and password, then click Sign In.</p>
+    </div>
 
-<h2 id="s4-2">4.2 Viewing My Leads</h2>
-
-<p>"My Leads" shows all the leads that are assigned to you personally.</p>
-
-<ol class="steps">
-  <li>Click <strong>My Leads</strong> in the left sidebar.</li>
-  <li>You will see a table of all your leads with columns like Name, Company, Status, Source, and Date Added.</li>
-  <li>Use the <strong>filters</strong> at the top to narrow down by date range, source, status, urgency, or budget.</li>
-  <li>Use the <strong>search bar</strong> to find a specific client by name or company.</li>
-</ol>
-
-<div class="screenshot-wrap">
-  <img src="screenshots/07-my-leads.png" alt="My Leads Page" />
-  <div class="caption">My Leads — your personal lead list with filters</div>
-</div>
-
-
-<h2 id="s4-3">4.3 Viewing All Company Leads</h2>
-
-<p>"All Leads" shows every lead in your company, regardless of who they're assigned to. This is only visible to Company Admins and Managers.</p>
-
-<ol class="steps">
-  <li>Click <strong>All Leads</strong> in the left sidebar.</li>
-  <li>You'll see leads from all team members in one table.</li>
-  <li>Use the <strong>Assigned To</strong> filter to see leads belonging to a specific team member.</li>
-</ol>
-
-<div class="screenshot-wrap">
-  <img src="screenshots/08-all-leads.png" alt="All Leads Page" />
-  <div class="caption">All Leads — company-wide view with all team members' leads</div>
-</div>
-
-
-<h2 id="s4-4">4.4 Editing a Lead</h2>
-
-<ol class="steps">
-  <li>In <strong>My Leads</strong> or <strong>All Leads</strong>, find the lead you want to update.</li>
-  <li>Click the <strong>Edit</strong> icon (pencil) on that row.</li>
-  <li>Update any of the lead's details.</li>
-  <li>Click <strong>Save</strong> to apply your changes.</li>
-</ol>
-
-<div class="tip">You can also update a lead's <strong>Status</strong> directly from the table row — just click on the status badge and select a new one from the dropdown.</div>
-
-
-<h2 id="s4-5">4.5 Assigning Leads to Team Members</h2>
-
-<p>When a lead has not been given to anyone yet (it shows as "Unassigned"), you can assign it to a specific team member.</p>
-
-<ol class="steps">
-  <li>Click <strong>Assign Leads</strong> in the left sidebar.</li>
-  <li>You'll see a list of all unassigned leads.</li>
-  <li>Tick the checkbox next to one or more leads you want to assign.</li>
-  <li>Click the <strong>Assign Selected</strong> button.</li>
-  <li>Choose a team member from the dropdown.</li>
-  <li>Click <strong>Assign</strong> to confirm. The leads will move off this list.</li>
-</ol>
-
-<div class="screenshot-wrap">
-  <img src="screenshots/09-assign-leads.png" alt="Assign Leads Page" />
-  <div class="caption">Assign unassigned leads to your team members in bulk</div>
-</div>
-
-
-<h2 id="s4-6">4.6 Bulk Actions</h2>
-
-<p>In <strong>All Leads</strong>, you can update or export multiple leads at once:</p>
-
-<ol class="steps">
-  <li>Tick the checkbox next to each lead you want to act on. Use the checkbox in the <strong>header row</strong> to select all.</li>
-  <li>A toolbar will appear at the top with options:
-    <ul>
-      <li><strong>Update Status</strong> – change the status of all selected leads at once</li>
-      <li><strong>Assign</strong> – assign all selected leads to a team member</li>
-      <li><strong>Export</strong> – download selected leads as an Excel file</li>
+    <ul class="steps">
+      <li>Open the Leadbox website. You will see the <strong>Welcome Back</strong> screen.</li>
+      <li>Type your <strong>Email or Username</strong> in the first box.</li>
+      <li>Type your <strong>Password</strong> in the second box.</li>
+      <li>Tick <strong>Remember me for 7 days</strong> if you don't want to log in every day.</li>
+      <li>Click <strong>Sign In</strong>.</li>
     </ul>
-  </li>
-  <li>Choose your action and confirm.</li>
-</ol>
 
+    <div class="tip"><strong>Forgot your password?</strong> Click the <strong>Forgot password?</strong> link below the Sign In button and follow the instructions sent to your email.</div>
+  </div>
 
-<!-- ==================== SECTION 5 ==================== -->
-<h1 id="section5">5. Follow-Ups</h1>
+  <!-- Section 4: Your Dashboard -->
+  <div class="section" id="s4">
+    <div class="section-header">
+      <div class="section-number">4</div>
+      <h2 class="section-title">Your Dashboard</h2>
+    </div>
+    <p>After logging in, you will land on your <strong>Dashboard</strong>. This is the home screen — it gives you a quick summary of everything happening in your business.</p>
 
-<p>A follow-up is a reminder to call or contact a lead on a specific date. The Follow-Ups page helps you stay on top of these reminders so no lead falls through the cracks.</p>
+    <div class="screenshot-block">
+      <img src="screenshots/05-dashboard.png" alt="Dashboard overview" />
+      <p class="screenshot-caption">Your Dashboard — a quick overview of all leads and activity.</p>
+    </div>
 
-<ol class="steps">
-  <li>Click <strong>Follow-Ups</strong> in the left sidebar.</li>
-  <li>You'll see three groups:
-    <ul>
-      <li><strong>Overdue</strong> – follow-ups that were scheduled in the past and not yet done (shown in red)</li>
-      <li><strong>Today</strong> – follow-ups due today</li>
-      <li><strong>Upcoming</strong> – follow-ups scheduled for future dates</li>
+    <div class="screenshot-block">
+      <img src="screenshots/12-dashboard-with-lead.png" alt="Dashboard with lead data" />
+      <p class="screenshot-caption">The Dashboard updates in real time as you add leads and your team takes action.</p>
+    </div>
+
+    <p>Here is what each section of the Dashboard means:</p>
+    <table class="field-table">
+      <tr><th>What you see</th><th>What it means</th></tr>
+      <tr><td>Total Leads</td><td>The total number of leads in your company's system</td></tr>
+      <tr><td>Unassigned</td><td>Leads that have not yet been given to a team member</td></tr>
+      <tr><td>Today's Follow-ups</td><td>Leads that need to be followed up today</td></tr>
+      <tr><td>Conversion Rate</td><td>The percentage of leads that turned into customers</td></tr>
+      <tr><td>Sales Conversion Funnel</td><td>A chart showing how many leads are at each stage</td></tr>
+      <tr><td>Leads by Source</td><td>Where your leads are coming from (website, referral, etc.)</td></tr>
+      <tr><td>Leads by Status</td><td>How your leads are distributed by their current stage</td></tr>
+      <tr><td>Recent Leads</td><td>The latest leads added to the system</td></tr>
+    </table>
+
+    <div class="tip"><strong>Tip:</strong> Click <strong>Refresh Dashboard</strong> at any time to get the latest numbers.</div>
+  </div>
+
+  <!-- Section 5: Setting Up Your Company -->
+  <div class="section" id="s5">
+    <div class="section-header">
+      <div class="section-number">5</div>
+      <h2 class="section-title">Setting Up Your Company</h2>
+    </div>
+    <p>Before your team starts working, it's a good idea to complete your company profile. Go to <strong>Settings</strong> in the left menu.</p>
+
+    <div class="screenshot-block">
+      <img src="screenshots/06-settings-company.png" alt="Settings — Company Profile tab" />
+      <p class="screenshot-caption">The Company Settings page — update your company information here.</p>
+    </div>
+
+    <ul class="steps">
+      <li>Click <strong>Settings</strong> in the left-side menu.</li>
+      <li>You will see the <strong>Company Settings</strong> tab is already selected.</li>
+      <li>Update your company name, industry, size, phone, and website if needed.</li>
+      <li>To add a company logo, click <strong>Upload Logo</strong> and choose an image file from your computer.</li>
+      <li>You can also turn on or off <strong>Email</strong>, <strong>WhatsApp</strong>, and <strong>Push Notifications</strong> for your team.</li>
+      <li>Click <strong>Save Changes</strong> when you're done.</li>
     </ul>
-  </li>
-  <li>For each lead, you can:
-    <ul>
-      <li>Click <strong>Reschedule</strong> to set a new follow-up date</li>
-      <li>Click <strong>Update Status</strong> to mark the lead as Contacted, Won, etc.</li>
-      <li>Click <strong>Notes</strong> to add or edit notes for the lead</li>
-      <li>Click <strong>Edit Lead</strong> to open the full lead details</li>
+
+    <div class="tip"><strong>Tip:</strong> Adding a company logo makes the platform look more professional for your team.</div>
+  </div>
+
+  <!-- Section 6: Interested In Options -->
+  <div class="section" id="s6">
+    <div class="section-header">
+      <div class="section-number">6</div>
+      <h2 class="section-title">Setting Up "Interested In" Options</h2>
+    </div>
+    <p>This is an <strong>important step</strong> that must be done before your team starts adding leads. "Interested In" options are the products or services your company offers. When adding a lead, your team will select from this list to record what the customer is interested in.</p>
+
+    <div class="screenshot-block">
+      <img src="screenshots/07-settings-interested-in.png" alt="Interested In Options list" />
+      <p class="screenshot-caption">The list of "Interested In" options available to your team when adding leads.</p>
+    </div>
+
+    <ul class="steps">
+      <li>Go to <strong>Settings</strong> in the left menu.</li>
+      <li>Click the <strong>Interested In Options</strong> tab at the top of the page.</li>
+      <li>You will see a list of options. Click <strong>Add New Option</strong> to create a new one.</li>
     </ul>
-  </li>
-</ol>
 
-<div class="screenshot-wrap">
-  <img src="screenshots/10-followups.png" alt="Upcoming Follow-Ups Page" />
-  <div class="caption">Follow-Ups page — overdue items are highlighted in red</div>
-</div>
+    <div class="screenshot-block">
+      <img src="screenshots/08-settings-add-interested-in.png" alt="Add New Interested In Option modal" />
+      <p class="screenshot-caption">Type the name of the product or service your company offers and click Create Option.</p>
+    </div>
 
-<div class="warning">Make sure to check your overdue follow-ups regularly. Leads that are left too long without contact are less likely to convert.</div>
-
-
-<!-- ==================== SECTION 6 ==================== -->
-<h1 id="section6">6. Reports</h1>
-
-<p>The Reports section gives you insight into how well your company is converting leads into sales. Click <strong>Reports</strong> in the left sidebar to see three types of reports.</p>
-
-<div class="screenshot-wrap">
-  <img src="screenshots/11-reports-hub.png" alt="Reports Hub" />
-  <div class="caption">Reports hub — choose the report you want to view</div>
-</div>
-
-
-<h2 id="s6-1">6.1 Conversion Report</h2>
-
-<p>This report shows you how many leads are at each stage of your sales process — like a funnel where leads enter at the top and progress toward a sale.</p>
-
-<ol class="steps">
-  <li>Click <strong>Conversion Report</strong>.</li>
-  <li>The chart shows each stage (e.g. New → Contacted → Proposal Sent → Won) with the number of leads at each stage.</li>
-  <li>The <strong>conversion rate</strong> between stages tells you what percentage of leads are moving forward.</li>
-  <li>A low conversion rate at a particular stage means that stage needs attention.</li>
-</ol>
-
-<div class="screenshot-wrap">
-  <img src="screenshots/12-conversion-report.png" alt="Conversion Report" />
-  <div class="caption">Conversion Report — see where leads are dropping off</div>
-</div>
-
-
-<h2 id="s6-2">6.2 Win vs. Loss Report</h2>
-
-<p>This report compares how many leads your team is winning (closing successfully) versus losing.</p>
-
-<ol class="steps">
-  <li>Click <strong>Win vs. Loss Report</strong>.</li>
-  <li>You'll see a breakdown by lead source and urgency level.</li>
-  <li>Use this to identify which sources bring in the highest quality leads.</li>
-</ol>
-
-<div class="screenshot-wrap">
-  <img src="screenshots/13-win-loss-report.png" alt="Win vs Loss Report" />
-  <div class="caption">Win vs. Loss Report — understand what's working and what isn't</div>
-</div>
-
-
-<h2 id="s6-3">6.3 Additional Analytics</h2>
-
-<p>This section provides extra charts and data about your lead pipeline.</p>
-
-<ul>
-  <li><strong>Leads by Source</strong> – which channels bring in the most leads</li>
-  <li><strong>Leads by Status</strong> – how leads are distributed across stages</li>
-  <li><strong>Leads by Urgency</strong> – breakdown by urgency level (Hot, Warm, Cold, etc.)</li>
-  <li><strong>Team Performance</strong> – how many leads each team member has and their conversion rate</li>
-</ul>
-
-<div class="screenshot-wrap">
-  <img src="screenshots/14-additional-analytics.png" alt="Additional Analytics" />
-  <div class="caption">Additional Analytics — deeper insights into your pipeline</div>
-</div>
-
-
-<!-- ==================== SECTION 7 ==================== -->
-<h1 id="section7">7. Importing Leads in Bulk</h1>
-
-<p>If you have a list of leads in a spreadsheet (Excel or CSV), you can upload them all at once instead of adding them one by one.</p>
-
-<h2>Step 1 – Download the Template</h2>
-<ol class="steps">
-  <li>Click <strong>Import Leads</strong> in the left sidebar.</li>
-  <li>Click <strong>Download Template</strong> to get the correct file format.</li>
-  <li>Open the template in Excel or Google Sheets and fill it in with your lead data. Do not change the column headings.</li>
-</ol>
-
-<h2>Step 2 – Upload Your File</h2>
-<ol class="steps">
-  <li>Once your file is ready, go back to the <strong>Import Leads</strong> page.</li>
-  <li>Click <strong>Choose File</strong> and select your filled-in spreadsheet.</li>
-  <li>Click <strong>Upload</strong>. A progress bar will show you how the import is going.</li>
-  <li>When it's done, you'll see a summary: how many leads were added successfully and how many had errors.</li>
-</ol>
-
-<div class="screenshot-wrap">
-  <img src="screenshots/15-import-leads.png" alt="Import Leads Page" />
-  <div class="caption">Import Leads — upload your spreadsheet to add leads in bulk</div>
-</div>
-
-<div class="warning">If some rows have errors (e.g. missing required fields), those leads will be rejected. You can download the rejected rows, fix them, and re-upload.</div>
-
-<h2>Viewing Import History</h2>
-<ol class="steps">
-  <li>Click <strong>Import History</strong> in the left sidebar.</li>
-  <li>You'll see a list of all past import jobs with their date, status, and how many leads were imported.</li>
-  <li>Click on any import to download the results or the rejected rows file.</li>
-</ol>
-
-<div class="screenshot-wrap">
-  <img src="screenshots/16-import-history.png" alt="Import History Page" />
-  <div class="caption">Import History — review all past bulk imports</div>
-</div>
-
-
-<!-- ==================== SECTION 8 ==================== -->
-<h1 id="section8">8. Managing Your Team</h1>
-
-<p>As Company Admin, you can invite new users, change their roles, and deactivate accounts when needed.</p>
-
-<ol class="steps">
-  <li>Click <strong>Manage Users</strong> in the left sidebar.</li>
-  <li>You'll see a list of everyone in your company along with their name, email, role, and status.</li>
-</ol>
-
-<div class="screenshot-wrap">
-  <img src="screenshots/17-manage-users.png" alt="Manage Users Page" />
-  <div class="caption">Manage Users — see and control everyone in your company</div>
-</div>
-
-<h2>Inviting a New User</h2>
-<ol class="steps">
-  <li>Click the <strong>Invite User</strong> button.</li>
-  <li>Enter the person's <strong>email address</strong> and select their <strong>role</strong> (Company Manager or Team Member).</li>
-  <li>Click <strong>Send Invite</strong>. They'll receive an email with a link to join your company.</li>
-</ol>
-
-<div class="note">Team Members and Company Managers join via the invite link. Only you (as Company Admin) can set up the company initially.</div>
-
-<h2>Changing a User's Role</h2>
-<ol class="steps">
-  <li>Find the user in the list and click the <strong>Edit</strong> icon (pencil).</li>
-  <li>Select a new role from the dropdown.</li>
-  <li>Click <strong>Save</strong>.</li>
-</ol>
-
-<h2>Deactivating a User</h2>
-<ol class="steps">
-  <li>Find the user and click the <strong>toggle switch</strong> next to their name to turn them inactive.</li>
-  <li>Inactive users cannot log in, but their leads and data remain in the system.</li>
-</ol>
-
-<div class="tip">You can reactivate an inactive user at any time by toggling them back on.</div>
-
-
-<!-- ==================== SECTION 9 ==================== -->
-<h1 id="section9">9. Settings</h1>
-
-<p>The Settings page lets you customise your company's profile and the categories used when managing leads. Click <strong>Settings</strong> in the left sidebar to open it.</p>
-
-<div class="screenshot-wrap">
-  <img src="screenshots/18-settings.png" alt="Settings Page – Company tab" />
-  <div class="caption">Settings — Company tab is open by default</div>
-</div>
-
-<h2 id="s9-1">9.1 Company Profile</h2>
-
-<p>Update your company's information that appears across the app.</p>
-
-<ol class="steps">
-  <li>Click the <strong>Company Settings</strong> tab.</li>
-  <li>You can update:
-    <ul>
-      <li><strong>Company Name, Industry, Size, Website, Phone</strong></li>
-      <li><strong>Company Logo</strong> – click the logo area to upload a new image</li>
+    <ul class="steps">
+      <li>Type the name of the product or service in the <strong>Option Name</strong> box. For example: "Annual Maintenance Contract".</li>
+      <li>Click <strong>Create Option</strong> to save it.</li>
+      <li>Repeat this for every product or service your company offers.</li>
     </ul>
-  </li>
-  <li>Click <strong>Save Changes</strong> when done.</li>
-</ol>
 
+    <div class="warning"><strong>Important:</strong> Set up all your "Interested In" options before inviting your team or adding any leads. Your team will not be able to select a product or service if it's not in this list.</div>
 
-<h2 id="s9-2">9.2 User Profile</h2>
+    <p>You can also <strong>Edit</strong>, <strong>Deactivate</strong>, or <strong>Delete</strong> any option from the list at any time.</p>
+  </div>
 
-<div class="screenshot-wrap">
-  <img src="screenshots/18b-settings-profile.png" alt="Settings – User Profile tab" />
-  <div class="caption">User Profile tab — update your personal details</div>
-</div>
+  <!-- Section 7: Managing Your Team -->
+  <div class="section" id="s7">
+    <div class="section-header">
+      <div class="section-number">7</div>
+      <h2 class="section-title">Managing Your Team</h2>
+    </div>
+    <p>Once your company is set up, you can start inviting your team members to Leadbox. Go to <strong>Manage Users</strong> in the left menu.</p>
 
-<p>Update your own personal information.</p>
+    <div class="screenshot-block">
+      <img src="screenshots/09-manage-users.png" alt="Manage Users page" />
+      <p class="screenshot-caption">The Manage Users page shows all team members and their roles.</p>
+    </div>
 
-<ol class="steps">
-  <li>Click the <strong>User Profile</strong> tab.</li>
-  <li>You can update your <strong>Full Name, Email, Phone Number</strong>, and <strong>Username</strong>.</li>
-  <li>To change your password, click <strong>Change Password</strong> and follow the prompts.</li>
-  <li>Click <strong>Save Changes</strong>.</li>
-</ol>
+    <p>This page shows everyone in your company — their name, email, role, and whether they are active. To add someone new, click <strong>Invite User</strong>.</p>
 
+    <div class="screenshot-block">
+      <img src="screenshots/10-invite-user.png" alt="Invite User modal" />
+      <p class="screenshot-caption">Enter the team member's email and select their role, then send the invitation.</p>
+    </div>
 
-<h2 id="s9-3">9.3 Interested In Options</h2>
+    <ul class="steps">
+      <li>Click <strong>Invite User</strong> at the top right of the page.</li>
+      <li>Enter the team member's <strong>email address</strong>.</li>
+      <li>Select their <strong>Role</strong>:<br>
+        — <strong>Team Member</strong>: A salesperson who adds and manages their own leads.<br>
+        — <strong>Referral Partner</strong>: Someone who refers leads to your team but doesn't manage them directly.
+      </li>
+      <li>Click <strong>Send Invitation</strong>. The team member will receive an email with a link to create their account.</li>
+    </ul>
 
-<div class="screenshot-wrap">
-  <img src="screenshots/18c-settings-interested-in.png" alt="Settings – Interested In Options tab" />
-  <div class="caption">Interested In Options tab — manage your product/service categories</div>
-</div>
+    <div class="tip"><strong>Tip:</strong> You can change a team member's role later by clicking the <strong>Actions</strong> button next to their name. You can also deactivate a user if they leave your company — this removes their access without deleting their history.</div>
+  </div>
 
-<p>"Interested In" options are the products or services that your leads can be interested in. You can customise this list to match what your company offers.</p>
+  <!-- Section 8: Adding a Lead -->
+  <div class="section" id="s8">
+    <div class="section-header">
+      <div class="section-number">8</div>
+      <h2 class="section-title">Adding a Lead</h2>
+    </div>
+    <p>A <strong>lead</strong> is a potential customer — someone who has shown interest in your products or services. To add a lead, click <strong>Add Lead</strong> in the left menu.</p>
 
-<ol class="steps">
-  <li>Click the <strong>Interested In Options</strong> tab.</li>
-  <li>You'll see a list of current options.</li>
-  <li>To <strong>add a new option</strong>, click <strong>+ Add Option</strong>, type the name, and click <strong>Save</strong>.</li>
-  <li>To <strong>edit</strong> an existing option, click the <strong>Edit</strong> icon (pencil) next to it.</li>
-  <li>To <strong>delete</strong> an option, click the <strong>Delete</strong> icon (bin) and confirm.</li>
-</ol>
+    <div class="screenshot-block">
+      <img src="screenshots/11-add-lead-filled.png" alt="Add Lead form filled in" />
+      <p class="screenshot-caption">Fill in the lead's details and click Create Lead to save.</p>
+    </div>
 
-<div class="note">These options appear in the "Interested In" dropdown when adding or editing a lead. Keep the list relevant to your business offerings.</div>
+    <table class="field-table">
+      <tr><th>Field</th><th>What to enter</th><th>Required?</th></tr>
+      <tr><td>Client Name</td><td>The full name of the potential customer</td><td><span class="required">Yes</span></td></tr>
+      <tr><td>Company Name</td><td>The company the person works for (if any)</td><td>Optional</td></tr>
+      <tr><td>Mobile Number</td><td>Their phone number</td><td><span class="required">Yes</span></td></tr>
+      <tr><td>Email Address</td><td>Their email address</td><td>Optional</td></tr>
+      <tr><td>City</td><td>The city they are based in</td><td>Optional</td></tr>
+      <tr><td>Lead Source</td><td>How did you hear about this person? (Website, Referral, etc.)</td><td><span class="required">Yes</span></td></tr>
+      <tr><td>Lead Status</td><td>Where is this lead in your sales process? (defaults to New Lead)</td><td>Optional</td></tr>
+    </table>
 
+    <ul class="steps">
+      <li>Click <strong>Add Lead</strong> in the left menu.</li>
+      <li>Fill in the lead's details in the form.</li>
+      <li>Click <strong>More Details</strong> if you want to add extra information like urgency, budget, or a follow-up date.</li>
+      <li>Click <strong>Create Lead</strong> to save.</li>
+    </ul>
 
-<!-- ==================== FOOTER ==================== -->
-<hr style="margin-top: 60px; border-color: #e5e7eb;" />
-<p style="text-align:center; font-size:9pt; color:#aaa;">
-  Leadbox User Guide &nbsp;|&nbsp; Company Admin Edition &nbsp;|&nbsp; Version 1.0 &nbsp;|&nbsp; March 2026
-</p>
+    <div class="tip"><strong>Tip:</strong> You can also add a lead directly from the Dashboard by clicking the <strong>Add Lead</strong> button there.</div>
+  </div>
+
+  <!-- Section 9: Viewing Your Leads -->
+  <div class="section" id="s9">
+    <div class="section-header">
+      <div class="section-number">9</div>
+      <h2 class="section-title">Viewing Your Leads</h2>
+    </div>
+    <p><strong>My Leads</strong> shows only the leads that are assigned to you personally. Click <strong>My Leads</strong> in the left menu to see them.</p>
+
+    <div class="screenshot-block">
+      <img src="screenshots/13-my-leads.png" alt="My Leads page" />
+      <p class="screenshot-caption">My Leads shows all leads assigned to you. Use the search and filter options to find specific leads.</p>
+    </div>
+
+    <ul class="steps">
+      <li>Click <strong>My Leads</strong> in the left menu.</li>
+      <li>Use the <strong>Search</strong> box to find a lead by name, company, or phone number.</li>
+      <li>Use <strong>Filters</strong> to narrow down leads by status, source, or date.</li>
+      <li>Click <strong>Edit Lead</strong> next to any lead to update their information or add notes.</li>
+    </ul>
+  </div>
+
+  <!-- Section 10: All Leads -->
+  <div class="section" id="s10">
+    <div class="section-header">
+      <div class="section-number">10</div>
+      <h2 class="section-title">Viewing All Company Leads</h2>
+    </div>
+    <p><strong>All Leads</strong> shows every lead in your company — including leads added by your team members. This is a view only available to Company Admins and Managers.</p>
+
+    <div class="screenshot-block">
+      <img src="screenshots/14-all-leads.png" alt="All Leads page" />
+      <p class="screenshot-caption">All Leads gives you a complete view of every lead in your company.</p>
+    </div>
+
+    <ul class="steps">
+      <li>Click <strong>All Leads</strong> in the left menu.</li>
+      <li>You will see all leads from all team members in one place.</li>
+      <li>Use <strong>Show Filters</strong> to filter by assigned team member, status, source, or date range.</li>
+      <li>Click <strong>Export</strong> to download the leads as a spreadsheet file.</li>
+      <li>Click <strong>Edit Lead</strong> next to any lead to make changes.</li>
+    </ul>
+  </div>
+
+  <!-- Section 11: Assign Leads -->
+  <div class="section" id="s11">
+    <div class="section-header">
+      <div class="section-number">11</div>
+      <h2 class="section-title">Assigning Leads to Team Members</h2>
+    </div>
+    <p>When a new lead comes in, it is "unassigned" — no one is responsible for it yet. You can assign leads to your team members so they know who to follow up with.</p>
+
+    <div class="screenshot-block">
+      <img src="screenshots/15-assign-leads.png" alt="Assign Leads page" />
+      <p class="screenshot-caption">Assign Leads shows all unassigned leads. Use the dropdown next to each lead to assign them to a team member.</p>
+    </div>
+
+    <ul class="steps">
+      <li>Click <strong>Assign Leads</strong> in the left menu.</li>
+      <li>You will see a list of all leads that have not been assigned to anyone yet.</li>
+      <li>For each lead, click the <strong>Select user…</strong> dropdown in the "Assign To" column and choose a team member.</li>
+      <li>To assign multiple leads at once, tick the checkboxes next to the leads you want and click <strong>Bulk Assign</strong>.</li>
+    </ul>
+
+    <div class="tip"><strong>Tip:</strong> Once a lead is assigned, it will appear in that team member's <strong>My Leads</strong> page and they will be notified.</div>
+  </div>
+
+  <!-- Section 12: Follow-ups -->
+  <div class="section" id="s12">
+    <div class="section-header">
+      <div class="section-number">12</div>
+      <h2 class="section-title">Follow-ups</h2>
+    </div>
+    <p>A <strong>follow-up</strong> is a reminder to contact a lead again on a specific date. The Follow-ups page shows all scheduled follow-ups for your team so nothing falls through the cracks.</p>
+
+    <div class="screenshot-block">
+      <img src="screenshots/16-followups.png" alt="Upcoming Follow-ups page" />
+      <p class="screenshot-caption">The Follow-ups page shows overdue, today's, and upcoming follow-ups in one place.</p>
+    </div>
+
+    <ul class="steps">
+      <li>Click <strong>Follow-ups</strong> in the left menu.</li>
+      <li>You will see follow-ups grouped into <strong>Overdue</strong>, <strong>Today</strong>, and <strong>Upcoming</strong>.</li>
+      <li>Use the <strong>From Date</strong> and <strong>To Date</strong> filters to view follow-ups for a specific time period.</li>
+      <li>Click on a follow-up to open the lead and take action — call, mark as done, or reschedule.</li>
+    </ul>
+
+    <div class="warning"><strong>Important:</strong> Follow-up dates are set when adding or editing a lead. Make sure your team sets follow-up dates so this page stays up to date.</div>
+  </div>
+
+  <!-- Section 13: Reports -->
+  <div class="section" id="s13">
+    <div class="section-header">
+      <div class="section-number">13</div>
+      <h2 class="section-title">Reports</h2>
+    </div>
+    <p>Reports help you understand how your business is performing — how many leads are converting, where they are coming from, and how your team is doing.</p>
+
+    <div class="screenshot-block">
+      <img src="screenshots/17-reports.png" alt="Reports hub" />
+      <p class="screenshot-caption">The Reports section gives you three types of detailed reports.</p>
+    </div>
+
+    <p>There are three reports available:</p>
+
+    <h3 class="subsection-title">Conversion Report</h3>
+    <p>Shows how many leads are moving through your sales stages and how many are converting into customers.</p>
+    <div class="screenshot-block">
+      <img src="screenshots/18-reports-conversion.png" alt="Conversion Report" />
+      <p class="screenshot-caption">The Conversion Report shows your overall conversion rate and team performance.</p>
+    </div>
+
+    <h3 class="subsection-title">Win vs Loss Report</h3>
+    <p>Shows which leads were won (converted to customers) and which were lost, broken down by source and urgency.</p>
+    <div class="screenshot-block">
+      <img src="screenshots/19-reports-winloss.png" alt="Win vs Loss Report" />
+      <p class="screenshot-caption">The Win vs Loss Report helps you understand what's working and what isn't.</p>
+    </div>
+
+    <h3 class="subsection-title">Additional Analytics</h3>
+    <p>A detailed report where you can search and filter all leads and export the results to a spreadsheet.</p>
+    <div class="screenshot-block">
+      <img src="screenshots/20-reports-additional.png" alt="Additional Analytics" />
+      <p class="screenshot-caption">Use Additional Analytics to search and export leads based on any criteria.</p>
+    </div>
+
+    <ul class="steps">
+      <li>Click <strong>Reports</strong> in the left menu.</li>
+      <li>Choose the report you want to view by clicking the corresponding button.</li>
+      <li>Use the <strong>Filters</strong> (date range, source, assigned user) to narrow down the data.</li>
+      <li>Click <strong>Apply Filters</strong> to update the charts.</li>
+    </ul>
+  </div>
+
+  <!-- Section 14: Import Leads -->
+  <div class="section" id="s14">
+    <div class="section-header">
+      <div class="section-number">14</div>
+      <h2 class="section-title">Importing Leads in Bulk</h2>
+    </div>
+    <p>If you have a large list of leads in a spreadsheet, you can upload them all at once instead of entering them one by one. This saves a lot of time.</p>
+
+    <div class="screenshot-block">
+      <img src="screenshots/21-import-leads.png" alt="Import Leads page" />
+      <p class="screenshot-caption">The Import Leads page lets you upload an Excel file with multiple leads at once.</p>
+    </div>
+
+    <ul class="steps">
+      <li>Click <strong>Import Leads</strong> in the left menu.</li>
+      <li>Click <strong>Template</strong> to download a ready-made spreadsheet. Fill in your leads' details into this template.</li>
+      <li>Once your spreadsheet is ready, click <strong>Excel File</strong> and select your file from your computer.</li>
+      <li>Click <strong>Import</strong> to upload. Leadbox will automatically check for duplicates and errors.</li>
+    </ul>
+
+    <div class="tip"><strong>Tip:</strong> Always use the downloaded template to fill in your leads. Using a different format may cause errors during the upload.</div>
+
+    <h3 class="subsection-title">Import History</h3>
+    <p>You can see a record of all previous imports by clicking <strong>Import History</strong> in the left menu.</p>
+
+    <div class="screenshot-block">
+      <img src="screenshots/22-import-history.png" alt="Import History page" />
+      <p class="screenshot-caption">Import History shows all past bulk uploads and their status.</p>
+    </div>
+
+    <p>This page shows each import — when it was done, how many leads were imported, and if any rows were rejected. Click on any import to see which rows had errors and why.</p>
+  </div>
 
 </body>
 </html>
