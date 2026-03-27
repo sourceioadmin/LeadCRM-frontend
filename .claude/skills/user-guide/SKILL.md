@@ -25,9 +25,9 @@ Do not proceed until all answers are provided.
 4. **Verify every screenshot** — after saving each one, tell the user the file name and ask them to confirm before moving to the next step.
 5. **React inputs require `evaluate_script`** — use the native input value setter pattern (see below) for text fields. The standard `fill` tool alone does not trigger React state updates.
 6. **OTP / manual steps** — pause and ask the user to complete these manually, then wait for confirmation before continuing.
-7. **Screenshots folder**: `docs/screenshots/` — save all screenshots here.
+7. **Screenshots folder**: `public/docs/screenshots/` — save all screenshots here.
 8. **Viewport**: Set to 1280×900 before starting using `resize_page`.
-9. **Reference theme**: The HTML guide must use the same CSS styling as `docs/user-guide-company-admin.html` — read that file for the theme before generating any HTML.
+9. **Reference theme**: The HTML guide must use the same CSS styling as `public/docs/user-guide-company-admin.html` — read that file for the theme before generating any HTML.
 
 ---
 
@@ -65,7 +65,7 @@ Use this script whenever filling text inputs (React controlled components ignore
 
 Follow the pages/workflow relevant to the role. For each page:
 - Fill in all form fields with test data FIRST
-- Then take screenshot with `fullPage: true` and save to `docs/screenshots/NN-descriptive-name.png`
+- Then take screenshot with `fullPage: true` and save to `public/docs/screenshots/NN-descriptive-name.png`
 - Tell user the file name and wait for confirmation before moving to the next screenshot
 
 #### Standard Registration Flow (if account needs to be created)
@@ -113,8 +113,8 @@ If a browser dialog appears (`confirm`, `alert`), use `handle_dialog` to dismiss
 
 After all screenshots are confirmed:
 
-1. Read `docs/user-guide-company-admin.html` to extract the full CSS theme (cover, TOC, section styles, screenshot-block, steps, tip/warning, field-table classes).
-2. Create `docs/user-guide-{role-slug}.html` (overwrite if it exists) using that exact same CSS.
+1. Read `public/docs/user-guide-company-admin.html` to extract the full CSS theme (cover, TOC, section styles, screenshot-block, steps, tip/warning, field-table classes).
+2. Create `public/docs/user-guide-{role-slug}.html` (overwrite if it exists) using that exact same CSS.
 
 #### HTML Structure Rules
 - **Cover page**: App name "Leadbox", subtitle "User Guide", role badge, version and today's date
