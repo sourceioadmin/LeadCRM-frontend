@@ -242,7 +242,7 @@ const Login: React.FC = () => {
                   <Form.Check
                     type="checkbox"
                     name="rememberMe"
-                    label="Remember me for 7 days"
+                    label="Remember me"
                     checked={formData.rememberMe}
                     onChange={handleInputChange}
                     disabled={isLoading || isGoogleLoading}
