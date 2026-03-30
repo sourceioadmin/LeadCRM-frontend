@@ -448,7 +448,7 @@ const AdditionalReports: React.FC = () => {
             <Row className="g-3 mb-3">
               <Col xs={12} sm={6} md={6}>
                 <Form.Group>
-                  <Form.Label className="small">Budget Min ($)</Form.Label>
+                  <Form.Label className="small">Budget Min (₹)</Form.Label>
                   <Form.Control
                     type="number"
                     size="sm"
@@ -462,7 +462,7 @@ const AdditionalReports: React.FC = () => {
               </Col>
               <Col xs={12} sm={6} md={6}>
                 <Form.Group>
-                  <Form.Label className="small">Budget Max ($)</Form.Label>
+                  <Form.Label className="small">Budget Max (₹)</Form.Label>
                   <Form.Control
                     type="number"
                     size="sm"
@@ -601,7 +601,7 @@ const AdditionalReports: React.FC = () => {
                                 <div className="col-6">
                                   <small className="text-muted d-block"><i className="bi bi-cash me-1"></i>Budget</small>
                                   <span className="fw-medium">
-                                    {lead.expectedBudget ? `$${lead.expectedBudget.toLocaleString()}` : 'Not specified'}
+                                    {lead.expectedBudget ? `₹${lead.expectedBudget.toLocaleString()}` : 'Not specified'}
                                   </span>
                                 </div>
                                 {lead.followupDate && (
@@ -701,7 +701,7 @@ const AdditionalReports: React.FC = () => {
                                 </Badge>
                               </td>
                               <td className="text-end d-none d-lg-table-cell">
-                                {lead.expectedBudget ? `$${lead.expectedBudget.toLocaleString()}` : '-'}
+                                {lead.expectedBudget ? `₹${lead.expectedBudget.toLocaleString()}` : '-'}
                               </td>
                               <td className="d-none d-xl-table-cell">
                                 <div style={{ maxWidth: '150px' }}>

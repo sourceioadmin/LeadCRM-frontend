@@ -11,18 +11,42 @@
       font-size: 11pt;
       line-height: 1.8;
       color: #222;
-      max-width: 960px;
-      margin: 0 auto;
-      padding: 40px 48px;
+      margin: 0;
+      padding: 0;
       background: #fff;
+    }
+
+    /* ===== Layout ===== */
+    .page-layout {
+      display: flex;
+      align-items: flex-start;
+      min-height: 100vh;
+    }
+    .toc-sidebar {
+      width: 240px;
+      flex-shrink: 0;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      background: #f0fdfa;
+      border-right: 1px solid #99f6e4;
+      padding: 28px 20px;
+      box-sizing: border-box;
+    }
+    .main-content {
+      flex: 1;
+      padding: 16px 48px;
+      max-width: 960px;
+      box-sizing: border-box;
     }
 
     /* ===== Cover ===== */
     .cover {
       text-align: center;
-      padding: 80px 0 60px;
+      padding: 8px 0 12px;
       border-bottom: 3px solid #0d9488;
-      margin-bottom: 60px;
+      margin-bottom: 24px;
     }
     .cover .app-name {
       font-size: 42pt;
@@ -52,34 +76,29 @@
       font-size: 10pt;
     }
 
-    /* ===== Table of Contents ===== */
-    .toc {
-      background: #f0fdfa;
-      border: 1px solid #99f6e4;
-      border-radius: 8px;
-      padding: 28px 36px;
-      margin-bottom: 50px;
-    }
-    .toc h2 {
+    /* ===== Table of Contents (sidebar) ===== */
+    .toc-sidebar h2 {
       margin-top: 0;
       color: #0d9488;
-      font-size: 14pt;
+      font-size: 12pt;
       border-bottom: 2px solid #99f6e4;
       padding-bottom: 8px;
     }
-    .toc ol {
+    .toc-sidebar ol {
       margin: 0;
-      padding-left: 20px;
+      padding-left: 18px;
     }
-    .toc li {
-      margin: 5px 0;
+    .toc-sidebar li {
+      margin: 6px 0;
     }
-    .toc a {
+    .toc-sidebar a {
       color: #0d9488;
       text-decoration: none;
-      font-size: 10.5pt;
+      font-size: 9.5pt;
+      line-height: 1.4;
+      display: block;
     }
-    .toc a:hover {
+    .toc-sidebar a:hover {
       text-decoration: underline;
     }
 
@@ -230,41 +249,47 @@
 
     /* ===== Print ===== */
     @media print {
-      body { padding: 20px; }
-      .toc { page-break-after: always; }
+      .toc-sidebar { display: none; }
+      .main-content { padding: 20px; }
       .section { page-break-inside: avoid; }
     }
   </style>
 </head>
 <body>
+<div class="page-layout">
 
-  <!-- Cover -->
-  <div class="cover">
-    <p class="app-name">Leadbox</p>
-    <p class="subtitle">User Guide</p>
-    <span class="role-badge">Company Admin</span>
-    <p class="doc-meta">Version 2.0 &nbsp;|&nbsp; March 2026</p>
-  </div>
-
-  <!-- Table of Contents -->
-  <div class="toc">
-    <h2>Table of Contents</h2>
+  <!-- Sticky TOC Sidebar -->
+  <nav class="toc-sidebar">
+    <h2>Contents</h2>
     <ol>
       <li><a href="#s1">Creating Your Account</a></li>
       <li><a href="#s2">Verifying Your Email</a></li>
       <li><a href="#s3">Logging In</a></li>
       <li><a href="#s4">Your Dashboard</a></li>
-      <li><a href="#s5">Setting Up Your Company</a></li>
-      <li><a href="#s6">Setting Up "Interested In" Options</a></li>
-      <li><a href="#s7">Managing Your Team</a></li>
-      <li><a href="#s8">Adding a Lead</a></li>
-      <li><a href="#s9">Viewing Your Leads</a></li>
-      <li><a href="#s10">Viewing All Company Leads</a></li>
-      <li><a href="#s11">Assigning Leads to Team Members</a></li>
-      <li><a href="#s12">Follow-ups</a></li>
-      <li><a href="#s13">Reports</a></li>
-      <li><a href="#s14">Importing Leads in Bulk</a></li>
+      <li><a href="#s5">Settings</a></li>
+      <li><a href="#s6">Managing Your Team</a></li>
+      <li><a href="#s7">Leads</a>
+        <ul style="padding-left: 16px; margin: 4px 0; list-style: none;">
+          <li><a href="#s7-adding">7.1 Adding a Lead</a></li>
+          <li><a href="#s7-my-leads">7.2 Viewing Your Leads</a></li>
+          <li><a href="#s7-all-leads">7.3 Viewing All Company Leads</a></li>
+          <li><a href="#s7-assign">7.4 Assigning Leads</a></li>
+        </ul>
+      </li>
+      <li><a href="#s8">Follow-ups</a></li>
+      <li><a href="#s9">Reports</a></li>
+      <li><a href="#s10">Importing Leads in Bulk</a></li>
     </ol>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="main-content">
+
+  <!-- Cover -->
+  <div class="cover">
+    <p class="app-name">Leadbox</p>
+    <p class="subtitle">User Guide for Company Admin</p>
+    <p class="doc-meta">Version 2.0 &nbsp;|&nbsp; March 2026</p>
   </div>
 
   <!-- Section 1: Creating Your Account -->
@@ -275,8 +300,15 @@
     </div>
     <p>Before you can use Leadbox, you need to create an account for your company. This is a two-step process — first you enter your company details, then your personal login details.</p>
 
+    <p>Open the Leadbox website. On the login page, click the <strong>Create Account</strong> link at the bottom of the form.</p>
+
+    <div class="screenshot-block">
+      <img src="screenshots/00-login-create-account.png" alt="Login page — Create Account link highlighted" />
+      <p class="screenshot-caption">The login page — click <strong>Create Account</strong> (highlighted in red) to begin registration.</p>
+    </div>
+
     <h3 class="subsection-title">Step 1 — Company Details</h3>
-    <p>Open the Leadbox website and click <strong>Create Account</strong> on the login page. You will see a form asking for your company information.</p>
+    <p>You will see a form asking for your company information.</p>
 
     <div class="screenshot-block">
       <img src="screenshots/01-register-step1.png" alt="Registration Step 1 — Company Details (empty form)" />
@@ -381,7 +413,7 @@
       <li>Open the Leadbox website. You will see the <strong>Welcome Back</strong> screen.</li>
       <li>Type your <strong>Email or Username</strong> in the first box.</li>
       <li>Type your <strong>Password</strong> in the second box.</li>
-      <li>Tick <strong>Remember me for 7 days</strong> if you don't want to log in every day.</li>
+      <li>Tick <strong>Remember me</strong> if you don't want to log in every day.</li>
       <li>Click <strong>Sign In</strong>.</li>
     </ul>
 
@@ -407,28 +439,31 @@
     </div>
 
     <p>Here is what each section of the Dashboard means:</p>
-    <table class="field-table">
+    <table class="field-table" style="border: 1px solid #d1d5db;">
       <tr><th>What you see</th><th>What it means</th></tr>
-      <tr><td>Total Leads</td><td>The total number of leads in your company's system</td></tr>
-      <tr><td>Unassigned</td><td>Leads that have not yet been given to a team member</td></tr>
-      <tr><td>Today's Follow-ups</td><td>Leads that need to be followed up today</td></tr>
-      <tr><td>Conversion Rate</td><td>The percentage of leads that turned into customers</td></tr>
-      <tr><td>Sales Conversion Funnel</td><td>A chart showing how many leads are at each stage</td></tr>
-      <tr><td>Leads by Source</td><td>Where your leads are coming from (website, referral, etc.)</td></tr>
-      <tr><td>Leads by Status</td><td>How your leads are distributed by their current stage</td></tr>
-      <tr><td>Recent Leads</td><td>The latest leads added to the system</td></tr>
+      <tr><td style="border: 1px solid #d1d5db;">Total Leads</td><td style="border: 1px solid #d1d5db;">The total number of leads in your company's system</td></tr>
+      <tr><td style="border: 1px solid #d1d5db;">Unassigned</td><td style="border: 1px solid #d1d5db;">Leads that have not yet been given to a team member</td></tr>
+      <tr><td style="border: 1px solid #d1d5db;">Today's Follow-ups</td><td style="border: 1px solid #d1d5db;">Leads that need to be followed up today</td></tr>
+      <tr><td style="border: 1px solid #d1d5db;">Conversion Rate</td><td style="border: 1px solid #d1d5db;">The percentage of leads that turned into customers</td></tr>
+      <tr><td style="border: 1px solid #d1d5db;">Sales Conversion Funnel</td><td style="border: 1px solid #d1d5db;">A chart showing how many leads are at each stage</td></tr>
+      <tr><td style="border: 1px solid #d1d5db;">Leads by Source</td><td style="border: 1px solid #d1d5db;">Where your leads are coming from (website, referral, etc.)</td></tr>
+      <tr><td style="border: 1px solid #d1d5db;">Leads by Status</td><td style="border: 1px solid #d1d5db;">How your leads are distributed by their current stage</td></tr>
+      <tr><td style="border: 1px solid #d1d5db;">Recent Leads</td><td style="border: 1px solid #d1d5db;">The latest leads added to the system</td></tr>
     </table>
 
     <div class="tip"><strong>Tip:</strong> Click <strong>Refresh Dashboard</strong> at any time to get the latest numbers.</div>
   </div>
 
-  <!-- Section 5: Setting Up Your Company -->
+  <!-- Section 5: Settings -->
   <div class="section" id="s5">
     <div class="section-header">
       <div class="section-number">5</div>
-      <h2 class="section-title">Setting Up Your Company</h2>
+      <h2 class="section-title">Settings</h2>
     </div>
-    <p>Before your team starts working, it's a good idea to complete your company profile. Go to <strong>Settings</strong> in the left menu.</p>
+    <p>Before your team starts working, go to <strong>Settings</strong> in the left menu to complete two important setup steps.</p>
+
+    <h3 class="subsection-title">Company Profile</h3>
+    <p>Complete your company profile so your account is fully set up.</p>
 
     <div class="screenshot-block">
       <img src="screenshots/06-settings-company.png" alt="Settings — Company Profile tab" />
@@ -440,52 +475,55 @@
       <li>You will see the <strong>Company Settings</strong> tab is already selected.</li>
       <li>Update your company name, industry, size, phone, and website if needed.</li>
       <li>To add a company logo, click <strong>Upload Logo</strong> and choose an image file from your computer.</li>
-      <li>You can also turn on or off <strong>Email</strong>, <strong>WhatsApp</strong>, and <strong>Push Notifications</strong> for your team.</li>
+      <li>You can also turn on or off <strong>Email</strong> and <strong>WhatsApp</strong> notifications for your team.</li>
       <li>Click <strong>Save Changes</strong> when you're done.</li>
     </ul>
 
     <div class="tip"><strong>Tip:</strong> Adding a company logo makes the platform look more professional for your team.</div>
-  </div>
 
-  <!-- Section 6: Interested In Options -->
-  <div class="section" id="s6">
-    <div class="section-header">
-      <div class="section-number">6</div>
-      <h2 class="section-title">Setting Up "Interested In" Options</h2>
-    </div>
+    <h3 class="subsection-title">Setting Up "Interested In" Options</h3>
     <p>This is an <strong>important step</strong> that must be done before your team starts adding leads. "Interested In" options are the products or services your company offers. When adding a lead, your team will select from this list to record what the customer is interested in.</p>
 
-    <div class="screenshot-block">
-      <img src="screenshots/07-settings-interested-in.png" alt="Interested In Options list" />
-      <p class="screenshot-caption">The list of "Interested In" options available to your team when adding leads.</p>
-    </div>
-
     <ul class="steps">
-      <li>Go to <strong>Settings</strong> in the left menu.</li>
-      <li>Click the <strong>Interested In Options</strong> tab at the top of the page.</li>
-      <li>You will see a list of options. Click <strong>Add New Option</strong> to create a new one.</li>
+      <li>Click the <strong>Interested In Options</strong> tab at the top of the Settings page.</li>
+      <li>When you first open this tab, the list will be empty as shown below.</li>
     </ul>
 
     <div class="screenshot-block">
-      <img src="screenshots/08-settings-add-interested-in.png" alt="Add New Interested In Option modal" />
-      <p class="screenshot-caption">Type the name of the product or service your company offers and click Create Option.</p>
+      <img src="screenshots/07a-settings-interested-in-empty.png" alt="Interested In Options — empty state" />
+      <p class="screenshot-caption">The Interested In Options tab when no options have been added yet.</p>
     </div>
 
     <ul class="steps">
-      <li>Type the name of the product or service in the <strong>Option Name</strong> box. For example: "Annual Maintenance Contract".</li>
+      <li>Click <strong>Add New Option</strong> to create your first option.</li>
+      <li>Type the name of the product or service in the <strong>Option Name</strong> box, for example: "Software Development".</li>
       <li>Click <strong>Create Option</strong> to save it.</li>
-      <li>Repeat this for every product or service your company offers.</li>
     </ul>
+
+    <div class="screenshot-block">
+      <img src="screenshots/07b-settings-interested-in-adding.png" alt="Add New Interested In Option modal" />
+      <p class="screenshot-caption">Type the name of the product or service and click Create Option to save it.</p>
+    </div>
+
+    <ul class="steps">
+      <li>Repeat this for every product or service your company offers.</li>
+      <li>Once all options are added, the list will look like this:</li>
+    </ul>
+
+    <div class="screenshot-block">
+      <img src="screenshots/07-settings-interested-in.png" alt="Interested In Options — completed list" />
+      <p class="screenshot-caption">The completed list of "Interested In" options available to your team when adding leads.</p>
+    </div>
 
     <div class="warning"><strong>Important:</strong> Set up all your "Interested In" options before inviting your team or adding any leads. Your team will not be able to select a product or service if it's not in this list.</div>
 
-    <p>You can also <strong>Edit</strong>, <strong>Deactivate</strong>, or <strong>Delete</strong> any option from the list at any time.</p>
+    <p>You can also <strong>Edit</strong> or <strong>Deactivate</strong> any option from the list at any time.</p>
   </div>
 
-  <!-- Section 7: Managing Your Team -->
-  <div class="section" id="s7">
+  <!-- Section 6: Managing Your Team -->
+  <div class="section" id="s6">
     <div class="section-header">
-      <div class="section-number">7</div>
+      <div class="section-number">6</div>
       <h2 class="section-title">Managing Your Team</h2>
     </div>
     <p>Once your company is set up, you can start inviting your team members to Leadbox. Go to <strong>Manage Users</strong> in the left menu.</p>
@@ -504,39 +542,45 @@
 
     <ul class="steps">
       <li>Click <strong>Invite User</strong> at the top right of the page.</li>
-      <li>Enter the team member's <strong>email address</strong>.</li>
-      <li>Select their <strong>Role</strong>:<br>
-        — <strong>Team Member</strong>: A salesperson who adds and manages their own leads.<br>
-        — <strong>Referral Partner</strong>: Someone who refers leads to your team but doesn't manage them directly.
-      </li>
+      <li>Enter the team member's <strong>Email Address</strong>.</li>
+      <li><div>Select a <strong>Role</strong> for the team member — there are two options to choose from:
+        <table class="field-table" style="margin-top: 10px; border: 1px solid #d1d5db;">
+          <tr><th>Role</th><th>Who is it for?</th></tr>
+          <tr><td style="border: 1px solid #d1d5db;"><strong>Team Member</strong></td><td style="border: 1px solid #d1d5db;">A salesperson who adds and manages their own leads.</td></tr>
+          <tr><td style="border: 1px solid #d1d5db;"><strong>Referral Partner</strong></td><td style="border: 1px solid #d1d5db;">Someone who refers leads to your team but does not manage them directly.</td></tr>
+        </table>
+      </div></li>
       <li>Click <strong>Send Invitation</strong>. The team member will receive an email with a link to create their account.</li>
     </ul>
 
     <div class="tip"><strong>Tip:</strong> You can change a team member's role later by clicking the <strong>Actions</strong> button next to their name. You can also deactivate a user if they leave your company — this removes their access without deleting their history.</div>
   </div>
 
-  <!-- Section 8: Adding a Lead -->
-  <div class="section" id="s8">
+  <!-- Section 7: Leads -->
+  <div class="section" id="s7">
     <div class="section-header">
-      <div class="section-number">8</div>
-      <h2 class="section-title">Adding a Lead</h2>
+      <div class="section-number">7</div>
+      <h2 class="section-title">Leads</h2>
     </div>
-    <p>A <strong>lead</strong> is a potential customer — someone who has shown interest in your products or services. To add a lead, click <strong>Add Lead</strong> in the left menu.</p>
+    <p>A <strong>lead</strong> is a potential customer — someone who has shown interest in your products or services. This section covers everything you need to know about adding, viewing, and managing leads.</p>
+
+    <h3 class="subsection-title" id="s7-adding">7.1 Adding a Lead</h3>
+    <p>To add a lead, click <strong>Add Lead</strong> in the left menu.</p>
 
     <div class="screenshot-block">
       <img src="screenshots/11-add-lead-filled.png" alt="Add Lead form filled in" />
       <p class="screenshot-caption">Fill in the lead's details and click Create Lead to save.</p>
     </div>
 
-    <table class="field-table">
+    <table class="field-table" style="border: 1px solid #d1d5db;">
       <tr><th>Field</th><th>What to enter</th><th>Required?</th></tr>
-      <tr><td>Client Name</td><td>The full name of the potential customer</td><td><span class="required">Yes</span></td></tr>
-      <tr><td>Company Name</td><td>The company the person works for (if any)</td><td>Optional</td></tr>
-      <tr><td>Mobile Number</td><td>Their phone number</td><td><span class="required">Yes</span></td></tr>
-      <tr><td>Email Address</td><td>Their email address</td><td>Optional</td></tr>
-      <tr><td>City</td><td>The city they are based in</td><td>Optional</td></tr>
-      <tr><td>Lead Source</td><td>How did you hear about this person? (Website, Referral, etc.)</td><td><span class="required">Yes</span></td></tr>
-      <tr><td>Lead Status</td><td>Where is this lead in your sales process? (defaults to New Lead)</td><td>Optional</td></tr>
+      <tr><td style="border: 1px solid #d1d5db;">Client Name</td><td style="border: 1px solid #d1d5db;">The full name of the potential customer</td><td style="border: 1px solid #d1d5db;"><span class="required">Yes</span></td></tr>
+      <tr><td style="border: 1px solid #d1d5db;">Company Name</td><td style="border: 1px solid #d1d5db;">The company the person works for (if any)</td><td style="border: 1px solid #d1d5db;">Optional</td></tr>
+      <tr><td style="border: 1px solid #d1d5db;">Mobile Number</td><td style="border: 1px solid #d1d5db;">Their phone number</td><td style="border: 1px solid #d1d5db;"><span class="required">Yes</span></td></tr>
+      <tr><td style="border: 1px solid #d1d5db;">Email Address</td><td style="border: 1px solid #d1d5db;">Their email address</td><td style="border: 1px solid #d1d5db;">Optional</td></tr>
+      <tr><td style="border: 1px solid #d1d5db;">City</td><td style="border: 1px solid #d1d5db;">The city they are based in</td><td style="border: 1px solid #d1d5db;">Optional</td></tr>
+      <tr><td style="border: 1px solid #d1d5db;">Lead Source</td><td style="border: 1px solid #d1d5db;">How did you hear about this person? (Website, Referral, etc.)</td><td style="border: 1px solid #d1d5db;"><span class="required">Yes</span></td></tr>
+      <tr><td style="border: 1px solid #d1d5db;">Lead Status</td><td style="border: 1px solid #d1d5db;">Where is this lead in your sales process? (defaults to New Lead)</td><td style="border: 1px solid #d1d5db;">Optional</td></tr>
     </table>
 
     <ul class="steps">
@@ -547,14 +591,8 @@
     </ul>
 
     <div class="tip"><strong>Tip:</strong> You can also add a lead directly from the Dashboard by clicking the <strong>Add Lead</strong> button there.</div>
-  </div>
 
-  <!-- Section 9: Viewing Your Leads -->
-  <div class="section" id="s9">
-    <div class="section-header">
-      <div class="section-number">9</div>
-      <h2 class="section-title">Viewing Your Leads</h2>
-    </div>
+    <h3 class="subsection-title" id="s7-my-leads">7.2 Viewing Your Leads</h3>
     <p><strong>My Leads</strong> shows only the leads that are assigned to you personally. Click <strong>My Leads</strong> in the left menu to see them.</p>
 
     <div class="screenshot-block">
@@ -568,15 +606,9 @@
       <li>Use <strong>Filters</strong> to narrow down leads by status, source, or date.</li>
       <li>Click <strong>Edit Lead</strong> next to any lead to update their information or add notes.</li>
     </ul>
-  </div>
 
-  <!-- Section 10: All Leads -->
-  <div class="section" id="s10">
-    <div class="section-header">
-      <div class="section-number">10</div>
-      <h2 class="section-title">Viewing All Company Leads</h2>
-    </div>
-    <p><strong>All Leads</strong> shows every lead in your company — including leads added by your team members. This is a view only available to Company Admins and Managers.</p>
+    <h3 class="subsection-title" id="s7-all-leads">7.3 Viewing All Company Leads</h3>
+    <p><strong>All Leads</strong> shows every lead in your company — including leads added by your team members. This view is only available to Company Admins and Managers.</p>
 
     <div class="screenshot-block">
       <img src="screenshots/14-all-leads.png" alt="All Leads page" />
@@ -590,14 +622,8 @@
       <li>Click <strong>Export</strong> to download the leads as a spreadsheet file.</li>
       <li>Click <strong>Edit Lead</strong> next to any lead to make changes.</li>
     </ul>
-  </div>
 
-  <!-- Section 11: Assign Leads -->
-  <div class="section" id="s11">
-    <div class="section-header">
-      <div class="section-number">11</div>
-      <h2 class="section-title">Assigning Leads to Team Members</h2>
-    </div>
+    <h3 class="subsection-title" id="s7-assign">7.4 Assigning Leads to Team Members</h3>
     <p>When a new lead comes in, it is "unassigned" — no one is responsible for it yet. You can assign leads to your team members so they know who to follow up with.</p>
 
     <div class="screenshot-block">
@@ -615,10 +641,10 @@
     <div class="tip"><strong>Tip:</strong> Once a lead is assigned, it will appear in that team member's <strong>My Leads</strong> page and they will be notified.</div>
   </div>
 
-  <!-- Section 12: Follow-ups -->
-  <div class="section" id="s12">
+  <!-- Section 8: Follow-ups -->
+  <div class="section" id="s8">
     <div class="section-header">
-      <div class="section-number">12</div>
+      <div class="section-number">8</div>
       <h2 class="section-title">Follow-ups</h2>
     </div>
     <p>A <strong>follow-up</strong> is a reminder to contact a lead again on a specific date. The Follow-ups page shows all scheduled follow-ups for your team so nothing falls through the cracks.</p>
@@ -638,10 +664,10 @@
     <div class="warning"><strong>Important:</strong> Follow-up dates are set when adding or editing a lead. Make sure your team sets follow-up dates so this page stays up to date.</div>
   </div>
 
-  <!-- Section 13: Reports -->
-  <div class="section" id="s13">
+  <!-- Section 9: Reports -->
+  <div class="section" id="s9">
     <div class="section-header">
-      <div class="section-number">13</div>
+      <div class="section-number">9</div>
       <h2 class="section-title">Reports</h2>
     </div>
     <p>Reports help you understand how your business is performing — how many leads are converting, where they are coming from, and how your team is doing.</p>
@@ -682,10 +708,10 @@
     </ul>
   </div>
 
-  <!-- Section 14: Import Leads -->
-  <div class="section" id="s14">
+  <!-- Section 10: Import Leads -->
+  <div class="section" id="s10">
     <div class="section-header">
-      <div class="section-number">14</div>
+      <div class="section-number">10</div>
       <h2 class="section-title">Importing Leads in Bulk</h2>
     </div>
     <p>If you have a large list of leads in a spreadsheet, you can upload them all at once instead of entering them one by one. This saves a lot of time.</p>
@@ -714,6 +740,9 @@
 
     <p>This page shows each import — when it was done, how many leads were imported, and if any rows were rejected. Click on any import to see which rows had errors and why.</p>
   </div>
+
+  </div><!-- /.main-content -->
+</div><!-- /.page-layout -->
 
 </body>
 </html>

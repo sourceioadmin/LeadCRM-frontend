@@ -373,9 +373,9 @@ const AllLeads: React.FC = () => {
 
   const formatCurrency = (amount: number | null | undefined): string => {
     if (amount == null) return '-';
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat('en-IN', {
       style: 'currency',
-      currency: 'USD',
+      currency: 'INR',
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
     }).format(amount);
@@ -579,7 +579,7 @@ const AllLeads: React.FC = () => {
             <Row className="g-3 mb-3">
               <Col xs={12} sm={6} md={6}>
                 <Form.Group>
-                  <Form.Label className="small">Budget Min ($)</Form.Label>
+                  <Form.Label className="small">Budget Min (₹)</Form.Label>
                   <Form.Control
                     type="number"
                     size="sm"
@@ -593,7 +593,7 @@ const AllLeads: React.FC = () => {
               </Col>
               <Col xs={12} sm={6} md={6}>
                 <Form.Group>
-                  <Form.Label className="small">Budget Max ($)</Form.Label>
+                  <Form.Label className="small">Budget Max (₹)</Form.Label>
                   <Form.Control
                     type="number"
                     size="sm"

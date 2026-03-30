@@ -1304,39 +1304,47 @@ const AddLeadModal: React.FC<AddLeadModalProps> = ({ show, onHide, onSuccess, le
                       <Col xs={12}>
                         <Form.Group className="mb-3">
                           <Form.Label className="fw-medium">Interested In</Form.Label>
-                          {interestedInOptions.length > 0 && (
-                            <div className="mb-2 p-2 border rounded" style={{ background: 'var(--bs-light, #f8f9fa)' }}>
-                              {interestedInOptions.map((option) => (
-                                <Form.Check
-                                  key={option.interestedInOptionId}
-                                  type="checkbox"
-                                  id={`interested-in-${option.interestedInOptionId}`}
-                                  label={option.name}
-                                  checked={selectedInterestedInOptionIds.includes(option.interestedInOptionId)}
-                                  onChange={(e) => {
-                                    if (e.target.checked) {
-                                      setSelectedInterestedInOptionIds(prev => [...prev, option.interestedInOptionId]);
-                                    } else {
-                                      setSelectedInterestedInOptionIds(prev => prev.filter(id => id !== option.interestedInOptionId));
-                                    }
-                                  }}
-                                  disabled={loading || isLeadReadonly}
-                                  className="mb-1"
-                                />
-                              ))}
-                            </div>
-                          )}
-                          <Form.Control
-                            as="textarea"
-                            rows={2}
-                            size="sm"
-                            name="interestedIn"
-                            value={formData.interestedIn}
-                            onChange={handleChange}
-                            placeholder="Other / Additional notes"
-                            disabled={loading || isLeadReadonly}
-                            maxLength={500}
-                          />
+                          <div className="border rounded overflow-hidden">
+                            {interestedInOptions.length > 0 && (
+                              <div className="p-2" style={{ background: 'var(--bs-light, #f8f9fa)' }}>
+                                {interestedInOptions.map((option) => (
+                                  <Form.Check
+                                    key={option.interestedInOptionId}
+                                    type="checkbox"
+                                    id={`interested-in-${option.interestedInOptionId}`}
+                                    label={option.name}
+                                    checked={selectedInterestedInOptionIds.includes(option.interestedInOptionId)}
+                                    onChange={(e) => {
+                                      if (e.target.checked) {
+                                        setSelectedInterestedInOptionIds(prev => [...prev, option.interestedInOptionId]);
+                                      } else {
+                                        setSelectedInterestedInOptionIds(prev => prev.filter(id => id !== option.interestedInOptionId));
+                                      }
+                                    }}
+                                    disabled={loading || isLeadReadonly}
+                                    className="mb-1"
+                                  />
+                                ))}
+                              </div>
+                            )}
+                            {interestedInOptions.length > 0 && (
+                              <div className="text-center border-top border-bottom py-1" style={{ background: '#fff' }}>
+                                <small className="text-muted">or</small>
+                              </div>
+                            )}
+                            <Form.Control
+                              as="textarea"
+                              rows={2}
+                              size="sm"
+                              name="interestedIn"
+                              value={formData.interestedIn}
+                              onChange={handleChange}
+                              placeholder="Type a custom option..."
+                              disabled={loading || isLeadReadonly}
+                              maxLength={500}
+                              style={{ border: 'none', borderRadius: 0, resize: 'none' }}
+                            />
+                          </div>
                         </Form.Group>
                       </Col>
                     </Row>
@@ -1345,21 +1353,23 @@ const AddLeadModal: React.FC<AddLeadModalProps> = ({ show, onHide, onSuccess, le
                       <Col xs={12} md={6}>
                         <Form.Group className="mb-3">
                           <Form.Label className="fw-medium">Expected Budget</Form.Label>
-                          <Form.Control
-                            type="number"
-                            size="sm"
-                            name="expectedBudget"
-                            value={formData.expectedBudget}
-                            onChange={handleChange}
-                            placeholder="Enter expected budget"
-                            isInvalid={!!errors.expectedBudget}
-                            disabled={loading}
-                            min="0"
-                            step="0.01"
-                          />
-                          <Form.Control.Feedback type="invalid">
-                            {errors.expectedBudget}
-                          </Form.Control.Feedback>
+                          <InputGroup size="sm">
+                            <InputGroup.Text>₹</InputGroup.Text>
+                            <Form.Control
+                              type="number"
+                              name="expectedBudget"
+                              value={formData.expectedBudget}
+                              onChange={handleChange}
+                              placeholder="Enter expected budget"
+                              isInvalid={!!errors.expectedBudget}
+                              disabled={loading}
+                              min="0"
+                              step="0.01"
+                            />
+                            <Form.Control.Feedback type="invalid">
+                              {errors.expectedBudget}
+                            </Form.Control.Feedback>
+                          </InputGroup>
                         </Form.Group>
                       </Col>
 

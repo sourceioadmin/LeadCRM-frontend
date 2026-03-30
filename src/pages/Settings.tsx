@@ -3099,9 +3099,6 @@ const Settings: React.FC = () => {
                                               {option.isActive ? <ToggleRight size={14} className="me-1" /> : <ToggleLeft size={14} className="me-1" />}
                                               {option.isActive ? 'Deactivate' : 'Activate'}
                                             </Button>
-                                            <Button variant="outline-danger" size="sm" onClick={() => setDeletingInterestedIn(option)} className="flex-fill">
-                                              <Trash2 size={14} className="me-1" />Delete
-                                            </Button>
                                           </>
                                         )}
                                       </div>
@@ -3182,9 +3179,6 @@ const Settings: React.FC = () => {
                                           </Button>
                                           <Button variant="outline-warning" size="sm" title={option.isActive ? 'Deactivate' : 'Activate'} onClick={() => handleToggleInterestedInActive(option)}>
                                             {option.isActive ? <ToggleRight size={14} /> : <ToggleLeft size={14} />}
-                                          </Button>
-                                          <Button variant="outline-danger" size="sm" title="Delete" onClick={() => setDeletingInterestedIn(option)}>
-                                            <Trash2 size={14} />
                                           </Button>
                                         </div>
                                       )}
