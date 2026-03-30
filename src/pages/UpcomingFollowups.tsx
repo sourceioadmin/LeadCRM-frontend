@@ -5,10 +5,15 @@ import { getUpcomingFollowups, rescheduleFollowup, addNote, updateLead, getLeadS
 import { Lead, LeadStatus, UpcomingFollowupsResponse, RescheduleFollowupRequest, AddNoteRequest } from '../types/Lead';
 import { formatDate, formatDateForInput, isOverdue as checkIsOverdue, isToday, getTodayForInput } from '../utils/dateUtils';
 import AddLeadModal from '../components/AddLeadModal';
+import { useAuth } from '../contexts/AuthContext';
 
 const UpcomingFollowups: React.FC = () => {
+  const { user } = useAuth();
+  const isAdminOrManager = user?.userRoleId === 2 || user?.userRoleId === 3;
+
   // State management
   const [followupsData, setFollowupsData] = useState<UpcomingFollowupsResponse | null>(null);
+  const [showAllFollowups, setShowAllFollowups] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [leadStatuses, setLeadStatuses] = useState<LeadStatus[]>([]);
@@ -277,6 +282,11 @@ const UpcomingFollowups: React.FC = () => {
       return statusName === 'followup';
     });
 
+    // If not showing all, restrict to current user's assigned followups
+    if (!isAdminOrManager || !showAllFollowups) {
+      filtered = filtered.filter(lead => lead.assignedToUserId === user?.userId);
+    }
+
     // Filter by from date
     if (fromDate) {
       const from = new Date(fromDate);
@@ -415,6 +425,17 @@ const UpcomingFollowups: React.FC = () => {
                 </Button>
               </Col>
             </Row>
+
+            {isAdminOrManager && (
+              <Form.Check
+                type="checkbox"
+                id="show-all-followups"
+                label="Show me all Follow ups"
+                checked={showAllFollowups}
+                onChange={(e) => setShowAllFollowups(e.target.checked)}
+                className="mt-1"
+              />
+            )}
           </Card.Body>
         </Card>
       </div>

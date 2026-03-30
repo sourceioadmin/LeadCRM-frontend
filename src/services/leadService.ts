@@ -313,8 +313,8 @@ export const bulkAssignLeads = async (leadIds: number[], targetUserId: number): 
 /**
  * Get upcoming follow-ups for the current user
  */
-export const getUpcomingFollowups = async (): Promise<ApiResponse<UpcomingFollowupsResponse>> => {
-  const response = await api.get('/lead/upcoming-followups');
+export const getUpcomingFollowups = async (showAll = false): Promise<ApiResponse<UpcomingFollowupsResponse>> => {
+  const response = await api.get('/lead/upcoming-followups', { params: showAll ? { showAll: true } : {} });
   return response.data;
 };
 
