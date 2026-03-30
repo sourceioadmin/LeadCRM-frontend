@@ -454,7 +454,7 @@ const Dashboard: React.FC = () => {
       <div className="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 gap-3">
         <div className="flex-grow-1">
           <h2 className="mb-1">
-            Welcome back, {user?.fullName || 'User'}! 
+            Welcome, {user?.fullName || 'User'}!
             {user?.roleName && (
               <Badge 
                 bg={getRoleBadgeVariant(user.roleName)} 

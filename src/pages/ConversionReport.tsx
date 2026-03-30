@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Card, Row, Col, Form, Button, Alert, Spinner, Table, Badge } from 'react-bootstrap';
-import { Filter, TrendingUp, Calendar, Users, Target, RefreshCw, User, XCircle } from 'lucide-react';
+import { Card, Row, Col, Form, Button, Alert, Spinner, Table, Badge, Collapse } from 'react-bootstrap';
+import { Filter, TrendingUp, Calendar, Users, Target, RefreshCw, User, XCircle, ChevronDown } from 'lucide-react';
 import Chart from 'react-apexcharts';
 import { ApexOptions } from 'apexcharts';
 import { getConversionReport, getTeamPerformance } from '../services/reportService';
@@ -45,6 +45,9 @@ const ConversionReport: React.FC = () => {
     leadSourceId: '',
     assignedUserId: '',
   });
+
+  // Filter panel open/close
+  const [filtersOpen, setFiltersOpen] = useState(false);
 
   // Dropdown data
   const [leadSources, setLeadSources] = useState<LeadSource[]>([]);
@@ -259,20 +262,30 @@ const ConversionReport: React.FC = () => {
           </h2>
           <p className="text-muted mb-0">Track your lead conversion performance and analytics</p>
         </div>
-        <Button variant="outline-primary" onClick={loadReportData} disabled={loading}>
-          <RefreshCw className={`me-2 ${loading ? 'spin' : ''}`} size={16} />
-          Refresh
+        <Button variant="outline-primary" onClick={() => { loadReportData(); loadTeamPerformance(); }} disabled={loading}>
+          <RefreshCw className={`${loading ? 'spin' : ''} me-0 me-sm-2`} size={16} />
+          <span className="d-none d-sm-inline">Refresh</span>
         </Button>
       </div>
 
       {/* Filters */}
       <Card className="mb-4 shadow-sm">
-        <Card.Header className="bg-white">
+        <Card.Header
+          className="bg-white d-flex justify-content-between align-items-center"
+          style={{ cursor: 'pointer' }}
+          onClick={() => setFiltersOpen(o => !o)}
+        >
           <h5 className="mb-0">
             <Filter className="me-2" size={18} />
             Filters
           </h5>
+          <ChevronDown
+            size={18}
+            style={{ transform: filtersOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }}
+          />
         </Card.Header>
+        <Collapse in={filtersOpen}>
+        <div>
         <Card.Body>
           <Row className="g-3">
             <Col md={3}>
@@ -353,6 +366,8 @@ const ConversionReport: React.FC = () => {
             </Col>
           </Row>
         </Card.Body>
+        </div>
+        </Collapse>
       </Card>
 
       {/* Error Display */}
@@ -382,9 +397,7 @@ const ConversionReport: React.FC = () => {
       {/* Report Content */}
       {reportData && reportData.totalLeads > 0 && (
         <div>
-          <p className="text-muted small mb-3">
-            Leads marked Lost are counted only up to the stage they were in when lost; they are not counted in later stages.
-          </p>
+          <hr className="my-4" />
           {/* Key Metrics Cards */}
           <Row className="mb-4 g-3">
             <Col md={6} lg={3}>
@@ -597,19 +610,19 @@ const ConversionReport: React.FC = () => {
                                 </div>
                               </td>
                               <td className="text-center">
-                                <Badge bg="primary" className="fs-6 px-3 py-2">
+                                <Badge bg="primary" className="px-2 py-1">
                                   {member.leadsAssigned}
                                 </Badge>
                               </td>
                               <td className="text-center">
-                                <Badge bg="success" className="fs-6 px-3 py-2">
+                                <Badge bg="success" className="px-2 py-1">
                                   {member.convertedLeads}
                                 </Badge>
                               </td>
                               <td className="text-center">
                                 <Badge
                                   bg={(member.conversionRate ?? 0) >= 50 ? "success" : (member.conversionRate ?? 0) >= 25 ? "warning" : "danger"}
-                                  className="fs-6 px-3 py-2"
+                                  className="px-2 py-1"
                                 >
                                   {(member.conversionRate ?? 0).toFixed(1)}%
                                 </Badge>
