@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Card, Row, Col, Form, Button, Alert, Spinner, Table, Badge } from 'react-bootstrap';
-import { Filter, TrendingUp, Calendar, Users, Trophy, X, RefreshCw, Target, BarChart3 } from 'lucide-react';
+import { Card, Row, Col, Form, Button, Alert, Spinner, Table, Badge, Collapse } from 'react-bootstrap';
+import { Filter, TrendingUp, Calendar, Users, Trophy, X, RefreshCw, Target, BarChart3, ChevronDown } from 'lucide-react';
 import Chart from 'react-apexcharts';
 import { ApexOptions } from 'apexcharts';
 import { getWinLossReport } from '../services/reportService';
@@ -47,6 +47,9 @@ const WinLossReport: React.FC = () => {
     leadSourceId: '',
     leadOwnerId: '',
   });
+
+  // Filter panel open/close
+  const [filtersOpen, setFiltersOpen] = useState(false);
 
   // Dropdown data
   const [leadSources, setLeadSources] = useState<LeadSource[]>([]);
@@ -702,19 +705,29 @@ const leadSourceBarChartOptions: ApexOptions = {
           <p className="text-muted mb-0">Analyze your win/loss ratios and identify patterns</p>
         </div>
         <Button variant="outline-primary" onClick={loadReportData} disabled={loading}>
-          <RefreshCw className={`me-2 ${loading ? 'spin' : ''}`} size={16} />
-          Refresh
+          <RefreshCw className={`${loading ? 'spin' : ''} me-0 me-sm-2`} size={16} />
+          <span className="d-none d-sm-inline">Refresh</span>
         </Button>
       </div>
 
       {/* Filters */}
       <Card className="mb-4 shadow-sm">
-        <Card.Header className="bg-white">
+        <Card.Header
+          className="bg-white d-flex justify-content-between align-items-center"
+          style={{ cursor: 'pointer' }}
+          onClick={() => setFiltersOpen(o => !o)}
+        >
           <h5 className="mb-0">
             <Filter className="me-2" size={18} />
             Filters
           </h5>
+          <ChevronDown
+            size={18}
+            style={{ transform: filtersOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }}
+          />
         </Card.Header>
+        <Collapse in={filtersOpen}>
+        <div>
         <Card.Body>
           <Row className="g-3">
             <Col xs={12} sm={6} md={3}>
@@ -791,6 +804,8 @@ const leadSourceBarChartOptions: ApexOptions = {
             </Col>
           </Row>
         </Card.Body>
+        </div>
+        </Collapse>
       </Card>
 
       {/* Error Display */}
@@ -820,6 +835,7 @@ const leadSourceBarChartOptions: ApexOptions = {
       {/* Report Content */}
       {reportData && reportData.totalLeads > 0 && (
         <>
+          <hr className="my-4" />
           {/* Key Metrics Cards */}
           <Row className="mb-4 g-3">
             <Col xs={12} sm={6} md={6} lg={3}>
