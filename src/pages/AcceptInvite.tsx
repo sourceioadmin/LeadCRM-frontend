@@ -281,6 +281,12 @@ const AcceptInvite: React.FC = () => {
               )}
 
               <Form onSubmit={handleSubmit}>
+                {error && !errorField && (
+                  <Alert variant="danger" className="mb-3">
+                    {error}
+                  </Alert>
+                )}
+
                 <Form.Group className="mb-3">
                   <Form.Label>
                     Full Name <span className="text-danger">*</span>
