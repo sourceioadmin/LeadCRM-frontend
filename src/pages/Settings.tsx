@@ -62,7 +62,9 @@ const Settings: React.FC = () => {
   const { user, updateUser } = useAuth();
   const { showSuccess, showError, showInfo } = useToast();
   const { sendTestPush, isLoading: pushLoading } = usePushNotification();
-  const [activeTab, setActiveTab] = useState('company');
+  const [activeTab, setActiveTab] = useState(
+    (user?.roleName === 'Company Admin' || user?.roleName === 'System Admin') ? 'company' : 'profile'
+  );
 
   // Company Settings state
   const [companySettings, setCompanySettings] = useState<CompanySettings | null>(null);
@@ -172,9 +174,13 @@ const Settings: React.FC = () => {
     isActive: true
   });
 
-  // Load company settings on component mount
+  // Load company settings on component mount (admins only)
   useEffect(() => {
-    loadCompanySettings();
+    if (user?.roleName === 'Company Admin' || user?.roleName === 'System Admin') {
+      loadCompanySettings();
+    } else {
+      setLoading(false);
+    }
   }, []);
 
   // Load lead sources when tab changes to lead-sources
