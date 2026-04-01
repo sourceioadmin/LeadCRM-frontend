@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Leadbox – Referral Partner User Guide</title>
+  <style>
+    /* ===== Base ===== */
+    body {
+      font-family: Arial, sans-serif;
+      font-size: 11pt;
+      line-height: 1.8;
+      color: #222;
+      margin: 0;
+      padding: 0;
+      background: #fff;
+    }
+
+    /* ===== Layout ===== */
+    .page-layout {
+      display: flex;
+      align-items: flex-start;
+      min-height: 100vh;
+    }
+    .toc-sidebar {
+      width: 240px;
+      flex-shrink: 0;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      background: #f0fdfa;
+      border-right: 1px solid #99f6e4;
+      padding: 28px 20px;
+      box-sizing: border-box;
+    }
+    .main-content {
+      flex: 1;
+      padding: 16px 48px;
+      max-width: 960px;
+      box-sizing: border-box;
+    }
+
+    /* ===== Cover ===== */
+    .cover {
+      text-align: center;
+      padding: 8px 0 12px;
+      border-bottom: 3px solid #0d9488;
+      margin-bottom: 24px;
+    }
+    .cover .app-name {
+      font-size: 42pt;
+      font-weight: 700;
+      color: #0d9488;
+      letter-spacing: 2px;
+      margin: 0;
+    }
+    .cover .subtitle {
+      font-size: 16pt;
+      color: #555;
+      margin: 10px 0 30px;
+    }
+    .cover .doc-meta {
+      margin-top: 30px;
+      color: #888;
+      font-size: 10pt;
+    }
+
+    /* ===== Table of Contents (sidebar) ===== */
+    .toc-sidebar h2 {
+      margin-top: 0;
+      color: #0d9488;
+      font-size: 12pt;
+      border-bottom: 2px solid #99f6e4;
+      padding-bottom: 8px;
+    }
+    .toc-sidebar ol {
+      margin: 0;
+      padding-left: 18px;
+    }
+    .toc-sidebar li {
+      margin: 6px 0;
+    }
+    .toc-sidebar a {
+      color: #0d9488;
+      text-decoration: none;
+      font-size: 9.5pt;
+      line-height: 1.4;
+      display: block;
+    }
+    .toc-sidebar a:hover {
+      text-decoration: underline;
+    }
+    .toc-sub {
+      list-style: none;
+      padding-left: 12px;
+      margin: 4px 0 4px 0;
+    }
+    .toc-sub li {
+      margin: 3px 0;
+    }
+    .toc-sub a {
+      font-size: 9pt;
+      color: #1f6b67;
+    }
+
+    /* ===== Section ===== */
+    .section {
+      margin-bottom: 60px;
+      padding-bottom: 40px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    .section:last-child {
+      border-bottom: none;
+    }
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+    .section-number {
+      background: #0d9488;
+      color: #fff;
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 13pt;
+      flex-shrink: 0;
+    }
+    h2.section-title {
+      font-size: 17pt;
+      color: #0d9488;
+      margin: 0;
+    }
+    h3.subsection-title {
+      font-size: 13pt;
+      color: #1f6b67;
+      margin-top: 28px;
+      margin-bottom: 10px;
+      border-left: 4px solid #0d9488;
+      padding-left: 10px;
+    }
+
+    /* ===== Screenshot ===== */
+    .screenshot-block {
+      margin: 20px 0 28px;
+    }
+    .screenshot-block img {
+      width: 100%;
+      max-width: 780px;
+      display: block;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+      margin: 0 auto;
+    }
+    .screenshot-caption {
+      text-align: center;
+      font-size: 9pt;
+      color: #888;
+      margin-top: 6px;
+      font-style: italic;
+    }
+
+    /* ===== Steps ===== */
+    .steps {
+      padding-left: 0;
+      list-style: none;
+      margin: 14px 0;
+      counter-reset: step-counter;
+    }
+    .steps li {
+      counter-increment: step-counter;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 10px;
+      font-size: 10.5pt;
+    }
+    .steps li::before {
+      content: counter(step-counter);
+      background: #ccfbf1;
+      color: #0d9488;
+      border-radius: 50%;
+      min-width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 9pt;
+      flex-shrink: 0;
+    }
+
+    /* ===== Tips / Notes ===== */
+    .tip {
+      background: #f0fdfa;
+      border-left: 4px solid #0d9488;
+      border-radius: 4px;
+      padding: 12px 16px;
+      margin: 16px 0;
+      font-size: 10pt;
+      color: #1f6b67;
+    }
+    .tip strong {
+      color: #0d9488;
+    }
+    .warning {
+      background: #fffbeb;
+      border-left: 4px solid #f59e0b;
+      border-radius: 4px;
+      padding: 12px 16px;
+      margin: 16px 0;
+      font-size: 10pt;
+      color: #78350f;
+    }
+    .warning strong {
+      color: #b45309;
+    }
+
+    /* ===== Field Table ===== */
+    .field-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 10pt;
+      margin: 14px 0;
+    }
+    .field-table th {
+      background: #0d9488;
+      color: #fff;
+      padding: 8px 12px;
+      text-align: left;
+    }
+    .field-table td {
+      padding: 8px 12px;
+      border-bottom: 1px solid #e5e7eb;
+      vertical-align: top;
+    }
+    .field-table tr:nth-child(even) td {
+      background: #f9fafb;
+    }
+    .required {
+      color: #dc2626;
+      font-weight: bold;
+    }
+
+    @media print {
+      .toc-sidebar { display: none; }
+      .main-content { padding: 0; }
+    }
+  </style>
+</head>
+<body>
+<div class="page-layout">
+
+  <!-- Sidebar TOC -->
+  <nav class="toc-sidebar">
+    <h2>Contents</h2>
+    <ol>
+      <li><a href="#section-1">Accepting Your Invitation</a></li>
+      <li><a href="#section-2">Logging In</a></li>
+      <li><a href="#section-3">Your Dashboard</a></li>
+      <li><a href="#section-4">Adding a Lead</a></li>
+      <li><a href="#section-5">Viewing Your Leads</a></li>
+    </ol>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="main-content">
+
+    <!-- Cover -->
+    <div class="cover">
+      <p class="app-name">Leadbox</p>
+      <p class="subtitle">User Guide for Referral Partners</p>
+      <div class="doc-meta">Version 1.0 &nbsp;|&nbsp; April 2026</div>
+    </div>
+
+    <!-- Section 1: Accepting Your Invitation -->
+    <div class="section" id="section-1">
+      <div class="section-header">
+        <div class="section-number">1</div>
+        <h2 class="section-title">Accepting Your Invitation</h2>
+      </div>
+      <p>As a Referral Partner, you are invited to Leadbox by a company administrator. You will receive an invitation email at the address registered by the admin. Follow the steps below to accept the invitation and set up your account.</p>
+
+      <h3 class="subsection-title">Step 1 — Check Your Email</h3>
+      <p>Look for an invitation email from Leadbox in your inbox. The email contains a personal invitation link that is unique to you.</p>
+
+      <div class="screenshot-block">
+        <img src="screenshots/rp-email-invite.png" alt="Invitation email" style="max-width: 580px;" />
+        <p class="screenshot-caption">The invitation email you will receive in your inbox</p>
+      </div>
+
+      <ol class="steps">
+        <li>Open your email inbox and look for an email from Leadbox with the subject line containing "You're invited".</li>
+        <li>Click the <strong>Accept Invitation</strong> button in the email to open the registration page.</li>
+      </ol>
+
+      <div class="tip"><strong>Tip:</strong> If you don't see the email, check your Spam or Junk folder. The invitation link may expire, so accept it promptly.</div>
+
+      <h3 class="subsection-title">Step 2 — Complete Your Registration</h3>
+      <p>Clicking the invitation link opens the registration page. Fill in your details to create your Leadbox account.</p>
+
+      <div class="screenshot-block">
+        <img src="screenshots/referral-partner-accept-invite.png" alt="Accept invitation registration form" style="max-width: 480px;" />
+        <p class="screenshot-caption">The registration form — fill in your details to activate your account</p>
+      </div>
+
+      <table class="field-table">
+        <tr><th>Field</th><th>What to enter</th><th>Required?</th></tr>
+        <tr><td>Full Name</td><td>Your full name</td><td><span class="required">Required</span></td></tr>
+        <tr><td>Username</td><td>A unique username for your account</td><td><span class="required">Required</span></td></tr>
+        <tr><td>Phone Number</td><td>Your contact number (used for WhatsApp notifications)</td><td><span class="required">Required</span></td></tr>
+        <tr><td>Password</td><td>Create a strong password</td><td><span class="required">Required</span></td></tr>
+        <tr><td>Confirm Password</td><td>Re-enter your password to confirm</td><td><span class="required">Required</span></td></tr>
+      </table>
+
+      <ol class="steps">
+        <li>Enter your <strong>Full Name</strong>, <strong>Username</strong>, and <strong>Phone Number</strong>.</li>
+        <li>Create a <strong>Password</strong> and re-enter it in the <strong>Confirm Password</strong> field.</li>
+        <li>Click <strong>Accept Invitation</strong> to complete your registration.</li>
+      </ol>
+
+      <div class="warning"><strong>Note:</strong> Your email address is pre-filled and cannot be changed — it was set by the administrator who invited you.</div>
+
+    </div>
+    <!-- End Section 1 -->
+
+    <!-- Section 2: Logging In -->
+    <div class="section" id="section-2">
+      <div class="section-header">
+        <div class="section-number">2</div>
+        <h2 class="section-title">Logging In</h2>
+      </div>
+      <p>Once your account is set up, you can log in to Leadbox at any time using your email and password.</p>
+
+      <div class="screenshot-block">
+        <img src="screenshots/rp-loginpage.png" alt="Leadbox login page" style="max-width: 480px;" />
+        <p class="screenshot-caption">The Leadbox login page — enter your email and password to sign in</p>
+      </div>
+
+      <ol class="steps">
+        <li>Go to the Leadbox login page.</li>
+        <li>Enter your <strong>Email</strong> and <strong>Password</strong>.</li>
+        <li>Click <strong>Sign In</strong> to access your account.</li>
+      </ol>
+
+      <div class="tip"><strong>Tip:</strong> Tick <strong>Remember me</strong> if you want to stay logged in on your device.</div>
+    </div>
+    <!-- End Section 2 -->
+
+    <!-- Section 3: Your Dashboard -->
+    <div class="section" id="section-3">
+      <div class="section-header">
+        <div class="section-number">3</div>
+        <h2 class="section-title">Your Dashboard</h2>
+      </div>
+      <p>The Dashboard is the first page you see after logging in. It gives you a quick summary of the leads you have submitted and their current status.</p>
+
+      <div class="screenshot-block">
+        <img src="screenshots/rp-initial-dashboard.png" alt="Referral Partner Dashboard" style="width: 900px; max-width: 100%;" />
+        <p class="screenshot-caption">Your Dashboard — an overview of leads you have submitted</p>
+      </div>
+
+      <ol class="steps">
+        <li>After logging in, you will land on the <strong>Dashboard</strong> automatically.</li>
+        <li>Use the sidebar on the left to navigate to other pages.</li>
+        <li>The summary cards at the top show key counts — total leads, new leads, converted leads, and more.</li>
+      </ol>
+    </div>
+    <!-- End Section 3 -->
+
+    <!-- Section 4: Adding a Lead -->
+    <div class="section" id="section-4">
+      <div class="section-header">
+        <div class="section-number">4</div>
+        <h2 class="section-title">Adding a Lead</h2>
+      </div>
+      <p>As a Referral Partner, your primary role is to submit leads — people or businesses you think may be interested in your company's products or services.</p>
+
+      <div class="screenshot-block">
+        <img src="screenshots/rp-add-lead.png" alt="Add Lead form filled with example data" />
+        <p class="screenshot-caption">The Add Lead form — fill in the lead's details and click Create Lead</p>
+      </div>
+
+      <ol class="steps">
+        <li>Click <strong>Add Lead</strong> in the left sidebar.</li>
+        <li>Fill in the lead's details in the form that appears.</li>
+        <li>Click <strong>Save Lead</strong> to submit it.</li>
+      </ol>
+
+      <table class="field-table">
+        <tr><th>Field</th><th>What to enter</th><th>Required?</th></tr>
+        <tr><td>First Name</td><td>Lead's first name</td><td><span class="required">Required</span></td></tr>
+        <tr><td>Last Name</td><td>Lead's last name</td><td><span class="required">Required</span></td></tr>
+        <tr><td>Email</td><td>Lead's email address</td><td>Optional</td></tr>
+        <tr><td>Phone</td><td>Lead's contact number</td><td>Optional</td></tr>
+        <tr><td>Company</td><td>Lead's company or organisation</td><td>Optional</td></tr>
+        <tr><td>Interested In</td><td>Product or service the lead is interested in</td><td>Optional</td></tr>
+        <tr><td>Source</td><td>How you found this lead (e.g. Referral, WhatsApp)</td><td>Optional</td></tr>
+        <tr><td>Notes</td><td>Any additional context about the lead</td><td>Optional</td></tr>
+      </table>
+
+      <div class="tip"><strong>Tip:</strong> The more details you provide, the easier it is for the sales team to follow up with the lead.</div>
+    </div>
+    <!-- End Section 4 -->
+
+    <!-- Section 5: Viewing Your Leads -->
+    <div class="section" id="section-5">
+      <div class="section-header">
+        <div class="section-number">5</div>
+        <h2 class="section-title">Viewing Your Leads</h2>
+      </div>
+      <p>The <strong>My Leads</strong> page shows all the leads you have submitted. You can track each lead's status to see how far along it is in the sales process.</p>
+
+      <div class="screenshot-block">
+        <img src="screenshots/rp-my-leads.png" alt="My Referred Leads page" style="width: 900px; max-width: 100%;" />
+        <p class="screenshot-caption">My Referred Leads — all leads you have submitted with their current status</p>
+      </div>
+
+      <ol class="steps">
+        <li>Click <strong>My Leads</strong> in the left sidebar.</li>
+        <li>You will see a list of all leads you have added.</li>
+        <li>Each lead shows the name, status, source, and when it was added.</li>
+        <li>Click on any lead to view its full details.</li>
+      </ol>
+
+      <div class="tip"><strong>Tip:</strong> Use the search bar at the top to quickly find a specific lead by name or company.</div>
+    </div>
+    <!-- End Section 5 -->
+
+  </div><!-- end main-content -->
+</div><!-- end page-layout -->
+</body>
+</html>
