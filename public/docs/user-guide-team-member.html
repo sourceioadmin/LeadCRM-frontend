@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Leadbox – Team Member User Guide</title>
+  <style>
+    /* ===== Base ===== */
+    body {
+      font-family: Arial, sans-serif;
+      font-size: 11pt;
+      line-height: 1.8;
+      color: #222;
+      margin: 0;
+      padding: 0;
+      background: #fff;
+    }
+
+    /* ===== Layout ===== */
+    .page-layout {
+      display: flex;
+      align-items: flex-start;
+      min-height: 100vh;
+    }
+    .toc-sidebar {
+      width: 240px;
+      flex-shrink: 0;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      background: #f0fdfa;
+      border-right: 1px solid #99f6e4;
+      padding: 28px 20px;
+      box-sizing: border-box;
+    }
+    .main-content {
+      flex: 1;
+      padding: 16px 48px;
+      max-width: 960px;
+      box-sizing: border-box;
+    }
+
+    /* ===== Cover ===== */
+    .cover {
+      text-align: center;
+      padding: 8px 0 12px;
+      border-bottom: 3px solid #0d9488;
+      margin-bottom: 24px;
+    }
+    .cover .app-name {
+      font-size: 42pt;
+      font-weight: 700;
+      color: #0d9488;
+      letter-spacing: 2px;
+      margin: 0;
+    }
+    .cover .subtitle {
+      font-size: 16pt;
+      color: #555;
+      margin: 10px 0 30px;
+    }
+    .cover .doc-meta {
+      margin-top: 30px;
+      color: #888;
+      font-size: 10pt;
+    }
+
+    /* ===== Table of Contents (sidebar) ===== */
+    .toc-sidebar h2 {
+      margin-top: 0;
+      color: #0d9488;
+      font-size: 12pt;
+      border-bottom: 2px solid #99f6e4;
+      padding-bottom: 8px;
+    }
+    .toc-sidebar ol {
+      margin: 0;
+      padding-left: 18px;
+    }
+    .toc-sidebar li {
+      margin: 6px 0;
+    }
+    .toc-sidebar a {
+      color: #0d9488;
+      text-decoration: none;
+      font-size: 9.5pt;
+      line-height: 1.4;
+      display: block;
+    }
+    .toc-sidebar a:hover {
+      text-decoration: underline;
+    }
+
+    /* ===== Section ===== */
+    .section {
+      margin-bottom: 60px;
+      padding-bottom: 40px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    .section:last-child {
+      border-bottom: none;
+    }
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+    .section-number {
+      background: #0d9488;
+      color: #fff;
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 13pt;
+      flex-shrink: 0;
+    }
+    h2.section-title {
+      font-size: 17pt;
+      color: #0d9488;
+      margin: 0;
+    }
+    h3.subsection-title {
+      font-size: 13pt;
+      color: #1f6b67;
+      margin-top: 28px;
+      margin-bottom: 10px;
+      border-left: 4px solid #0d9488;
+      padding-left: 10px;
+    }
+
+    /* ===== Screenshot ===== */
+    .screenshot-block {
+      margin: 20px 0 28px;
+    }
+    .screenshot-block img {
+      width: 100%;
+      max-width: 780px;
+      display: block;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+      margin: 0 auto;
+    }
+    .screenshot-caption {
+      text-align: center;
+      font-size: 9pt;
+      color: #888;
+      margin-top: 6px;
+      font-style: italic;
+    }
+
+    /* ===== Steps ===== */
+    .steps {
+      padding-left: 0;
+      list-style: none;
+      margin: 14px 0;
+      counter-reset: step-counter;
+    }
+    .steps li {
+      counter-increment: step-counter;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 10px;
+      font-size: 10.5pt;
+    }
+    .steps li::before {
+      content: counter(step-counter);
+      background: #ccfbf1;
+      color: #0d9488;
+      border-radius: 50%;
+      min-width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 9pt;
+      flex-shrink: 0;
+    }
+
+    /* ===== Tips / Notes ===== */
+    .tip {
+      background: #f0fdfa;
+      border-left: 4px solid #0d9488;
+      border-radius: 4px;
+      padding: 12px 16px;
+      margin: 16px 0;
+      font-size: 10pt;
+      color: #1f6b67;
+    }
+    .tip strong {
+      color: #0d9488;
+    }
+    .warning {
+      background: #fffbeb;
+      border-left: 4px solid #f59e0b;
+      border-radius: 4px;
+      padding: 12px 16px;
+      margin: 16px 0;
+      font-size: 10pt;
+      color: #78350f;
+    }
+    .warning strong {
+      color: #b45309;
+    }
+
+    /* ===== Field Table ===== */
+    .field-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 10pt;
+      margin: 14px 0;
+    }
+    .field-table th {
+      background: #0d9488;
+      color: #fff;
+      padding: 8px 12px;
+      text-align: left;
+    }
+    .field-table td {
+      padding: 8px 12px;
+      border-bottom: 1px solid #e5e7eb;
+      vertical-align: top;
+    }
+    .field-table tr:nth-child(even) td {
+      background: #f9fafb;
+    }
+    .required {
+      color: #dc2626;
+      font-weight: bold;
+    }
+
+    /* ===== Print ===== */
+    @media print {
+      .toc-sidebar { display: none; }
+      .main-content { padding: 20px; }
+      .section { page-break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+<div class="page-layout">
+
+  <!-- Sticky TOC Sidebar -->
+  <nav class="toc-sidebar">
+    <h2>Contents</h2>
+    <ol>
+      <li><a href="#s1">Accepting Your Invitation</a></li>
+      <li><a href="#s2">Logging In</a></li>
+      <li><a href="#s3">Your Dashboard</a></li>
+      <li><a href="#s4">Leads</a>
+        <ul style="padding-left: 16px; margin: 4px 0; list-style: none;">
+          <li><a href="#s4-adding">4.1 Adding a Lead</a></li>
+          <li><a href="#s4-my-leads">4.2 Viewing Your Leads</a></li>
+        </ul>
+      </li>
+      <li><a href="#s5">Follow-ups</a></li>
+      <li><a href="#s6">Reports</a>
+        <ul style="padding-left: 16px; margin: 4px 0; list-style: none;">
+          <li><a href="#s6-conversion">6.1 Conversion Report</a></li>
+          <li><a href="#s6-winloss">6.2 Win vs Loss Report</a></li>
+          <li><a href="#s6-additional">6.3 Additional Analytics</a></li>
+        </ul>
+      </li>
+      <li><a href="#s7">Settings</a></li>
+    </ol>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="main-content">
+
+    <!-- Cover -->
+    <div class="cover">
+      <p class="app-name">Leadbox</p>
+      <p class="subtitle">User Guide for Team Members</p>
+      <p class="doc-meta">Version 1.0 &nbsp;|&nbsp; March 2026</p>
+    </div>
+
+    <!-- Section 1: Accepting Your Invitation -->
+    <div class="section" id="s1">
+      <div class="section-header">
+        <div class="section-number">1</div>
+        <h2 class="section-title">Accepting Your Invitation</h2>
+      </div>
+
+      <p>As a Team Member, you do not register on your own — your Company Admin sends you an invitation by email. When you receive this email, follow the steps below to set up your Leadbox account.</p>
+
+      <h3 class="subsection-title">Step 1 — Open the Invitation Email</h3>
+      <p>Check your inbox for an invitation email from Leadbox. Click the <strong>Accept Invitation</strong> link inside the email. This link takes you directly to the registration page with your details pre-filled.</p>
+
+      <div class="screenshot-block">
+        <img src="screenshots/Invitation-link-Screenshot 2026-03-31 153911.png" alt="Invitation link in email" />
+        <p class="screenshot-caption">The invitation link sent to your email — click it to begin registration.</p>
+      </div>
+
+      <h3 class="subsection-title">Step 2 — Complete Your Registration</h3>
+      <p>The registration page will open. Your email address is already filled in. You just need to set your name, username, phone number, and password.</p>
+
+      <div class="screenshot-block">
+        <img src="screenshots/accept_invitation_team_member.png" alt="Team Member registration form filled" style="max-width: 420px;" />
+        <p class="screenshot-caption">Registration form with all details filled in — click Register to proceed.</p>
+      </div>
+
+      <table class="field-table" style="border: 1px solid #d1d5db;">
+        <tr>
+          <th>Field</th>
+          <th>What to enter</th>
+          <th>Required?</th>
+        </tr>
+        <tr>
+          <td style="border: 1px solid #d1d5db;"><strong>Full Name</strong></td>
+          <td style="border: 1px solid #d1d5db;">Your first and last name</td>
+          <td style="border: 1px solid #d1d5db;"><span class="required">Required</span></td>
+        </tr>
+        <tr>
+          <td style="border: 1px solid #d1d5db;"><strong>Username</strong></td>
+          <td style="border: 1px solid #d1d5db;">A unique username you will use to log in</td>
+          <td style="border: 1px solid #d1d5db;"><span class="required">Required</span></td>
+        </tr>
+        <tr>
+          <td style="border: 1px solid #d1d5db;"><strong>Email Address</strong></td>
+          <td style="border: 1px solid #d1d5db;">Pre-filled from your invitation — cannot be changed</td>
+          <td style="border: 1px solid #d1d5db;"><span class="required">Required</span></td>
+        </tr>
+        <tr>
+          <td style="border: 1px solid #d1d5db;"><strong>Phone Number</strong></td>
+          <td style="border: 1px solid #d1d5db;">Your 10-digit mobile number (used for WhatsApp notifications)</td>
+          <td style="border: 1px solid #d1d5db;"><span class="required">Required</span></td>
+        </tr>
+        <tr>
+          <td style="border: 1px solid #d1d5db;"><strong>Password</strong></td>
+          <td style="border: 1px solid #d1d5db;">Create a strong password for your account</td>
+          <td style="border: 1px solid #d1d5db;"><span class="required">Required</span></td>
+        </tr>
+        <tr>
+          <td style="border: 1px solid #d1d5db;"><strong>Confirm Password</strong></td>
+          <td style="border: 1px solid #d1d5db;">Re-enter your password to confirm it</td>
+          <td style="border: 1px solid #d1d5db;"><span class="required">Required</span></td>
+        </tr>
+      </table>
+
+      <ol class="steps">
+        <li>Open the invitation email sent to you by your Company Admin.</li>
+        <li>Click the <strong>Accept Invitation</strong> link in the email.</li>
+        <li>On the registration page, fill in your <strong>Full Name</strong>, <strong>Username</strong>, <strong>Phone Number</strong>, <strong>Password</strong>, and <strong>Confirm Password</strong>.</li>
+        <li>Click the <strong>Register</strong> button to create your account.</li>
+      </ol>
+
+      <h3 class="subsection-title">Step 3 — Account Created</h3>
+      <p>Once you click Register, your account is set up and you are ready to log in. You do not need to verify your email separately — your invitation already confirmed it.</p>
+
+      <div class="tip"><strong>Tip:</strong> Keep your username and password in a safe place. You will need them every time you log in.</div>
+    </div>
+
+    <!-- Section 2: Logging In -->
+    <div class="section" id="s2">
+      <div class="section-header">
+        <div class="section-number">2</div>
+        <h2 class="section-title">Logging In</h2>
+      </div>
+
+      <p>Once your account is set up, you can log in to Leadbox at any time using your username and password.</p>
+
+      <ol class="steps">
+        <li>Go to the Leadbox website and click <strong>Login</strong>.</li>
+        <li>Enter your <strong>Username</strong> and <strong>Password</strong>.</li>
+        <li>Optionally tick <strong>Remember me</strong> so you stay logged in on this device.</li>
+        <li>Click the <strong>Login</strong> button to access your account.</li>
+      </ol>
+
+      <div class="screenshot-block">
+        <img src="screenshots/team-member-login.png" alt="Leadbox login page" style="max-width: 420px;" />
+        <p class="screenshot-caption">The Leadbox login page — enter your username and password to access your account.</p>
+      </div>
+
+      <div class="tip"><strong>Tip:</strong> If you forget your password, use the <strong>Forgot Password</strong> link on the login page to reset it via email.</div>
+    </div>
+
+    <!-- Section 3: Dashboard -->
+    <div class="section" id="s3">
+      <div class="section-header">
+        <div class="section-number">3</div>
+        <h2 class="section-title">Your Dashboard</h2>
+      </div>
+
+      <p>After logging in, you will land on your Dashboard. This is your home screen — it gives you a quick overview of your own leads and activity at a glance.</p>
+
+      <div class="screenshot-block">
+        <img src="screenshots/team-member-empty-dashboard1.png" alt="Team Member Dashboard" style="max-width: 100%; width: 900px;" />
+        <p class="screenshot-caption">Your Dashboard — shows your lead summary, pipeline funnel, and charts.</p>
+      </div>
+
+      <p>Here is what you will see on your Dashboard:</p>
+      <ol class="steps">
+        <li><strong>Total Leads card</strong> — shows the total number of leads assigned to you.</li>
+        <li><strong>Today's Follow-ups card</strong> — shows how many follow-ups are due today so you never miss a callback.</li>
+        <li><strong>Pipeline funnel chart</strong> — a visual breakdown of your leads by stage (New Lead → Contacted → Meeting Scheduled → Converted, etc.).</li>
+        <li><strong>Leads by Source chart</strong> — shows where your leads are coming from (e.g. Referral, LinkedIn, Cold Call).</li>
+        <li><strong>Recent Leads table</strong> — lists the latest leads you have added or updated.</li>
+        <li>Use the <strong>sidebar on the left</strong> to navigate to any section of Leadbox.</li>
+      </ol>
+
+      <div class="tip"><strong>Tip:</strong> When you first log in, the Dashboard will appear empty. It will fill up as you start adding leads.</div>
+    </div>
+
+    <!-- Section 4: Leads -->
+    <div class="section" id="s4">
+      <div class="section-header">
+        <div class="section-number">4</div>
+        <h2 class="section-title">Leads</h2>
+      </div>
+
+      <p>Leads are the prospects or clients you are working with. You can add new leads, view and update your existing leads, and track their progress through the sales pipeline.</p>
+
+      <!-- 4.1 Adding a Lead -->
+      <h3 class="subsection-title" id="s4-adding">4.1 Adding a Lead</h3>
+
+      <p>When you get a new prospect, add them as a lead in Leadbox straight away so nothing is missed.</p>
+
+      <div class="screenshot-block">
+        <img src="screenshots/tm-add-lead.png" alt="Add New Lead form" />
+        <p class="screenshot-caption">The Add New Lead form — fill in the details and click Create Lead to save.</p>
+      </div>
+
+      <ol class="steps">
+        <li>Click <strong>Add Lead</strong> in the left sidebar.</li>
+        <li>Fill in the lead's details — name, phone number, company, and how they found you.</li>
+        <li>Set the <strong>Lead Status</strong> (e.g. New Lead or Contacted) and the <strong>Interested In</strong> field to describe what they are looking for.</li>
+        <li>Click <strong>Create Lead</strong> to save.</li>
+      </ol>
+
+      <div class="tip"><strong>Tip:</strong> Always fill in the <strong>Interested In</strong> field — it helps your manager understand what the lead is looking for at a glance.</div>
+
+      <!-- 4.2 Viewing Your Leads -->
+      <h3 class="subsection-title" id="s4-my-leads">4.2 Viewing Your Leads</h3>
+
+      <p>The <strong>My Leads</strong> page shows all the leads that belong to you. You can search, filter, and update the status of each lead from here.</p>
+
+      <div class="screenshot-block">
+        <img src="screenshots/tm-my-leads.png" alt="My Leads page" />
+        <p class="screenshot-caption">My Leads page — view, search, and manage all your leads from here.</p>
+      </div>
+
+      <ol class="steps">
+        <li>Click <strong>My Leads</strong> in the left sidebar.</li>
+        <li>Use the <strong>Search</strong> bar to find a lead by name, company, or phone number.</li>
+        <li>Use <strong>Filters</strong> to narrow down leads by status, source, or date.</li>
+        <li>Click on any lead row to view the full lead details and update its status or add notes.</li>
+      </ol>
+
+      <div class="tip"><strong>Tip:</strong> Keep your lead statuses up to date — your manager uses this information to track team performance.</div>
+    </div>
+
+    <!-- Section 5: Follow-ups -->
+    <div class="section" id="s5">
+      <div class="section-header">
+        <div class="section-number">5</div>
+        <h2 class="section-title">Follow-ups</h2>
+      </div>
+
+      <p>The Follow-ups page shows all the leads that are due for a follow-up. Use this page to make sure you never miss a scheduled callback or check-in.</p>
+
+      <div class="screenshot-block">
+        <img src="screenshots/tm-followups.png" alt="Follow-ups page" />
+        <p class="screenshot-caption">The Follow-ups page — shows overdue, today's, and upcoming follow-ups at a glance.</p>
+      </div>
+
+      <ol class="steps">
+        <li>Click <strong>Follow-ups</strong> in the left sidebar.</li>
+        <li>The summary at the top shows counts for <strong>Overdue</strong>, <strong>Today</strong>, <strong>Upcoming</strong>, and <strong>Total</strong> follow-ups.</li>
+        <li>Use the <strong>From Date</strong> and <strong>To Date</strong> filters to view follow-ups within a specific date range.</li>
+        <li>Contact the lead and then update their status or follow-up date in the lead details.</li>
+      </ol>
+
+      <div class="warning"><strong>Important:</strong> Overdue follow-ups appear highlighted — prioritise these first so no lead goes cold.</div>
+    </div>
+
+    <!-- Section 6: Reports -->
+    <div class="section" id="s6">
+      <div class="section-header">
+        <div class="section-number">6</div>
+        <h2 class="section-title">Reports</h2>
+      </div>
+
+      <p>The Reports section lets you view analytics about your leads and performance. Use this to track how many leads you have converted, where your leads are coming from, and how your pipeline is progressing.</p>
+
+      <div class="screenshot-block">
+        <img src="screenshots/tm-reports.png" alt="Reports hub" />
+        <p class="screenshot-caption">The Reports hub — choose a report type to view detailed analytics.</p>
+      </div>
+
+      <ol class="steps">
+        <li>Click <strong>Reports</strong> in the left sidebar.</li>
+        <li>Choose one of the three report types described below.</li>
+        <li>Use the filters at the top of each report to narrow results by date range or lead source.</li>
+      </ol>
+
+      <!-- 6.1 Conversion Report -->
+      <h3 class="subsection-title" id="s6-conversion">6.1 Conversion Report</h3>
+
+      <p>The Conversion Report shows how well your leads are progressing through the sales pipeline. It shows your overall conversion rate, average days to convert, and a breakdown of performance by lead source.</p>
+
+      <div class="screenshot-block">
+        <img src="screenshots/tm-reports-conversion.png" alt="Conversion Report" />
+        <p class="screenshot-caption">The Conversion Report — shows your conversion rate, top performing sources, and team performance.</p>
+      </div>
+
+      <ol class="steps">
+        <li>Click <strong>View Conversion Report</strong> on the Reports hub page.</li>
+        <li>The summary cards at the top show your <strong>Overall Conversion Rate</strong>, <strong>Avg Days to Convert</strong>, <strong>Total Converted</strong>, and <strong>Lost Leads</strong>.</li>
+        <li>The <strong>Top Performing Sources</strong> chart shows which lead sources have the highest conversion rates.</li>
+        <li>The <strong>Team Performance</strong> table shows your personal conversion stats.</li>
+      </ol>
+
+      <!-- 6.2 Win vs Loss Report -->
+      <h3 class="subsection-title" id="s6-winloss">6.2 Win vs Loss Report</h3>
+
+      <p>The Win vs Loss Report compares how many leads you have won (Converted) against those that were lost. Use this to identify which lead sources and urgency levels give the best outcomes.</p>
+
+      <div class="screenshot-block">
+        <img src="screenshots/tm-reports-winloss.png" alt="Win vs Loss Report" />
+        <p class="screenshot-caption">The Win vs Loss Report — shows win/loss ratios by source, urgency, and over time.</p>
+      </div>
+
+      <ol class="steps">
+        <li>Click <strong>View Win/Loss Report</strong> on the Reports hub page.</li>
+        <li>The summary cards show your <strong>Win Rate</strong>, <strong>Loss Rate</strong>, <strong>Total Won</strong>, and <strong>Total Lost</strong>.</li>
+        <li>The <strong>Win/Loss Distribution</strong> donut chart gives a quick visual of your won vs lost ratio.</li>
+        <li>The <strong>Win/Loss by Lead Source</strong> chart shows which sources produce the most wins.</li>
+        <li>The <strong>Trends Over Time</strong> chart shows how wins and losses have changed over the period.</li>
+      </ol>
+
+      <!-- 6.3 Additional Analytics -->
+      <h3 class="subsection-title" id="s6-additional">6.3 Additional Analytics</h3>
+
+      <p>The Additional Analytics page lets you search and filter through all your leads with detailed criteria and export the results for further analysis.</p>
+
+      <div class="screenshot-block">
+        <img src="screenshots/tm-reports-additional.png" alt="Additional Analytics" />
+        <p class="screenshot-caption">The Additional Analytics page — use filters to search leads and view detailed distribution data.</p>
+      </div>
+
+      <ol class="steps">
+        <li>Click <strong>View Analytics</strong> on the Reports hub page.</li>
+        <li>Click <strong>Show Filters</strong> to expand the filter options.</li>
+        <li>Filter leads by date range, status, source, or search by name, company, or phone number.</li>
+        <li>The filtered leads table will appear below — use the <strong>Export</strong> button to download the results.</li>
+      </ol>
+    </div>
+
+    <!-- Section 7: Settings -->
+    <div class="section" id="s7">
+      <div class="section-header">
+        <div class="section-number">7</div>
+        <h2 class="section-title">Settings</h2>
+      </div>
+
+      <p>The Settings page lets you update your personal profile information such as your name and phone number.</p>
+
+      <div class="screenshot-block">
+        <img src="screenshots/tm-settings.png" alt="Settings page" />
+        <p class="screenshot-caption">The Settings page — update your name and phone number here.</p>
+      </div>
+
+      <ol class="steps">
+        <li>Click <strong>Settings</strong> in the left sidebar.</li>
+        <li>Update your <strong>Full Name</strong> or <strong>Phone Number</strong> as needed.</li>
+        <li>Click <strong>Save Profile</strong> to apply your changes.</li>
+      </ol>
+
+      <div class="tip"><strong>Tip:</strong> Keep your phone number up to date so you receive WhatsApp notifications about your leads.</div>
+    </div>
+
+  </div><!-- end main-content -->
+</div><!-- end page-layout -->
+</body>
+</html>
