@@ -10,6 +10,12 @@ import "./styles/components.css";
 // // Import Google Fonts
 // import "https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Nunito:wght@300;400;600;700&display=swap";
 
+// When a new SW activates and cleans old precache, outdated chunk requests fail.
+// Reload to let the new SW serve the correct assets.
+window.addEventListener('vite:preloadError', () => {
+  window.location.reload();
+});
+
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
     <App />

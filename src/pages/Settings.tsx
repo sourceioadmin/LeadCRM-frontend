@@ -148,10 +148,12 @@ const Settings: React.FC = () => {
   const [notificationSettings, setNotificationSettings] = useState({
     emailNotificationsEnabled: true,
     whatsAppNotificationsEnabled: true,
+    pushNotificationsEnabled: true,
   });
   const [originalNotificationSettings, setOriginalNotificationSettings] = useState({
     emailNotificationsEnabled: true,
     whatsAppNotificationsEnabled: true,
+    pushNotificationsEnabled: true,
   });
 
   // Email Settings state
@@ -243,6 +245,7 @@ const Settings: React.FC = () => {
         const notifs = {
           emailNotificationsEnabled: response.data.emailNotificationsEnabled ?? true,
           whatsAppNotificationsEnabled: response.data.whatsAppNotificationsEnabled ?? true,
+          pushNotificationsEnabled: response.data.pushNotificationsEnabled ?? true,
         };
         setNotificationSettings(notifs);
         setOriginalNotificationSettings(notifs);
@@ -379,6 +382,7 @@ const Settings: React.FC = () => {
         logoFile: logoFile || undefined,
         emailNotificationsEnabled: notificationSettings.emailNotificationsEnabled,
         whatsAppNotificationsEnabled: notificationSettings.whatsAppNotificationsEnabled,
+        pushNotificationsEnabled: notificationSettings.pushNotificationsEnabled,
       };
 
       const response = await updateCompanySettings(updateData);
@@ -394,6 +398,7 @@ const Settings: React.FC = () => {
         if (logoFile || response.data.logo !== companySettings?.logo) updatedFields.push('Logo');
         if (response.data.emailNotificationsEnabled !== companySettings?.emailNotificationsEnabled) updatedFields.push('Email Notifications');
         if (response.data.whatsAppNotificationsEnabled !== companySettings?.whatsAppNotificationsEnabled) updatedFields.push('WhatsApp Notifications');
+        if (response.data.pushNotificationsEnabled !== companySettings?.pushNotificationsEnabled) updatedFields.push('Push Notifications');
 
         setCompanySettings(response.data);
         setLogoFile(null); // Clear the selected file after successful upload
@@ -401,6 +406,7 @@ const Settings: React.FC = () => {
         const savedNotifs = {
           emailNotificationsEnabled: response.data.emailNotificationsEnabled,
           whatsAppNotificationsEnabled: response.data.whatsAppNotificationsEnabled,
+          pushNotificationsEnabled: response.data.pushNotificationsEnabled,
         };
         setNotificationSettings(savedNotifs);
         setOriginalNotificationSettings(savedNotifs);
@@ -1387,6 +1393,23 @@ const Settings: React.FC = () => {
                                 <Bell size={20} className="me-3 text-warning" />
                                 <div>
                                   <div className="fw-semibold">Push Notifications</div>
+                                  <div className="text-muted small">Send browser push notifications to team members</div>
+                                </div>
+                              </div>
+                              <Form.Check
+                                type="switch"
+                                id="pushNotificationsSwitch"
+                                checked={notificationSettings.pushNotificationsEnabled}
+                                onChange={(e) => setNotificationSettings(prev => ({ ...prev, pushNotificationsEnabled: e.target.checked }))}
+                              />
+                            </div>
+                          </Col>
+                          <Col md={6}>
+                            <div className="d-flex align-items-center justify-content-between p-3 border rounded mb-3">
+                              <div className="d-flex align-items-center">
+                                <Bell size={20} className="me-3 text-warning" />
+                                <div>
+                                  <div className="fw-semibold">Test Push Notification</div>
                                   <div className="text-muted small">Test browser push notifications on this device</div>
                                 </div>
                               </div>
@@ -1421,7 +1444,8 @@ const Settings: React.FC = () => {
                                 formData.phone === originalCompanyFormData.phone &&
                                 logoFile === null &&
                                 notificationSettings.emailNotificationsEnabled === originalNotificationSettings.emailNotificationsEnabled &&
-                                notificationSettings.whatsAppNotificationsEnabled === originalNotificationSettings.whatsAppNotificationsEnabled
+                                notificationSettings.whatsAppNotificationsEnabled === originalNotificationSettings.whatsAppNotificationsEnabled &&
+                                notificationSettings.pushNotificationsEnabled === originalNotificationSettings.pushNotificationsEnabled
                               )
                             }
                           >
@@ -1480,6 +1504,9 @@ const Settings: React.FC = () => {
                             )}
                             {notificationSettings.whatsAppNotificationsEnabled !== originalNotificationSettings.whatsAppNotificationsEnabled && (
                               <li>WhatsApp Notifications: {notificationSettings.whatsAppNotificationsEnabled ? 'Enabled' : 'Disabled'}</li>
+                            )}
+                            {notificationSettings.pushNotificationsEnabled !== originalNotificationSettings.pushNotificationsEnabled && (
+                              <li>Push Notifications: {notificationSettings.pushNotificationsEnabled ? 'Enabled' : 'Disabled'}</li>
                             )}
                           </ul>
                           {Object.values(formData).every(value =>

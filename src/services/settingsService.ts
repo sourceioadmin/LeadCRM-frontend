@@ -9,6 +9,7 @@ export interface CompanySettings {
   logo?: string;
   emailNotificationsEnabled: boolean;
   whatsAppNotificationsEnabled: boolean;
+  pushNotificationsEnabled: boolean;
 }
 
 export interface CompanySettingsResponse {
@@ -28,6 +29,7 @@ export interface UpdateCompanySettingsData {
   removeLogo?: boolean; // Flag to indicate logo should be removed
   emailNotificationsEnabled: boolean;
   whatsAppNotificationsEnabled: boolean;
+  pushNotificationsEnabled: boolean;
 }
 
 export interface LeadSource {
@@ -118,6 +120,7 @@ export const updateCompanySettings = async (data: UpdateCompanySettingsData): Pr
 
   formData.append('emailNotificationsEnabled', data.emailNotificationsEnabled.toString());
   formData.append('whatsAppNotificationsEnabled', data.whatsAppNotificationsEnabled.toString());
+  formData.append('pushNotificationsEnabled', data.pushNotificationsEnabled.toString());
 
   const response = await api.put<CompanySettingsResponse>('/settings/company', formData, {
     headers: {

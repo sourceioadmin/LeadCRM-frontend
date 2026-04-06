@@ -77,16 +77,29 @@ registerRoute(
 
 // Push notification handler
 self.addEventListener('push', (event) => {
-  const data = event.data?.json() ?? { title: 'Leadbox', body: 'You have a new notification' };
+  const data = event.data?.json() ?? { title: 'Leadbox', body: 'You have a new notification', url: null };
   event.waitUntil(
     self.registration.showNotification(data.title, {
       body: data.body,
       icon: '/pwa-192x192.png',
+      badge: '/pwa-64x64.png',
+      data: { url: data.url },
     })
   );
 });
 
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
-  event.waitUntil(self.clients.openWindow('/'));
+  const url = event.notification.data?.url;
+  event.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
+      const existing = clientList.find((c) => c.url.includes(self.location.origin));
+      if (existing) {
+        existing.focus();
+        if (url) existing.navigate(url);
+      } else {
+        self.clients.openWindow(url ?? '/');
+      }
+    })
+  );
 });

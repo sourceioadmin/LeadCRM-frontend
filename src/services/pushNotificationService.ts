@@ -1,5 +1,41 @@
 import api from './api';
 
+/**
+ * Register a push subscription after login.
+ * Safe to call on every login — the backend upserts subscriptions.
+ */
+export const registerPushSubscription = async (): Promise<void> => {
+  if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
+
+  if (Notification.permission === 'denied') return;
+
+  if (Notification.permission === 'default') {
+    const permission = await Notification.requestPermission();
+    if (permission !== 'granted') return;
+  }
+
+  try {
+    const registration = await Promise.race([
+      navigator.serviceWorker.ready,
+      new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error('Service worker not ready')), 10000)
+      ),
+    ]);
+
+    const { data } = await api.get<{ data: string }>('/push/vapid-public-key');
+    const applicationServerKey = urlBase64ToUint8Array(data.data);
+
+    const subscription = await registration.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey,
+    });
+
+    await api.post('/push/subscribe', subscription.toJSON());
+  } catch {
+    // Non-fatal — push subscription failure should not block login
+  }
+};
+
 function urlBase64ToUint8Array(base64String: string) {
   const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
   const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
