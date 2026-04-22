@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Container,
@@ -21,7 +21,13 @@ import {
   EyeOff
 } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
-import { registerUser, verifyOtp, resendOtp } from "../services/authService";
+import {
+  registerUser,
+  verifyOtp,
+  resendOtp,
+  createRegistrationDraft,
+  updateRegistrationDraft
+} from "../services/authService";
 
 interface RegisterFormData {
   // Company Details
@@ -59,6 +65,21 @@ const Register: React.FC = () => {
   const [email, setEmail] = useState('');
   const { login } = useAuth();
   const [isResending, setIsResending] = useState(false);
+
+  // Session ID for progressive draft capture — persisted across refreshes
+  const [sessionId, setSessionId] = useState<string>('');
+  const draftCreated = useRef(false);
+
+  useEffect(() => {
+    const existing = sessionStorage.getItem('registrationSessionId');
+    if (existing) {
+      setSessionId(existing);
+    } else {
+      const newId = crypto.randomUUID();
+      sessionStorage.setItem('registrationSessionId', newId);
+      setSessionId(newId);
+    }
+  }, []);
 
   const [formData, setFormData] = useState<RegisterFormData>({
     companyName: '',
@@ -203,6 +224,13 @@ const Register: React.FC = () => {
     setError('');
     setErrorField('');
     if (currentStep === 1 && validateStep1()) {
+      // Save company name to draft (fire-and-forget)
+      if (sessionId && !draftCreated.current) {
+        draftCreated.current = true;
+        createRegistrationDraft({ sessionId, companyName: formData.companyName }).catch(() => {});
+      } else if (sessionId) {
+        createRegistrationDraft({ sessionId, companyName: formData.companyName }).catch(() => {});
+      }
       setCurrentStep(2);
     } else if (currentStep === 2 && validateStep2()) {
       handleRegister();
@@ -215,6 +243,12 @@ const Register: React.FC = () => {
     if (currentStep === 2) {
       setCurrentStep(1);
     }
+  };
+
+  // Saves a single Step 2 field to the draft on blur (fire-and-forget)
+  const handleDraftBlur = (field: 'fullName' | 'email' | 'phoneNumber', value: string) => {
+    if (!sessionId || !value.trim()) return;
+    updateRegistrationDraft(sessionId, { [field]: value }).catch(() => {});
   };
 
   const handleRegister = async () => {
@@ -231,7 +265,8 @@ const Register: React.FC = () => {
         username: formData.username,
         phoneNumber: formData.phoneNumber,
         password: formData.password,
-        confirmPassword: formData.confirmPassword
+        confirmPassword: formData.confirmPassword,
+        sessionId: sessionId || undefined
       };
 
       // Only include optional fields if they have values
@@ -245,6 +280,8 @@ const Register: React.FC = () => {
       const response = await registerUser(payload);
 
       if (response.data.success) {
+        // Clear draft session on successful registration
+        sessionStorage.removeItem('registrationSessionId');
         // Store email for OTP verification page
         localStorage.setItem('verificationEmail', formData.email);
         setTimeout(() => {
@@ -386,6 +423,7 @@ const Register: React.FC = () => {
               name="fullName"
               value={formData.fullName}
               onChange={handleInputChange}
+              onBlur={() => handleDraftBlur('fullName', formData.fullName)}
               placeholder="Enter your full name"
               required
               isInvalid={errorField === 'fullName'}
@@ -402,6 +440,7 @@ const Register: React.FC = () => {
               name="email"
               value={formData.email}
               onChange={handleInputChange}
+              onBlur={() => handleDraftBlur('email', formData.email)}
               placeholder="Enter your email"
               required
               isInvalid={errorField === 'email'}
@@ -437,6 +476,7 @@ const Register: React.FC = () => {
               name="phoneNumber"
               value={formData.phoneNumber}
               onChange={handleInputChange}
+              onBlur={() => handleDraftBlur('phoneNumber', formData.phoneNumber)}
               required
               isInvalid={errorField === 'phoneNumber'}
             />

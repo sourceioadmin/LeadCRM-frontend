@@ -6,6 +6,7 @@ import { LogIn, Mail, Lock, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { loginUser, googleLogin } from '../services/authService';
 import { LoginPayload, GoogleLoginPayload } from '../services/authService';
+import { registerPushSubscription } from '../services/pushNotificationService';
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
@@ -83,6 +84,7 @@ const Login: React.FC = () => {
         if (token && user) {
           // Store token and update auth context
           login(token, user);
+          registerPushSubscription();
 
           setTimeout(() => {
             navigate('/');
@@ -141,6 +143,7 @@ const Login: React.FC = () => {
           if (token && user) {
             // Store token and update auth context
             login(token, user);
+            registerPushSubscription();
 
             setTimeout(() => {
               navigate('/');

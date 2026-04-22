@@ -107,3 +107,27 @@ export const resetPassword = (payload: ResetPasswordPayload) => {
   return api.post("/auth/reset-password", payload);
 };
 
+export interface CreateDraftPayload {
+  sessionId: string;
+  companyName?: string;
+}
+
+export interface UpdateDraftPayload {
+  fullName?: string;
+  email?: string;
+  phoneNumber?: string;
+}
+
+export const createRegistrationDraft = (payload: CreateDraftPayload) => {
+  return api.post("/auth/registration-draft", payload);
+};
+
+export const updateRegistrationDraft = (sessionId: string, payload: UpdateDraftPayload) => {
+  return api.patch(`/auth/registration-draft/${sessionId}`, payload);
+};
+
+export const getRegistrationDrafts = (status?: string) => {
+  const params = status ? { status } : {};
+  return api.get("/auth/registration-drafts", { params });
+};
+
