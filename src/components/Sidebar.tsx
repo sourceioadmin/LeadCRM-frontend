@@ -13,6 +13,8 @@ import {
   TrendingUp,
   Upload,
   Clock,
+  ClipboardList,
+  CreditCard,
   X
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
@@ -80,6 +82,12 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, isMobile, onClose }) => {
 
     // Settings - visible to all roles except Referral Partner
     { path: '/settings', icon: Settings, label: 'Settings', hiddenForRoles: ['Referral Partner'] },
+
+    // Registration Drafts - System Admin only
+    { path: '/registration-drafts', icon: ClipboardList, label: 'Reg. Drafts', allowedRoleIds: [1] },
+
+    // Billing - Company Admin only
+    { path: '/billing', icon: CreditCard, label: 'Billing', requiredRole: 'Company Admin' },
   ];
 
   return (

@@ -16,6 +16,7 @@ import AcceptInvite from "./pages/AcceptInvite";
 const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 import ManageUsers from "./pages/ManageUsers";
+import RegistrationDrafts from "./pages/RegistrationDrafts";
 import AddLead from "./pages/AddLead";
 import MyLeads from "./pages/MyLeads";
 import AllLeads from "./pages/AllLeads";
@@ -29,6 +30,8 @@ import Settings from "./pages/Settings";
 import PrivateRoute from "./components/PrivateRoute";
 import ImportLeads from "./pages/ImportLeads";
 import ImportHistory from "./pages/ImportHistory";
+import Pricing from "./pages/Pricing";
+import Billing from "./pages/Billing";
 import PwaInstallPrompt from "./components/PwaInstallPrompt";
 import OfflineIndicator from "./components/OfflineIndicator";
 
@@ -62,6 +65,7 @@ const App: React.FC = () => {
               }
             />
             <Route path="/accept-invite" element={<AcceptInvite />} />
+            <Route path="/pricing" element={<Pricing />} />
             <Route path="/" element={<PrivateRoute><Layout /></PrivateRoute>}>
               <Route index element={<Dashboard />} />
               <Route path="add-lead" element={<AddLead />} />
@@ -91,6 +95,8 @@ const App: React.FC = () => {
               <Route path="reports/additional" element={<AdditionalReports />} />
               <Route path="settings" element={<Settings />} />
               <Route path="manage-users" element={<PrivateRoute requiredRole="Company Admin"><ManageUsers /></PrivateRoute>} />
+              <Route path="registration-drafts" element={<PrivateRoute requiredRole="System Admin"><RegistrationDrafts /></PrivateRoute>} />
+              <Route path="billing" element={<PrivateRoute requiredRole="Company Admin"><Billing /></PrivateRoute>} />
             </Route>
           </Routes>
         </Router>
