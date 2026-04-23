@@ -124,8 +124,8 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, isMobile, onClose }) => {
           .filter((item) => {
             // Check if user has required role for specific items
             if (item.requiredRole) {
-              // For Company Admin requirement, check userRoleId === 2
-              if (item.requiredRole === 'Company Admin' && user?.userRoleId !== 2) {
+              // For Company Admin requirement, check userRoleId === 2 OR roleName fallback
+              if (item.requiredRole === 'Company Admin' && user?.userRoleId !== 2 && user?.roleName !== 'Company Admin') {
                 return false;
               }
               // For other role requirements, check roleName
