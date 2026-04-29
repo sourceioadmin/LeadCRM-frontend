@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import {
+  Alert,
   Container,
   Row,
   Col,
@@ -105,6 +106,9 @@ const Register: React.FC = () => {
     if (errorField === name) {
       setError('');
       setErrorField('');
+    }
+    if (!errorField && error) {
+      setError('');
     }
   };
 
@@ -254,6 +258,7 @@ const Register: React.FC = () => {
   const handleRegister = async () => {
     setIsLoading(true);
     setError('');
+    setErrorField('');
 
     try {
       const payload: any = {
@@ -290,7 +295,23 @@ const Register: React.FC = () => {
       }
     } catch (err: any) {
       const errorMessage = err.response?.data?.message || 'Registration failed. Please try again.';
-      setError(errorMessage);
+      const errors: string[] = err.response?.data?.errors || [];
+      const msg = errorMessage.toLowerCase();
+
+      if (msg.includes('email')) {
+        setErrorField('email');
+      } else if (msg.includes('username')) {
+        setErrorField('username');
+      } else if (msg.includes('company name')) {
+        setCurrentStep(1);
+        setErrorField('companyName');
+      }
+
+      if (msg === 'validation failed' && errors.length > 0) {
+        setError(errors[0]);
+      } else {
+        setError(errorMessage);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -304,6 +325,12 @@ const Register: React.FC = () => {
         <h3>Company Details</h3>
         <p className="text-muted">Tell us about your company</p>
       </div>
+
+      {error && !errorField && (
+        <Alert variant="danger" dismissible onClose={() => setError('')}>
+          {error}
+        </Alert>
+      )}
 
       <Row className="justify-content-center">
         <Col md={10}>
@@ -413,6 +440,12 @@ const Register: React.FC = () => {
         <h3>User Details</h3>
         <p className="text-muted">Create your account credentials</p>
       </div>
+
+      {error && !errorField && (
+        <Alert variant="danger" dismissible onClose={() => setError('')}>
+          {error}
+        </Alert>
+      )}
 
       <Row className="justify-content-center">
         <Col md={10}>
